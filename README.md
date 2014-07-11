@@ -1,4 +1,4 @@
-Hierarchical Image Representation
+Hierarchical IMage REPresentation
 ======
 
 
