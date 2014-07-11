@@ -17,16 +17,13 @@
 
 /** 
 \defgroup icub_sparseCoder sparseCoder
-@ingroup icub_image_representation 
  
 The module performs a sequence of coding and pooling operator and retrieves a hierarchical image representation.
-
  
 \section intro_sec Description 
 This module is responsible for coding images into feature vectors. To this end,
 we extract local appearance descriptors (sparse or dense). These descriptors are coded
 using a learned dictionary and the pooled together via a spatial pyramid representation.
- 
  
 The commands sent as bottles to the module port 
 /sparseCoder/rpc are the following: 
@@ -47,7 +44,6 @@ action: starts to dump local descriptors that can be used for dictionary learnin
 format: [learn] <dictionarySize> "usePCA" <dimPCA>
 action: starts to learn a dictionary from previously dumped local descriptors. <dictionarySize> is the number of atoms of the dictionary, "usePCA" performs standard PCA analysis on low-level descriptors before the encoding and <dimPCA> indicates the number of relevant eigenvectors that you want use for the projection.
  
-
 \section lib_sec Libraries 
 - YARP libraries. 
 
@@ -66,8 +62,7 @@ action: starts to learn a dictionary from previously dumped local descriptors. <
 - \e /sparseCoder/rpc receives requests for SIFT dump or dictionary learning. 
   
 \section parameters_sec Parameters 
-	
-		
+        
 --dictionary_file \e file
 - specify the dictionary file.ini where atoms are stored.
  
@@ -175,7 +170,7 @@ private:
     Semaphore                           mutex;
     
     bool                                no_code;
-	int									dense;
+    int                                 dense;
     bool                                dump_sift;
     FILE                                *fout_sift;
 
@@ -208,9 +203,9 @@ private:
         cvCvtColor((IplImage*)img.getIplImage(),ipl,CV_RGB2GRAY);
         
         //cvSmooth(ipl,ipl);  
-	if(dense)
-	    siftGPU_extractor.extractDenseSift(ipl,&keypoints,&descriptors);
-	else
+    if(dense)
+        siftGPU_extractor.extractDenseSift(ipl,&keypoints,&descriptors);
+    else
             siftGPU_extractor.extractSift(ipl,&keypoints,&descriptors);
 
        
@@ -308,16 +303,16 @@ public:
         }
 
         rate=rf.check("rate",Value(0.0)).asDouble();
-		dense=rf.check("useDense",Value(1)).asInt();
+        dense=rf.check("useDense",Value(1)).asInt();
         int knn=rf.check("KNN",Value(5)).asInt();
         last_read=0.0;
 
         pyramidLevels=rf.check("PyramidLevels",Value(3)).asInt();
 
-		    if(dense)
-			      fprintf(stdout,"Step: %d Scale: %d Pyramid: %d Using Dense SIFT Grid\n",grid_step, grid_scale, pyramidLevels);
-	    	else
-			      fprintf(stdout,"Step: %d Scale: %d Pyramid: %d Using Sparse SIFTs \n",grid_step, grid_scale, pyramidLevels);
+            if(dense)
+                  fprintf(stdout,"Step: %d Scale: %d Pyramid: %d Using Dense SIFT Grid\n",grid_step, grid_scale, pyramidLevels);
+            else
+                  fprintf(stdout,"Step: %d Scale: %d Pyramid: %d Using Sparse SIFTs \n",grid_step, grid_scale, pyramidLevels);
                                         
         string code_mode_string=rf.check("code_mode",Value("SC")).asString().c_str();          
                                       
@@ -549,7 +544,7 @@ int main(int argc, char *argv[])
 
    ResourceFinder rf;
    rf.setVerbose(true);
-   rf.setDefaultContext("onTheFlyRecognition");   
+   rf.setDefaultContext("himrep");
    rf.setDefaultConfigFile("sparseCoder.ini");
    rf.configure(argc,argv);
    rf.setDefault("name","sparseCoder");

@@ -1,9 +1,4 @@
-
-
-    #include "SiftGPU_Extractor.h"
-
-
-
+#include "SiftGPU_Extractor.h"
 
 
     SiftGPU_Extractor::SiftGPU_Extractor()
