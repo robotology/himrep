@@ -11,6 +11,8 @@ Hierarchical Image Representation
 - [OpenCV](http://opencv.org/downloads.html)
 - [SiftGPU](http://cs.unc.edu/~ccwu/siftgpu)
 
+The `liblinear-1.91` package is a dependency for the `linearClassifierModule` and should be compiled providing the environment variable **`LIBSVMLIN_DIR`** pointing to the location where the library is generated.
+
 ## Documentation
 
 Online documentation is available here: [http://robotology.github.com/himrep](http://robotology.github.com/himrep).
