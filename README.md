@@ -15,6 +15,8 @@ The `liblinear-1.91` package is a dependency for the `linearClassifierModule` an
 
 ## Documentation
 
+This repository contains a collection of modules that perform features extraction, coding, pooling and learning through a linear classifier.
+
 Online documentation is available here: [http://robotology.github.com/himrep](http://robotology.github.com/himrep).
 
 ## License
