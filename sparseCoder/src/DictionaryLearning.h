@@ -84,6 +84,8 @@ public:
 
     void avgPooling(std::vector<yarp::sig::Vector> & features, yarp::sig::Vector & code, vector<SiftGPU::SiftKeypoint> & keypoints, int pLevels=1, int imgW=320, int imgH=240);	
     void bow(yarp::sig::Vector & feature, yarp::sig::Vector & code);
+
+    bool mutualInformationCoder(std::vector<yarp::sig::Vector> & features, yarp::sig::Vector & code, vector<SiftGPU::SiftKeypoint> & keypoints, int pLevels=1, int imgW=320, int imgH=240);
     ~DictionaryLearning();
 };
 

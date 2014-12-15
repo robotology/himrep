@@ -143,6 +143,7 @@ using namespace iCub::boostMIL;
 #define CODE_MODE_SC                0
 #define CODE_MODE_BOW               1
 #define CODE_MODE_BCE               2
+#define CODE_MODE_MI                3
 
 
 class SparseCoderPort: public BufferedPort<Image>
@@ -206,7 +207,7 @@ private:
     if(dense)
         siftGPU_extractor.extractDenseSift(ipl,&keypoints,&descriptors);
     else
-            siftGPU_extractor.extractSift(ipl,&keypoints,&descriptors);
+        siftGPU_extractor.extractSift(ipl,&keypoints,&descriptors);
 
        
         if(dump_sift)
@@ -245,6 +246,11 @@ private:
                 case CODE_MODE_BOW:
                 {
                     sparse_coder->avgPooling(features,coding,keypoints,pyramidLevels,ipl->width, ipl->height);
+                    break;
+                }
+                case CODE_MODE_MI:
+                {
+                    sparse_coder->mutualInformationCoder(features,coding,keypoints,pyramidLevels,ipl->width, ipl->height);
                     break;
                 }
             }
@@ -333,6 +339,8 @@ public:
             code_mode=CODE_MODE_BCE;
         if(code_mode_string=="BOW")
             code_mode=CODE_MODE_BOW;
+        if(code_mode_string=="MI")
+            code_mode=CODE_MODE_MI;
 
         string name=rf.find("name").asString().c_str();
 

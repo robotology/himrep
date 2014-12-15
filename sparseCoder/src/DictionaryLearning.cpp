@@ -1019,3 +1019,61 @@ double DictionaryLearning::gauss_chisquare(const yarp::sig::Vector &x, const yar
     return val;
 
 }
+
+
+
+
+
+bool mutualInformationCoder(std::vector<yarp::sig::Vector> & features, yarp::sig::Vector & code, vector<SiftGPU::SiftKeypoint> & keypoints, int pLevels, int imgW, int imgH)
+{
+
+    if(features.size()==0)
+        return false;
+
+    int featuresize=features[0].size();
+
+    //the codes will be vectorization of the log covariance matrix 
+    code.resize(featuresize*featuresize,0.0);
+
+    // put the features in a n x d matrix (n = num samples d = feature dimension)
+    cv::Mat samples(features.size(), featuresize ,CV_64F);
+    
+    for (int i=0; i<features.size(); i++)
+        for (int j=0; j<features[i].size(); j++)
+            samples.at<double>(i,j)=(double)features[i][j];
+    
+    //compute the correlation matrix C = sample'*sample
+    cv::Mat C, Mean;
+    cv::calcCovarMatrix(samples, C, Mean, CV_COVAR_NORMAL+CV_COVAR_ROWS, CV_64F);
+
+    //compute the eigendecomposition of C
+    cv::Mat E,V;
+    cv::eigen(C,E,V);
+
+    //logaritmize it!
+    for (int i=0; i<featuresize; i++)
+    {
+        if(E.at<double>(0,i)<0.00000001)
+            E.at<double>(0,i)=0.00000001;
+
+        E.at<double>(0,i)=log(E.at<double>(0,i));
+    }
+
+    //put the eigenvectors in a diagonal matrix
+    cv::Mat D = cv::Mat::diag(E);
+
+    cv::Mat logC = V.t()*(D*V);
+
+    //vectorize the matrix by concatenating columns
+    int idx_curr=0;
+    for (int idx_row=0; idx_row<featuresize; idx_row++)
+        for (int idx_col=0; idx_col<featuresize; idx_col++)
+            code[idx_curr++]=logC.at<double>(idx_row,idx_col);
+
+
+    return true;
+}
+
+
+
+
