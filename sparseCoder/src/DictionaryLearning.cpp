@@ -1024,7 +1024,7 @@ double DictionaryLearning::gauss_chisquare(const yarp::sig::Vector &x, const yar
 
 
 
-bool mutualInformationCoder(std::vector<yarp::sig::Vector> & features, yarp::sig::Vector & code, vector<SiftGPU::SiftKeypoint> & keypoints, int pLevels, int imgW, int imgH)
+bool DictionaryLearning::mutualInformationCoder(std::vector<yarp::sig::Vector> & features, yarp::sig::Vector & code, vector<SiftGPU::SiftKeypoint> & keypoints, int pLevels, int imgW, int imgH)
 {
 
     if(features.size()==0)
