@@ -1,5 +1,5 @@
-# Copyright: 2013 iCub Facility
-# Author: Sean Ryan Fanello, Carlo Ciliberto
+# Copyright: 2014 iCub Facility
+# Author: Sean Ryan Fanello, Carlo Ciliberto, Giulia Pasquale
 # CopyPolicy: Released under the terms of the GNU GPL v2.0.
 cmake_minimum_required(VERSION 2.6)
 project(himrep)
@@ -17,6 +17,7 @@ icubcontrib_set_default_prefix()
 
 add_subdirectory(linearClassifierModule)
 add_subdirectory(sparseCoder)
+add_subdirectory(caffeCoder)
 
 icubcontrib_add_uninstall_target()
 
