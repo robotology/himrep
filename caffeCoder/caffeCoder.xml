@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+ 
+<module>
+    
+   <name>caffeCoder</name>
+   <doxygen-group>icub_module</doxygen-group>
+   <description>The module computes a representation of the input image using Caffe library.</description>
+   <copypolicy>Released under the terms of the GNU GPL v2.0</copypolicy>
+   <version>1.0</version>
+   
+   <description-long>
+
+    @subsection sec-intro Introduction
+
+    The input image is passed through a feed-forward Convolutional Network model (that must have been previously learned). The image representation can be extracted as the output of any layer in the network. 
+    Usually the latest convolutional layer is chosen and the output is a 1-dim vector, than is then fed to a classifier (e.g., linear SVM/RLS).
+
+    @subsection sec-details More stuff
+
+    This is a detailed description, etc.
+
+    </description-long>
+
+    <arguments>
+    <param default="caffeCoder" desc="name of the module"> name </param>
+    <param default="caffeCoder.ini" desc="configuration file name"> from </param>
+    <param default="himrep" desc="select the current context"> context </param>
+
+    <param default="$Caffe_ROOT/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel" desc="Absolute path to the .caffemodel file"> pretrained_binary_proto_file </param>
+    <param default="imagenet_val_cutfc6.prototxt" desc="File name of the .prototxt file. It must contain the definition of the network used"> feature_extraction_proto_file </param>
+    <param default="fc6" desc="Tag (see the .prototxt) of the layer at which we want to extract the features"> extract_features_blob_names </param>
+    <param default="GPU" desc="[GPU|gpu|CPU|cpu] passed to Caffe initialization"> compute_mode </param>
+    <param default="0" desc="GPU device chosen by Caffe to run the computations (used if compute_mode is set to GPU)"> device_id </param>
+    <param default="false" desc="[true|false] depending on whether you desire to read in the stdout the time to extract the features"> timing </param>
+
+    </arguments>
+
+    <authors>
+        <author email="giulia.pasquale@iit.it"> Giulia Pasquale </author>
+    </authors>
+
+    <data>
+        <input>
+            <type>Image</type>
+            <port carrier="udp">/caffeCoder/img:i</port>
+            <required>yes</required>
+            <priority>yes</priority>
+            <description>Feed images to caffeCoder using this port.</description>
+        </input>
+
+         <output>
+            <type>Image</type>
+            <port carrier="udp">/caffeCoder/img:o</port>
+            <description>Output image (equal to the input).</description>
+        </output>
+
+        <output>
+            <type>Vector</type>
+            <port carrier="tcp">/caffeCoder/code:o</port>
+            <description>
+                Output vectorial representation of the image.
+            </description>
+        </output>
+    </data>
+
+    <services>
+         <server>
+            <type>Port</type>
+            <port>/caffeCoder/rpc</port>
+            <description>Command port</description>
+        </server>
+    </services>
+
+    'gpu'
+
+    <dependencies>
+        <computer>
+            - yarp_port: /caffeCoder/img:i
+            - GPU: although Caffe can be compiled also on the CPU, it is strongly recommended to run this module on a sufficiently powerful NVIDIA GPU supporting CUDA in order to obtain acceptable performance ar runtime. At present, the module has been tested on:
+                - Tesla K40: around 10-13ms per image
+                - GeForce 650M: around 45-50ms per image
+            These numbers are obtained with the simplest use of the provided CaffeFeatExtractor, e.g., extracting features from one image at a time. Higher performances can be obtained extracting features from batches of images.
+        </computer>
+    </dependencies>
+
+    <development>
+        <library>
+        OpenCV
+        </library>
+
+        <library>
+        CUDA
+        This is an optional dependency of Caffe as described in Caffe instructions.
+        At present CUDA is also a dependency of the module, but this might become optional as well in the future.
+        Indeed the CaffeFeatExtractor class uses CUDA events for timing the feature extraction on the GPU (this is the only direct dependency of this module on CUDA at the moment). This is because in practice it is unsual to run Caffe without CUDA in real-time applications as this is.
+        If you want to run Caffe on the CPU and do not have CUDA installed, 
+        you have to remove this dependency from CaffeFeatExtractor.hpp (removing CUDA includes and 
+        deleting the timing code) and also remove the CUDA package from the CMakeLists.txt inside caffeCoder/src.
+        </library>
+
+        <library>
+        Caffe
+        For a complete guide to how to install Caffe you can go to <a href="http://caffe.berkeleyvision.org/installation.html"> Caffe - Installation</a>.
+        We do not cover here exaustively the procedure because it is changing quite rapidly (as Caffe is under active developement) and updated and detailed instructions are usually provided by the developers.
+        Here we report the procedure we have followed to use Caffe library from YARP and iCub's modules on Ubuntu 14.04.
+        
+        1) CUDA installation
+        Download and install CUDA drivers and toolkit following <a href="http://docs.nvidia.com/cuda/cuda-getting-started-guide-for-linux/index.html#axzz3VV5Adq1a"> CUDA Getting started guide for Linux </a>. We recommend CUDA 6.5 in order to exploit the speedup offered by the NVIDIA <a href="https://developer.nvidia.com/cuDNN"> cuDNN library </a>. 
+        If the CUDA 6.5 package isn't available with the package management system of Ubuntu 14.04 Thrusty (it is not at the time being) we recommend choosing the 'Runfile installation' and instead of adding external repositories in order to have a stable system.
+
+        2) cuDNN installation (optional but recommended)
+        Download cuDNN from the above page (you have to sign up as CUDA Registered Developer, it's for free), extract the archive and copy the libraries and the headers inside the CUDA directories:
+        tar -xzvf cudnn-6.5-linux-R1.tgz 
+        cd cudnn-6.5-linux-R1
+        sudo cp lib* /usr/local/cuda/lib64/
+        sudo cp cudnn.h /usr/local/cuda/include/
+
+        3) BLAS installation
+        We chose the OpenBLAS implementation but also ATLAS or Intel MKL are ok for Caffe.
+        Download the source code from <a href="http://www.openblas.net/"> OpenBLAS page </a> and follow instructions to compile and install it. We recommend to install it from source in a separate and specified location of your choice instead of installing the libopenblas-base package that comes with Ubuntu 14.04 because in this case there might be some linking issues with other YARP libraries (e.g. YARP_math).
+        Commonly, it is sufficient to do:
+        tar -xzvf <name>.tar.gz
+        cd <name>
+        make PREFIX=/path/to/install/dir install
+        Set the 'OpenBLAS_HOME' environment variable to the installation path to allow Caffe finding it.
+
+        4) BOOST installation
+        Download the source code from <a href="http://www.boost.org/"> Boost C++ Libraries </a> and follow instructions to compile and install it. We installed version 1.55 and made it work fine with Caffe. 
+        For convenience, we report the followed instructions (that can be found on Boost page):
+        tar --bzip2 -xf /path/to/boost_1_55_0.tar.bz2
+        ./bootstrap.sh --prefix=path/to/install/dir
+        ./b2 install
+        Set the 'Boost_DIR' environment variable to the installation path to allow Caffe finding it.
+
+        5) OpenCV installation
+        Download the source code from <a href="http://opencv.org/downloads.html"> OpenCV - Downloads </a> and follow instructions to compile and install it. We recommend version 2.4.10 and generally NOT 3.0, as this is not supported yet by YARP and iCub software.
+        You can do:
+        unzip OpenCV-$version.zip
+        cd opencv-$version
+        mkdir build
+        cd build
+        ccmake ../
+        make
+        make install 
+        Where in the CMake configuration you might have set the installation path (CMAKE_INSTALL_PREFIX) to one of your choice.
+        Set the 'OpenCV_DIR' environment variable to the installation path to allow Caffe finding it.
+
+        6) Other packages
+        Refer to <a href="http://caffe.berkeleyvision.org/install_apt.html"> Ubuntu Installation </a> for updated instructions. 
+        On Ubunutu 14.04 at the time being we have done:
+        Google Protobuf Buffers C++
+        sudo apt-get install libprotobuf-dev protobuf-compiler
+        Google Logging
+        sudo apt-get install libgoogle-glog-dev
+        Google Flags
+        sudo apt-get install libgflags-dev
+        LevelDB
+        sudo apt-get install libleveldb-dev 
+        HDF5
+        sudo apt-get install libhdf5-serial-dev
+        LMDB
+        sudo apt-get install liblmdb-dev
+        snappy
+        sudo apt-get libsnappy-dev 
+
+        7) Caffe compilation
+        Clone the <a href="https://github.com/BVLC/caffe"> Caffe Github repository </a> (master branch is ok):
+        git clone https://github.com/BVLC/caffe.git
+        In order to be able to link Caffe from an external project via CMake (as this application does) you should compile Caffe via CMake and not manually editing the Makefile.config. At present related instructions refer to this PR <a href="https://github.com/BVLC/caffe/pull/1667"> (even if the PR has been merged in Caffe's master branch). You can do:
+        cd caffe
+        mkdir build
+        cd build
+        ccmake ../
+        make all
+        make runtest
+        make install
+        Set the 'Caffe_DIR' environment variable to the installation path to allow finding Caffe via find_package(Caffe) in this module.
+
+        We point out that:
+        - in the configuration step, you should be able to link to all installed libraries if you have set correctly the environment variables
+        - set BLAS to 'open' or 'Open' if you installed OpenBLAS as we did: do not be worried if you still see that the Atlas implementation is not found, this is an issue with Caffe CMake compilation, but actually if you check you can see that OpenBLAS has been found in your installation directory.
+        - there is no need to build the Matlab or Python wrappers for Caffe
+        - the benchmarks reported above have been obtained using the cuDNN library thus it is better to use it if possible
+
+        8) Set up
+        Some data is necessary to extract features from a learned network model in Caffe.
+        The setup procedure follows the <a href="http://caffe.berkeleyvision.org/gathered/examples/feature_extraction.html"> Feature extraction with Caffe C++ code </a> examples provided with Caffe.
+
+        In particular you need to:
+
+        1) Provide the weights of a network model. In Caffe framework, these are stored in a .caffemodel file, whose absolute path must be provided to the module in the 'pretrained_binary_proto_file' parameter.
+        In Caffe's <a href="http://caffe.berkeleyvision.org/model_zoo.html"> Model Zoo </a> there are many models available with related descriptions and usage instructions. If you choose the 'BVLC Reference CaffeNet' model, as we did, you can download the weights by running the command:
+        
+        scripts/download_model_binary.py models/bvlc_reference_caffenet
+
+        from Caffe's source root directory. This creates the file 'models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel'. 
+
+        If you set the Caffe_ROOT environment variable to Caffe's source root directory, in case you do not provide any 'pretrained_binary_proto_file' parameter, this is set by default to '$Caffe_ROOT/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel'; otherwise, if such variable does not exist, in case you do not provide the parameter this is set to empty string.
+
+        2) 
+        Provide the network model definition. This is represented in Caffe framework by a .prototxt file, whose file name must be provided to the module in the 'feature_extraction_proto_file' parameter and whose location must be in the Resouce Finder search path. This file is an adapted copy of the .prototxt file that comes with the downloaded pretrained model (see above). 
+        In particular:
+        - if the purpose is feature extraction, all layers after the one from which one wants to extract the output can be deleted to avoid unnecessary computations. That's why the default value of this parameter is the file 'imagenet_val_cutfc6.prototxt', as the layer we extract the output from is 'fc6' by default (see 'extract_feature_blobs_name' parameter).
+        - the input data layer can be changed depending on how one provides the images to the network (see <a href="http://caffe.berkeleyvision.org/tutorial/layers.html#data-layers"> Data Layers Catalogue </a>). In this module we use a Memory Data Layer therefore you will find it in the provided .prototxt files. 
+        The only parameter that you need to modify explicitly is the path to the mean image that is subtracted from each input image. This is the mean image of the training set on which the model has been learned and for the chosen model you can download it by running the script:
+        
+        ./data/ilsvrc12/get_ilsvrc_aux.sh
+        
+        from Caffe's source root directory. This creates the file 'data/ilsvrc12/imagenet_mean.binaryproto' and you must set its absolute path (without using environment variables) in the file 'imagenet_val_cutfc6.prototxt'.
+
+        To recap:
+        download the .caffemodel and set 'pretrained_binary_proto_file' parameter to its abs path
+        eventually adapt the dowloaded .prototxt to your needs (no necessary if you use the provided ones)
+        download the mean image and set its absolute path (without env var) inside your .prototxt
+        set 'feature_extraction_proto_file' parameter to your .prototxt file name (should be found by the Resource Finder)
+
+        </library>
+
+    </development>
+
+</module>
+
