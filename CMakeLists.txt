@@ -15,9 +15,6 @@ include(ICUBcontribHelpers)
 include(ICUBcontribOptions)
 icubcontrib_set_default_prefix()
 
-add_subdirectory(linearClassifierModule)
-add_subdirectory(sparseCoder)
-add_subdirectory(caffeCoder)
+add_subdirectory(modules)
 
 icubcontrib_add_uninstall_target()
-

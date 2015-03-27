@@ -8,11 +8,10 @@ project(${PROJECTNAME})
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
-find_package(OpenCV)
-find_package(Caffe)
+find_package(OpenCV REQUIRED)
 
 # CUDA packagee
-find_package(CUDA)
+find_package(CUDA REQUIRED)
 # CUDA compilation flags
 list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_20,code=sm_20)
 list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30)
@@ -43,4 +42,3 @@ target_link_libraries(${PROJECTNAME} ${YARP_LIBRARIES} ${OpenCV_LIBRARIES} ${Caf
 target_link_libraries(${PROJECTNAME} ${CUDA_LIBRARIES})
 
 install(TARGETS ${PROJECTNAME} DESTINATION bin)
-

@@ -11,8 +11,8 @@ Hierarchical IMage REPresentation
 - [OpenCV](http://opencv.org/downloads.html)
 - [LIBLINEAR](http://www.csie.ntu.edu.tw/~cjlin/liblinear/)
 - [SiftGPU](http://cs.unc.edu/~ccwu/siftgpu)
-- [Caffe](http://caffe.berkeleyvision.org/)
-- [CUDA](https://developer.nvidia.com/cuda-zone)
+- [Caffe](http://caffe.berkeleyvision.org/) (optional)
+- [CUDA](https://developer.nvidia.com/cuda-zone) (optional)
 
 The `liblinear-1.91` package is a dependency for the `linearClassifierModule` and should be thus compiled beforehand. The resulting static library must be placed in the same directory of the `liblinear` package to then provide the environment variable **`LIBSVMLIN_DIR`** pointing to that location.
 
