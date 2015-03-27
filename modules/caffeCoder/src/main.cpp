@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Giulia Pasquale
  * email:  giulia.pasquale@iit.it
@@ -15,94 +15,6 @@
  * Public License for more details
  */
 
-/** 
-\defgroup icub_caffeCoder caffeCoder
-
-The module computes a representation of the input image using 
-Caffe library.
-
-\section intro_sec Description 
-The input image is passed through a feed-forward Convolutional Network model 
-(that must have been previously learned). The image representation 
-can be extracted as the output of any layer in the network. 
-Usually the latest convolutional layer is chosen and the output is a 
-one-dimensional vector, than can be fed directly to a (linear) classifier.
-
-The commands sent as bottles to the module port 
-/caffeCoder/rpc are the following: 
-
-(notation: [.] identifies a vocab, <.> specifies a double,
-"." specifies a string) 
-
-<b>HELP</b> 
-format: [help]
-action: it prints the available commands.
-
-
-<b>DUMP_CODE</b>
-format: [dump] "a"
-action: starts to save features in a binary file. "a" is optional and stands for "append".
-
-\section lib_sec Libraries 
-- YARP libraries. 
-
-- OpenCV 2.4 libraries.
-
-- Caffe libraries
-
-- CUDA libraries
-
-\section portsc_sec Ports Created 
-- \e /caffeCoder/img:i receives an image.
-
-- \e /caffeCoder/img:o streams out the image.
-
-- \e /caffeCoder/code:o streams out the vector containing 
-the hierarchical image representation.
-
-- \e /caffeCoder/rpc receives requests.
-
-\section parameters_sec Parameters 
-
---pretrained_binary_proto_file \e file
-- Absolute path to the .caffemodel file containing the weights of the learned model to be used.
-If absent, it is set to '$Caffe_ROOT/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel'
-if Caffe_ROOT env variable exists, otherwise it is set to empty string.
-
-feature_extraction_proto_file \e file
-- File name of the .prototxt file containing the network definition.
-If absent, it is set to 'imagenet_val_cutfc6.prototxt'.
-
-extract_features_blob_names \e layer_id
-Tag (see the .prototxt definition) of the layer at which we want to extract the features.
-If absent, it is set to 'fc6'.
-It can be more than one layer tags (separated by commas without spaces accordingly with Caffe's standard). 
-However, in this case the module (see main.cpp) must call a different function among those exposed by the 
-CaffeFeatExtractor wrapper. 
-
-compute_mode \e [GPU|gpu|CPU|cpu]
-- Argument passed to Caffe initialization. Set to 'GPU' if absent.
-Set it accordingly with your compilation of Caffe.
-However, it must be noted that, at present, the CaffeFeatExtractor wrapper uses CUDA events for timing the extraction.
-This is the only direct dependency of this module on CUDA at the moment.
-If you want to run Caffe on the CPU and do not have CUDA installed, 
-you have to remove this dependency from CaffeFeatExtractor.hpp (removing CUDA includes and 
-deleting the timing code) and also remove the CUDA package from the CMakeLists.txt inside caffeCoder/src.
-
-device_id \e dev_id 
-- Argument passed to Caffe initialization. Device chosen by Caffe to run the computations. 
-Used if compute_mode is set to GPU. Set to '0' if absent.
-
-timing \e [true|false]
-- Set to 'true' if you desire to read in the stdout the time to extract the features, to 'false' otherwise.
-
-\section tested_os_sec Tested OS
-Linux - Ubuntu 14.04
-
-\author Giulia Pasquale
- */
-
-// YARP
 #include <yarp/os/Network.h>
 #include <yarp/os/RFModule.h>
 #include <yarp/os/Time.h>
@@ -521,4 +433,3 @@ int main(int argc, char *argv[])
 	return mod.runModule(rf);
 
 }
-
