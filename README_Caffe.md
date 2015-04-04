@@ -32,10 +32,10 @@ Download and install CUDA drivers and toolkit following [CUDA Getting started gu
 
 Download cuDNN from [NVIDIA cuDNN library](https://developer.nvidia.com/cuDNN) (you have to sign up as CUDA Registered Developer, it's for free), extract the archive and copy the libraries and the headers inside the CUDA directories:
 
-tar -xzvf cudnn-6.5-linux-R1.tgz 
-cd cudnn-6.5-linux-R1
-sudo cp lib* /usr/local/cuda/lib64/
-sudo cp cudnn.h /usr/local/cuda/include/
+tar -xzvf cudnn-6.5-linux-R1.tgz \\
+cd cudnn-6.5-linux-R1 \\
+sudo cp lib* /usr/local/cuda/lib64/ \\ 
+sudo cp cudnn.h /usr/local/cuda/include/ \\
 
 We installed the cuDNN Release 1 but now also the Release 2 is available and should work fine with Caffe.
 
@@ -155,7 +155,7 @@ Now you are ready to compile and start playing with the module!
 
 ##### Detailed explanation
 
-######## Provide the weights of the network model
+1) Provide the weights of the network model:
 
 In Caffe framework, these are stored in a .caffemodel file, whose absolute path must be provided to the module in the 'pretrained_binary_proto_file' parameter.
 In Caffe's [Model Zoo](http://caffe.berkeleyvision.org/model_zoo.html) there are many models available with related descriptions and usage instructions. 
@@ -167,15 +167,14 @@ scripts/download_model_binary.py models/bvlc_reference_caffenet
 from Caffe's source root directory. This creates the file 'models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel'. 
 If you set the 'Caffe_ROOT' environment variable to Caffe's source root directory, in case you do not provide any 'pretrained_binary_proto_file' parameter to the module, this is set by default to '$Caffe_ROOT/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel'; otherwise, if such variable does not exist, in case you do not provide the parameter this is set to empty string and the module fails to start.
 
-######## Provide the mean image and network model definition - Detailed explanation
+2) Provide the mean image and network model definition
 
 This is represented in Caffe framework by a .prototxt file, whose name must be provided to the module in the 'feature_extraction_proto_file' parameter and whose location must be in the Resouce Finder search path. 
 
 This file is an adapted copy of the .prototxt file that comes with the downloaded model (see above). In particular:
 
-1) If the purpose is feature extraction, all layers after the one from which one wants to extract the output can be deleted to avoid unnecessary computations. That's why the default value of this parameter is the file 'imagenet_val_cutfc6.prototxt', because the layer we extract the output from is 'fc6' by default (see 'extract_feature_blobs_name' parameter).
-
-2) The input (data) layer does not depend on the model and in general it can be changed depending on how one wants to provide the images to the network (see [Data Layers Catalogue](http://caffe.berkeleyvision.org/tutorial/layers.html#data-layers). 
+- If the purpose is feature extraction, all layers after the one from which one wants to extract the output can be deleted to avoid unnecessary computations. That's why the default value of this parameter is the file 'imagenet_val_cutfc6.prototxt', because the layer we extract the output from is 'fc6' by default (see 'extract_feature_blobs_name' parameter).
+- The input (data) layer does not depend on the model and in general it can be changed depending on how one wants to provide the images to the network (see [Data Layers Catalogue](http://caffe.berkeleyvision.org/tutorial/layers.html#data-layers). 
 
 In this module we use a 'Memory Data Layer' therefore you will find it in the provided .prototxt files. The only parameter that you need to modify explicitly is the path to the mean image that is subtracted from each input image before feeding it to the network. This is the mean image of the training set on which the model has been learned. For the chosen model, you can download it by running the script:
         

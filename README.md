@@ -16,9 +16,9 @@ Hierarchical IMage REPresentation
 
 The `liblinear-1.91` package is a dependency for the `linearClassifierModule` and should be thus compiled beforehand. The resulting static library must be placed in the same directory of the `liblinear` package to then provide the environment variable **`LIBSVMLIN_DIR`** pointing to that location.
 
-The 'SiftGPU' library is a dependency for the 'sparseCoder' module.
+The `SiftGPU` library is a dependency for the `sparseCoder` module.
 
-The `Caffe` library and `CUDA` package are dependencies for the `caffeCoder` module. Documentation about `caffeCoder` setup can be found here [README_Caffe](https://github.com/robotology/himrep/README_Caffe.md).
+The `Caffe` library and `CUDA` package are dependencies for the `caffeCoder` module. Documentation about `caffeCoder` setup can be found in the [README_Caffe.md](https://github.com/robotology/himrep/blob/master/README_Caffe.md).
 
 ## Documentation
 
