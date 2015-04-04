@@ -171,11 +171,7 @@ This is represented in Caffe framework by a .prototxt file, whose name must be p
 This file usually is a modified copy of the .prototxt file that comes with the downloaded model (see above). In particular:
 
 - If the purpose is feature extraction, all layers after the one from which one wants to extract the output can be deleted to avoid unnecessary computations. That's why the default value of this parameter is the file 'imagenet_val_cutfc6.prototxt', because the layer we extract the output from is 'fc6' by default (see 'extract_feature_blobs_name' parameter).
-- The input (data) layer does not depend on the model and in general it can be changed depending on how one wants to provide the images to the network (see [Data Layers Catalogue](http://caffe.berkeleyvision.org/tutorial/layers.html#data-layers)). In this module we use a 'Memory Data Layer' therefore you will find it in the provided .prototxt files. The only parameter that you need to modify in any case is the path to the mean image that is subtracted from each input image before feeding it to the network. This is the mean image of the training set on which the model has been learned. For the chosen model, you can download it by running the following script from Caffe's source root directory:
-        
-./data/ilsvrc12/get_ilsvrc_aux.sh
-        
-This creates the file 'data/ilsvrc12/imagenet_mean.binaryproto' and you must set its absolute path (without using environment variables) in the file 'imagenet_val_cutfc6.prototxt'.
+- The input (data) layer does not depend on the model and in general it can be changed depending on how one wants to provide the images to the network (see [Data Layers Catalogue](http://caffe.berkeleyvision.org/tutorial/layers.html#data-layers)). In this module we use a 'Memory Data Layer' therefore you will find it in the provided .prototxt files. The only parameter that you need to modify in any case is the path to the mean image that is subtracted from each input image before feeding it to the network. This is the mean image of the training set on which the model has been learned. For the chosen model, you can download it by running this script from Caffe's source root directory: ./data/ilsvrc12/get_ilsvrc_aux.sh. This creates the file 'data/ilsvrc12/imagenet_mean.binaryproto' and you must set its absolute path (without using environment variables) in the file 'imagenet_val_cutfc6.prototxt'.
 
 ## License
 
