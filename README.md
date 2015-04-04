@@ -1,26 +1,28 @@
 Hierarchical IMage REPresentation
 ======
 
-
 ## Installation
 
 ##### Dependencies
+
 - [YARP](https://github.com/robotology/yarp)
 - [iCub](https://github.com/robotology/icub-main)
 - [icub-contrib-common](https://github.com/robotology/icub-contrib-common)
 - [OpenCV](http://opencv.org/downloads.html)
-- [LIBLINEAR](http://www.csie.ntu.edu.tw/~cjlin/liblinear/)
-- [SiftGPU](http://cs.unc.edu/~ccwu/siftgpu)
-- [Caffe](http://caffe.berkeleyvision.org/) (optional)
-- [CUDA](https://developer.nvidia.com/cuda-zone) (optional)
+- [LIBLINEAR](http://www.csie.ntu.edu.tw/~cjlin/liblinear/) (LinearClassifierModule)
+- [SiftGPU](http://cs.unc.edu/~ccwu/siftgpu) (sparseCoder)
+- [Caffe](http://caffe.berkeleyvision.org/) (caffeCoder)
+- [CUDA](https://developer.nvidia.com/cuda-zone) (caffeCoder)
 
 The `liblinear-1.91` package is a dependency for the `linearClassifierModule` and should be thus compiled beforehand. The resulting static library must be placed in the same directory of the `liblinear` package to then provide the environment variable **`LIBSVMLIN_DIR`** pointing to that location.
 
-The `Caffe` library and `CUDA` package are dependencies of the `caffeCoder` module. More detailed documentation about `Caffe` installation and dependencies are in the module documentation (see below).
+The 'SiftGPU' library is a dependency for the 'sparseCoder' module.
+
+The `Caffe` library and `CUDA` package are dependencies for the `caffeCoder` module. Documentation about `caffeCoder` setup can be found here [README_Caffe](https://github.com/robotology/himrep/README_Caffe.md).
 
 ## Documentation
 
-This repository contains a collection of modules that perform features extraction, coding, pooling and learning through a linear classifier.
+This repository contains a collection of modules that perform features extraction and learning through a linear classifier.
 
 Online documentation is available here: [http://robotology.github.com/himrep](http://robotology.github.com/himrep).
 
