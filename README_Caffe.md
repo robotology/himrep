@@ -5,7 +5,7 @@ caffeCoder Setup
 
 Although Caffe can be compiled also on the CPU, it is recommended to run this module on an NVIDIA GPU with Compute Capability higher or equal to 3.0 and CUDA version higher or equal to 5.5 in order to obtain acceptable performance at runtime. 
 
-At present, the module has been tested on:
+At present, the module has been tested on: <br />
     - Tesla K40: around 10-13ms per image <br />
     - GeForce 650M: around 45-50ms per image <br />
 These numbers are obtained with the simplest use of the provided Caffe's wrapper (CaffeFeatExtractor class), i.e., extracting features from one image at a time. Higher performances can be obtained extracting features from mini-batches of images.
@@ -79,7 +79,7 @@ Set the 'OpenCV_DIR' environment variable to the installation path to allow Caff
 
 ##### Other packages
 
-Refer to [Ubuntu Installation](http://caffe.berkeleyvision.org/install_apt.html) for updated instructions. On Ubunutu 14.04 LTS at the time being we have done:
+Refer to [Caffe - Ubuntu Installation](http://caffe.berkeleyvision.org/install_apt.html) for updated instructions. On Ubunutu 14.04 LTS at the time being we have done:
 
 Google Protobuf Buffers C++: <br />
 sudo apt-get install libprotobuf-dev protobuf-compiler
@@ -100,7 +100,7 @@ LMDB: <br />
 sudo apt-get install liblmdb-dev
 
 snappy: <br />
-sudo apt-get libsnappy-dev 
+sudo apt-get install libsnappy-dev 
 
 ##### Caffe compilation
 
@@ -108,7 +108,7 @@ Clone the [Caffe Github repository](https://github.com/BVLC/caffe):
 
 git clone https://github.com/BVLC/caffe.git
 
-In order to be able to link Caffe from an external project via CMake (as this application does) you should compile Caffe via CMake and not manually editing the Makefile.config. At present related instructions refer to this PR [Improved CMake scripts](https://github.com/BVLC/caffe/pull/1667), even if the PR has been merged in Caffe's master branch. Generally you can do:
+In order to be able to link Caffe from an external project via CMake (as this application does) you should compile Caffe via CMake and not manually editing the Makefile.config. At present related instructions refer to the PR 1667 [Improved CMake scripts](https://github.com/BVLC/caffe/pull/1667), even if the PR has been merged in Caffe's master branch. Generally you can do:
 
 cd caffe <br />
 mkdir build <br />
@@ -149,7 +149,7 @@ Navigate to the folder where you have cloned the 'himrep' repository and copy th
 cd himrep/modules/caffeCoder/app/conf <br />
 yarp-config context --import himrep imagenet_val_cutfc6.prototxt
 
-Open the imported file (should be in ~.local/share/yarp/contexts/himrep/imagenet_val_cutfc6.prototxt) and modify the absolute path to the mean image ('mean_file' field in the 'transform_param' section) with the correct path to the downloaded mean image (see step 2) on your machine, without using environment variables (if you have followed the instructions above, this path should be $Caffe_ROOT/data/ilsvrc12/imagenet_mean.binaryproto' with the value of $Caffe_ROOT on your machine subsituted).
+Open the imported file (should be in ~.local/share/yarp/contexts/himrep/imagenet_val_cutfc6.prototxt) and modify the absolute path to the mean image ('mean_file' field in the 'transform_param' section) with the correct path to the downloaded mean image (see step 2) on your machine, without using environment variables (if you have followed the instructions above, this path should be $Caffe_ROOT/data/ilsvrc12/imagenet_mean.binaryproto' with the value of $Caffe_ROOT on your machine substituted).
 
 Now you are ready to compile and start playing with the module!
 
@@ -158,9 +158,7 @@ Now you are ready to compile and start playing with the module!
 1) Provide the weights of the network model:
 
 In Caffe framework, these are stored in a .caffemodel file, whose absolute path must be provided to the module in the 'pretrained_binary_proto_file' parameter.
-In Caffe's [Model Zoo](http://caffe.berkeleyvision.org/model_zoo.html) there are many models available with related descriptions and usage instructions. 
-
-If you choose the 'BVLC Reference CaffeNet' model, as we did, you can download the weights (and other data related to the model) by running the following command from Caffe's source root directory:
+In Caffe's [Model Zoo](http://caffe.berkeleyvision.org/model_zoo.html) there are many models available with related descriptions and usage instructions. If you choose the 'BVLC Reference CaffeNet' model, as we did, you can download the weights (and other data related to the model) by running the following command from Caffe's source root directory:
         
 scripts/download_model_binary.py models/bvlc_reference_caffenet
 
@@ -170,16 +168,14 @@ This creates the file 'models/bvlc_reference_caffenet/bvlc_reference_caffenet.ca
 
 This is represented in Caffe framework by a .prototxt file, whose name must be provided to the module in the 'feature_extraction_proto_file' parameter and whose location must be in the Resouce Finder search path. 
 
-This file is an adapted copy of the .prototxt file that comes with the downloaded model (see above). In particular:
+This file usually is a modified copy of the .prototxt file that comes with the downloaded model (see above). In particular:
 
 - If the purpose is feature extraction, all layers after the one from which one wants to extract the output can be deleted to avoid unnecessary computations. That's why the default value of this parameter is the file 'imagenet_val_cutfc6.prototxt', because the layer we extract the output from is 'fc6' by default (see 'extract_feature_blobs_name' parameter).
-- The input (data) layer does not depend on the model and in general it can be changed depending on how one wants to provide the images to the network (see [Data Layers Catalogue](http://caffe.berkeleyvision.org/tutorial/layers.html#data-layers). 
-
-In this module we use a 'Memory Data Layer' therefore you will find it in the provided .prototxt files. The only parameter that you need to modify explicitly is the path to the mean image that is subtracted from each input image before feeding it to the network. This is the mean image of the training set on which the model has been learned. For the chosen model, you can download it by running the script:
+- The input (data) layer does not depend on the model and in general it can be changed depending on how one wants to provide the images to the network (see [Data Layers Catalogue](http://caffe.berkeleyvision.org/tutorial/layers.html#data-layers)). In this module we use a 'Memory Data Layer' therefore you will find it in the provided .prototxt files. The only parameter that you need to modify in any case is the path to the mean image that is subtracted from each input image before feeding it to the network. This is the mean image of the training set on which the model has been learned. For the chosen model, you can download it by running the following script from Caffe's source root directory:
         
 ./data/ilsvrc12/get_ilsvrc_aux.sh
         
-from Caffe's source root directory. This creates the file 'data/ilsvrc12/imagenet_mean.binaryproto' and you must set its absolute path (without using environment variables) in the file 'imagenet_val_cutfc6.prototxt'.
+This creates the file 'data/ilsvrc12/imagenet_mean.binaryproto' and you must set its absolute path (without using environment variables) in the file 'imagenet_val_cutfc6.prototxt'.
 
 ## License
 
