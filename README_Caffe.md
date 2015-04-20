@@ -89,7 +89,7 @@ Set the `OpenCV_DIR` environment variable to the installation path to allow Caff
 
 Refer to [Caffe - Ubuntu Installation](http://caffe.berkeleyvision.org/install_apt.html) for updated instructions. On Ubunutu 14.04 LTS at the time being we have done:
 
-Google Protobuf Buffers C++:
+Google Protobuf Buffers C++:<br>
 `sudo apt-get install libprotobuf-dev protobuf-compiler`
 
 Google Logging:<br>
