@@ -30,7 +30,7 @@ Download and install CUDA drivers and toolkit following [CUDA Getting started gu
 
 ##### cuDNN installation (optional but recommended)
 
-Download cuDNN from [NVIDIA cuDNN library](https://developer.nvidia.com/cuDNN) (you have to sign up as CUDA Registered Developer, it's for free), extract the archive and copy the libraries and the headers inside the CUDA directories:
+Download **cuDNN** from [NVIDIA cuDNN library](https://developer.nvidia.com/cuDNN) (you have to sign up as CUDA Registered Developer, it's for free), extract the archive and copy the libraries and the headers inside the CUDA directories:
 
 ```
 tar -xzvf cudnn-6.5-linux-R1.tgz
@@ -43,8 +43,8 @@ We installed the cuDNN Release 1 but now also the Release 2 is available and sho
 
 ##### BLAS installation
 
-We chose the OpenBLAS implementation but also ATLAS or Intel MKL are supported by Caffe.
-Download the source code from [OpenBLAS page](http://www.openblas.net/) and follow instructions to compile and install it. We installed the version 0.2.13. We recommend to install OpenBLAS from source in a separate and specified location of your choice (instead of the default /usr/local, where e.g. the libopenblas-base package that comes with Ubuntu 14.04 is installed) because in this case there might be some linking issues with some YARP libraries (e.g. YARP_math).
+We chose the **OpenBLAS** implementation but also ATLAS or Intel MKL are supported by Caffe.
+Download the source code from [OpenBLAS page](http://www.openblas.net/) and follow instructions to compile and install it. We installed the version `0.2.13`. We recommend to install OpenBLAS from source in a separate and specified location of your choice (instead of the default `/usr/local`, where e.g. the `libopenblas-base` package that comes with Ubuntu 14.04 is installed) because in this case there might be some linking issues with some YARP libraries (e.g. YARP_math).
 Commonly, it is sufficient to do:
 
 ```
@@ -112,9 +112,8 @@ snappy:<br>
 
 ##### Caffe compilation
 
-Clone the [Caffe Github repository](https://github.com/BVLC/caffe):
-
-git clone https://github.com/BVLC/caffe.git
+Clone the [Caffe Github repository](https://github.com/BVLC/caffe):<br>
+`git clone https://github.com/BVLC/caffe.git`
 
 In order to be able to link Caffe from an external project via CMake (as this application does) you should compile Caffe via CMake and not manually editing the Makefile.config. At present related instructions refer to the PR 1667 [Improved CMake scripts](https://github.com/BVLC/caffe/pull/1667), even if the PR has been merged in Caffe's master branch. Generally you can do:
 
