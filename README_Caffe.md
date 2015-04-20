@@ -141,12 +141,12 @@ Some data is necessary to extract features from a learned network model in Caffe
 
 Set the `Caffe_ROOT` environment variable to your Caffe's source root directory.
 
-1. Provide the weights of the network model:
+1. Provide the weights of the network model:<br>
 ```
 cd $Caffe_ROOT
 scripts/download_model_binary.py models/bvlc_reference_caffenet
 ```
-2. Provide the mean image:
+2. Provide the mean image:<br>
 ```
 cd $Caffe_ROOT
 ./data/ilsvrc12/get_ilsvrc_aux.sh
