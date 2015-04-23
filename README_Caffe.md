@@ -8,6 +8,7 @@ Although Caffe can be compiled also on the CPU, it is recommended to run this mo
 At present, the module has been tested on:
     - Tesla K40: around 10-13ms per image
     - GeForce 650M: around 45-50ms per image
+    - Quadro K2200: around 60ms per image
 These numbers are obtained with the simplest use of the provided Caffe's wrapper (CaffeFeatExtractor class), i.e., extracting features from one image at a time. Higher performances can be obtained extracting features from mini-batches of images.
 
 ## Dependencies
