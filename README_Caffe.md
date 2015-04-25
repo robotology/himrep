@@ -6,10 +6,12 @@ caffeCoder Setup
 Although Caffe can be compiled also on the CPU, it is recommended to run this module on an NVIDIA GPU with Compute Capability higher or equal to 3.0 and CUDA version higher or equal to 5.5 in order to obtain acceptable performance at runtime.
 
 At present, the module has been tested on:
-    - Tesla K40: around 10-13ms per image
-    - GeForce 650M: around 45-50ms per image
-    - Quadro K2200: around 60ms per image
-These numbers are obtained with the simplest use of the provided Caffe's wrapper (CaffeFeatExtractor class), i.e., extracting features from one image at a time. Higher performances can be obtained extracting features from mini-batches of images.
+
+- `Tesla K40`: around `10 ms` per image
+- `GeForce 650M`: around `50 ms` per image
+- `Quadro K2200`: around `60 ms` per image
+
+These numbers are obtained with the simplest use of the provided Caffe's wrapper (`CaffeFeatExtractor` class), i.e., extracting features from one image at a time. Higher performances can be obtained extracting features from mini-batches of images.
 
 ## Dependencies
 
