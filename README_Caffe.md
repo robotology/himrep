@@ -155,7 +155,7 @@ Set the `Caffe_ROOT` environment variable to your Caffe's source root directory.
 3. Provide the network model definition:<br>
 Install the `imagenet_val_cutfc6.prototxt` file located in the `himrep` repository (or all himrep context) into the YARP local context directory:<br>
 `yarp-config context --import himrep imagenet_val_cutfc6.prototxt`<br>
-Open the imported file (should be in `~.local/share/yarp/contexts/himrep/imagenet_val_cutfc6.prototxt`) and modify the absolute path to the mean image (`mean_file` field in the `transform_param` section) with the correct path to the downloaded mean image (see step 2) on your machine, without using environment variables (if you have followed the instructions above, this path should be `$Caffe_ROOT/data/ilsvrc12/imagenet_mean.binaryproto` with the value of `$Caffe_ROOT` on your machine substituted).
+Open the imported file (should be in `~/.local/share/yarp/contexts/himrep/imagenet_val_cutfc6.prototxt`) and modify the absolute path to the mean image (`mean_file` field in the `transform_param` section) with the correct path to the downloaded mean image (see step 2) on your machine, without using environment variables (if you have followed the instructions above, this path should be `$Caffe_ROOT/data/ilsvrc12/imagenet_mean.binaryproto` with the value of `$Caffe_ROOT` on your machine substituted).
 
 Now you are ready to compile and start playing with the module!
 
