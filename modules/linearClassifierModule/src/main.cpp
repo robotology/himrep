@@ -31,7 +31,7 @@ format: [train]
 action: starts the training process by reading all the database previously acquired via the [save] command.
  
 <b>FORGET</b> 
-format: [FORGET] "class" 
+format: [forget] "class" 
 action: forgets the "class", deleting all the feature vectors in the database. If "class"="all" all the classes are forgotten. 
  
 <b>LIST</b> 
@@ -64,7 +64,7 @@ action: starts the recognition process.
 --CSVM \e value
 - specify the value for the regularization parameter used during the training.
  
---WeightedSVM \e [0 |1]
+--WeightedSVM \e [0 | 1]
 - Useful parameter of unbalanced dataset. If 1 it weights positive examples such as their contribution is equal to the negative ones.
  
 --databaseFolder \e database
