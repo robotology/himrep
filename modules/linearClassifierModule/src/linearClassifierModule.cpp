@@ -79,7 +79,8 @@ bool linearClassifierModule::respond(const Bottle& command, Bottle& reply)
     if(command.get(0).asString()=="objList")
     {
     
-        this->lCThread->getClassList(reply);        
+        reply.addString("ack");
+        this->lCThread->getClassList(reply.addList());        
         return true;
 
     } 
