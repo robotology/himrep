@@ -9,10 +9,10 @@ Hierarchical IMage REPresentation
 - [iCub](https://github.com/robotology/icub-main)
 - [icub-contrib-common](https://github.com/robotology/icub-contrib-common)
 - [OpenCV](http://opencv.org/downloads.html)
-- [LIBLINEAR](http://www.csie.ntu.edu.tw/~cjlin/liblinear/) (LinearClassifierModule)
-- [SiftGPU](http://cs.unc.edu/~ccwu/siftgpu) (sparseCoder)
-- [Caffe](http://caffe.berkeleyvision.org/) (caffeCoder)
-- [CUDA](https://developer.nvidia.com/cuda-zone) (caffeCoder)
+- [LIBLINEAR](http://www.csie.ntu.edu.tw/~cjlin/liblinear/) ([`linearClassifierModule`](https://github.com/robotology/himrep/tree/master/modules/linearClassifierModule))
+- [SiftGPU](http://cs.unc.edu/~ccwu/siftgpu) ([`sparseCoder`](https://github.com/robotology/himrep/tree/master/modules/sparseCoder))
+- [Caffe](http://caffe.berkeleyvision.org/) ([`caffeCoder`](https://github.com/robotology/himrep/tree/master/modules/caffeCoder))
+- [CUDA](https://developer.nvidia.com/cuda-zone) ([`caffeCoder`](https://github.com/robotology/himrep/tree/master/modules/caffeCoder))
 
 The `liblinear-1.91` package is a dependency for the `linearClassifierModule` and should be thus compiled beforehand. The resulting static library must be placed in the same directory of the `liblinear` package to then provide the environment variable **`LIBSVMLIN_DIR`** pointing to that location.
 
