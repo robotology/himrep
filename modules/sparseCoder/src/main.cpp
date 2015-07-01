@@ -110,12 +110,6 @@ Linux
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
-#include <iCub/boostMIL/ClassifierFactory.h>
-#include <iCub/boostMIL/ClassifierInput.h>
-#include <iCub/boostMIL/WeakClassifier.h>
-#include <iCub/boostMIL/MILClassifier.h>
-#include <iCub/boostMIL/OnlineBoost.h>
-
 #include <stdio.h>
 #include <string>
 #include <deque>
@@ -133,12 +127,11 @@ using namespace yarp;
 using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::math;
-using namespace iCub::boostMIL;
 
 #define CMD_HELP                    VOCAB4('h','e','l','p')
 #define DUMP_SIFT                   VOCAB4('d','u','m','p')
 #define DUMP_STOP                   VOCAB4('s','t','o','p')
-#define LEARN_DICT                   VOCAB4('l','e','a','r')
+#define LEARN_DICT                  VOCAB4('l','e','a','r')
 
 #define CODE_MODE_SC                0
 #define CODE_MODE_BOW               1

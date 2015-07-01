@@ -13,7 +13,6 @@ if(SIFTGPU_FOUND)
 
    include_directories(${YARP_INCLUDE_DIRS})
    include_directories(${OpenCV_INCLUDE_DIRS})
-   include_directories(${boostMIL_INCLUDE_DIRS})
       
    set(folder_source main.cpp SiftGPU_Extractor.cpp DictionaryLearning.cpp)
    set(folder_header SiftGPU_Extractor.h DictionaryLearning.h)
@@ -21,7 +20,7 @@ if(SIFTGPU_FOUND)
    source_group("Header Files" FILES ${folder_header})
    include_directories(${PROJECT_SOURCE_DIR} ${SIFTGPU_INCLUDE_DIRS})
    add_executable(${PROJECTNAME} ${folder_source} ${folder_header})
-   target_link_libraries(${PROJECTNAME} boostMIL ${OpenCV_LIBRARIES} ${YARP_LIBRARIES} ${SIFTGPU_LIBRARIES})
+   target_link_libraries(${PROJECTNAME} ${OpenCV_LIBRARIES} ${YARP_LIBRARIES} ${SIFTGPU_LIBRARIES})
    install(TARGETS ${PROJECTNAME} DESTINATION bin)   
 endif()
 
