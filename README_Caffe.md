@@ -31,8 +31,9 @@ We do not cover here exhaustively the procedure because it is changing quite rap
 
 Download and install CUDA drivers and toolkit following [CUDA Getting started guide for Linux](http://docs.nvidia.com/cuda/cuda-getting-started-guide-for-linux/index.html#axzz3VV5Adq1a). CUDA 6.5 or later is strongly recommended in order to exploit the speedup offered by the [NVIDIA cuDNN library](https://developer.nvidia.com/cuDNN). We installed CUDA 6.5 but now also CUDA 7 is available and supported by Caffe. If the desired CUDA package isn't available yet with the package management system of Ubuntu (CUDA 6.5 is not, at the time being) we recommend installing the NVIDIA proprietary .run instead of adding external repositories, in order to have a stable system.
 
-**Important note**
-During installation, remember to answer **`YES`** if asked about **`DKMS`**.
+**Important notes**:
+- During installation, remember to answer **`YES`** if asked about **`DKMS`**.
+- We found very useful the instructions available at this [link](http://yohan.jasdid.com/2015/03/installing-nvidia-drivers-and-cuda-7-0-in-debian-wheezy/) to install CUDA 7.0 on a Debian `wheezy` system.
 
 ##### cuDNN installation (optional but recommended)
 
