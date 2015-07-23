@@ -100,7 +100,7 @@ Google Protobuf Buffers C++:<br>
 `sudo apt-get install libprotobuf-dev protobuf-compiler`
 
 Google Logging:<br>
-`sudo apt-get install libgoogle-glog-dev`
+`sudo apt-get install libgoogle-glog-dev` (read [this page](http://caffe.berkeleyvision.org/install_apt.html) for manual installation)
 
 Google Flags:<br>
 `sudo apt-get install libgflags-dev`
