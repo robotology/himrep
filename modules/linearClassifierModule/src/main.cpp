@@ -17,29 +17,32 @@ The commands sent as bottles to the module port
 (notation: [.] identifies a vocab, <.> specifies a double,
 "." specifies a string) 
  
-<b>SAVE</b> 
-format: [save] "class_name"
+<b>SAVE</b> \n
+format: [save] "class_name"  \n
 action: starts to dump feature vector in the "class_name" folder.
  
- 
-<b>STOP</b> 
-format: [stop] 
+<b>STOP</b>  \n
+format: [stop]  \n
 action: stops all the current activities, the module will be waiting for new commands.
 
-<b>TRAIN</b> 
-format: [train] 
+<b>TRAIN</b>  \n
+format: [train]  \n
 action: starts the training process by reading all the database previously acquired via the [save] command.
  
-<b>FORGET</b> 
-format: [forget] "class" 
+<b>FORGET</b>  \n
+format: [forget] "class"  \n
 action: forgets the "class", deleting all the feature vectors in the database. If "class"="all" all the classes are forgotten. 
  
-<b>LIST</b> 
-format: [objList] 
+<b>LIST</b>  \n
+format: [objList]  \n
 action: retrieves the current classes saved in the database.
 
-<b>RECOGNIZE</b> 
-format: [recognize] 
+<b>CHANGE NAME</b>  \n
+format: [changeName] "old_name" "new_name"  \n
+action: change the current name of a known object with a new name.
+
+<b>RECOGNIZE</b>  \n
+format: [recognize]  \n
 action: starts the recognition process.
  
 \section lib_sec Libraries 

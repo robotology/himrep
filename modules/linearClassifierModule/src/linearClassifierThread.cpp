@@ -47,6 +47,36 @@ bool linearClassifierThread::getClassList(Bottle &b)
     return true;
 }
 
+bool linearClassifierThread::changeName(const string &old_name, const string &new_name)
+{
+    int j=-1;
+    int k=-1;
+
+    mutex->wait();
+    for (size_t i=0; i<knownObjects.size(); i++)
+    {
+        if (knownObjects[i].first==old_name)
+            j=(int)i;
+        else if (knownObjects[i].first==new_name)
+            k=(int)i;
+    }
+
+    if ((j<0) || (k>=0))
+    {
+        mutex->post();
+        return false;
+    }
+
+    knownObjects[j].first=new_name;
+
+    string old_path=currPath+"/"+old_name;
+    string new_path=currPath+"/"+new_name;
+    yarp::os::rename(old_path.c_str(),new_path.c_str());
+
+    mutex->post();
+    return true;
+}
+
 void linearClassifierThread::checkKnownObjects()
 {
 

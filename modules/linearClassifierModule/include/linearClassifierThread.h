@@ -74,5 +74,5 @@ public:
     bool forgetClass(string className, bool retrain);
     bool forgetAll();
     bool getClassList(Bottle &b);
-
+    bool changeName(const string &old_name, const string &new_name);
 };

@@ -78,24 +78,29 @@ bool linearClassifierModule::respond(const Bottle& command, Bottle& reply)
 
     if(command.get(0).asString()=="objList")
     {
-    
         reply.addString("ack");
         this->lCThread->getClassList(reply.addList());        
         return true;
 
     } 
 
-    if(command.get(0).asString()=="train")
+    if(command.get(0).asString()=="changeName")
     {
-    
+        string old_name=command.get(1).asString().c_str();
+        string new_name=command.get(2).asString().c_str();
+        reply.addString(this->lCThread->changeName(old_name,new_name)?"ack":"nack");
+        return true;
+    } 
+
+    if(command.get(0).asString()=="train")
+    {    
         this->lCThread->trainClassifiers();
         reply.addString("ack");
         return true;
     }
 
     if(command.get(0).asString()=="recognize")
-    {
-    
+    {    
         bool ack=this->lCThread->startRecognition();
         reply.addString(ack?"ack":"nack");
         return true;
