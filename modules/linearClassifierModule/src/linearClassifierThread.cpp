@@ -153,14 +153,13 @@ bool linearClassifierThread::threadInit()
 
 
 
-void linearClassifierThread::run(){
-
+void linearClassifierThread::run()
+{
     int current=0;
-    while (!isStopping()) {
-
-        Bottle *p=featuresPort.read(false);
-
-        if(p==NULL)
+    while (!isStopping())
+    {
+        Bottle *p=featuresPort.read();
+        if (p==NULL)
             continue;
 
         vector<double> feature;
@@ -277,7 +276,6 @@ void linearClassifierThread::run(){
         }
 
         mutex->post();
-
     }
 }
 
@@ -305,8 +303,6 @@ void linearClassifierThread::onStop() {
 
 void linearClassifierThread::prepareObjPath(string objName)
 {
-
-
     stopAll();
     mutex->wait();
 
@@ -336,15 +332,11 @@ void linearClassifierThread::prepareObjPath(string objName)
     objFeatures.open(pathObj.c_str(),fstream::out | fstream::out);
     currentState=STATE_SAVING;
     mutex->post();
-
-
 }
 
 
 void linearClassifierThread::createFullPath(const char * path)
 {
-
-
     if (yarp::os::stat(path))
     {
         string strPath=string(path);
