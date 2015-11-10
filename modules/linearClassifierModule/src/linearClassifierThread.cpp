@@ -158,6 +158,8 @@ void linearClassifierThread::run(){
     int current=0;
     while (!isStopping()) {
 
+        yarp::os::Time::delay(0.1);
+
         Bottle *p=featuresPort.read(false);
 
         if(p==NULL)
