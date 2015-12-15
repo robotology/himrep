@@ -139,7 +139,7 @@ void linearClassifierThread::run()
     while (!isStopping())
     {
         Bottle *p=featuresPort.read();
-        if (p==NULL)
+        if (p==NULL) {
             continue;
         }
 
