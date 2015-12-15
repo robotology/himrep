@@ -138,10 +138,12 @@ void linearClassifierThread::run()
     int current=0;
     while (!isStopping())
     {
-        LockGuard lg(mutex);
         Bottle *p=featuresPort.read();
         if (p==NULL)
             continue;
+        }
+
+        LockGuard lg(mutex);
 
         vector<double> feature;
         feature.resize(p->size());
