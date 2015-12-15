@@ -135,11 +135,10 @@ bool linearClassifierThread::threadInit()
 
 void linearClassifierThread::run()
 {
-    LockGuard lg(mutex);
-
     int current=0;
     while (!isStopping())
     {
+        LockGuard lg(mutex);
         Bottle *p=featuresPort.read();
         if (p==NULL)
             continue;
