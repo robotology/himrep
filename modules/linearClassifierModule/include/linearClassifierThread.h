@@ -1,15 +1,13 @@
 #include <iostream>
 #include <string>
+
+#include <yarp/os/all.h>
 #include <yarp/sig/all.h>
 #include <yarp/math/Math.h>
-#include <yarp/os/all.h>
-#include <yarp/os/RFModule.h>
-#include <yarp/os/Network.h>
-#include <yarp/os/Thread.h>
+
 #include <iCub/ctrl/math.h>
-#include <yarp/os/Os.h>
+
 #include "SVMLinear.h"
-#include <yarp/os/Semaphore.h>
 
 #ifdef _WIN32
     #include "win_dirent.h"
@@ -30,38 +28,41 @@ using namespace yarp::math;
 class linearClassifierThread : public Thread
 {
 private:
-        string inputFeatures;
-        string outputPortName;
-        string outputScorePortName;
+    string inputFeatures;
+    string outputPortName;
+    string outputScorePortName;
 
-        string currPath;
-        string pathObj;
-        Port *commandPort;
-        BufferedPort<Bottle> featuresPort;
-        BufferedPort<Bottle> outputPort;
-        Port scorePort;
-        Semaphore * mutex;
-        fstream objFeatures;
+    string currPath;
+    string pathObj;
+    Port *commandPort;
+    BufferedPort<Bottle> featuresPort;
+    BufferedPort<Bottle> outputPort;
+    Port scorePort;
+    Mutex mutex;
+    fstream objFeatures;
 
-        vector<pair<string,vector<string> > > knownObjects;
-        vector<SVMLinear> linearClassifiers;
-        vector<int> datasetSizes;
-        vector<vector<vector<double> > > Features;
-        vector<vector<double > > bufferScores;
-        vector<vector<int > > countBuffer;
-        int bufferSize;
-        double CSVM;
-        int useWeightedSVM;
+    vector<pair<string,vector<string> > > knownObjects;
+    vector<SVMLinear> linearClassifiers;
+    vector<int> datasetSizes;
+    vector<vector<vector<double> > > Features;
+    vector<vector<double > > bufferScores;
+    vector<vector<int > > countBuffer;
+    int bufferSize;
+    double CSVM;
+    int useWeightedSVM;
 
-        int currentState;
+    int currentState;
 
-        void checkKnownObjects();
-        int getdir(string dir, vector<string> &files);
+    void checkKnownObjects();
+    int getdir(const string &dir, vector<string> &files);
+    void stopAllHelper();
+    bool trainClassifiersHelper();
+    bool forgetClassHelper(const string &className, const bool retrain);
 
 public:
 
     linearClassifierThread(yarp::os::ResourceFinder &rf,Port* commPort);
-    void prepareObjPath(string objName);
+    void prepareObjPath(const string &objName);
     bool threadInit();
     void threadRelease();
     void run(); 
@@ -71,7 +72,7 @@ public:
     bool loadFeatures();
     bool trainClassifiers();
     bool startRecognition();
-    bool forgetClass(string className, bool retrain);
+    bool forgetClass(const string &className, const bool retrain);
     bool forgetAll();
     bool getClassList(Bottle &b);
     bool changeName(const string &old_name, const string &new_name);

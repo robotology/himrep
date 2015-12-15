@@ -4,55 +4,48 @@
 
 linearClassifierThread::linearClassifierThread(yarp::os::ResourceFinder &rf, Port* commPort)
 {
+    this->commandPort=commPort;
+    currentState=STATE_DONOTHING;
 
-        this->commandPort=commPort;
-        currentState=STATE_DONOTHING;
+    this->currPath = rf.getHomeContextPath().c_str();
+    
+    string moduleName = rf.check("name",Value("linearClassifier"), "module name (string)").asString().c_str();
+    this->inputFeatures = "/";
+    this->inputFeatures += moduleName;
+    this->inputFeatures += rf.check("InputPortFeatures",Value("/features:i"),"Input image port (string)").asString().c_str();
 
-        this->currPath = rf.getHomeContextPath().c_str();
-        
-        mutex=new Semaphore(1);
+    this->outputPortName = "/";
+    this->outputPortName += moduleName;
+    this->outputPortName += rf.check("OutputPortClassification",Value("/classification:o"),"Input image port (string)").asString().c_str();
 
-        string moduleName = rf.check("name",Value("linearClassifier"), "module name (string)").asString().c_str();
-        this->inputFeatures = "/";
-        this->inputFeatures += moduleName;
-        this->inputFeatures += rf.check("InputPortFeatures",Value("/features:i"),"Input image port (string)").asString().c_str();
+    this->outputScorePortName = "/";
+    this->outputScorePortName += moduleName;
+    this->outputScorePortName += rf.check("OutputPortScores",Value("/scores:o"),"Input image port (string)").asString().c_str();
 
-        this->outputPortName = "/";
-        this->outputPortName += moduleName;
-        this->outputPortName += rf.check("OutputPortClassification",Value("/classification:o"),"Input image port (string)").asString().c_str();
+    this->bufferSize = rf.check("BufferSize",Value(15),"Buffer Size").asInt();
+    this->CSVM = rf.check("CSVM",Value(1.0),"CSVM").asDouble();
+    this->useWeightedSVM= rf.check("WeightedSVM",Value(0),"WeightedSVM").asInt();
 
-        this->outputScorePortName = "/";
-        this->outputScorePortName += moduleName;
-        this->outputScorePortName += rf.check("OutputPortScores",Value("/scores:o"),"Input image port (string)").asString().c_str();
+    printf("WeightedSVM: %d \n",useWeightedSVM);
 
-        this->bufferSize = rf.check("BufferSize",Value(15),"Buffer Size").asInt();
-        this->CSVM = rf.check("CSVM",Value(1.0),"CSVM").asDouble();
-        this->useWeightedSVM= rf.check("WeightedSVM",Value(0),"WeightedSVM").asInt();
-
-        printf("WeightedSVM: %d \n",useWeightedSVM);
-
-        string dbfolder = rf.check("databaseFolder",Value("database"), "module name (string)").asString().c_str();
-        dbfolder="/"+dbfolder;
-        this->currPath=this->currPath+dbfolder;
-
-
+    string dbfolder = rf.check("databaseFolder",Value("database"), "module name (string)").asString().c_str();
+    dbfolder="/"+dbfolder;
+    this->currPath=this->currPath+dbfolder;
 }
 
 bool linearClassifierThread::getClassList(Bottle &b)
 {
-    mutex->wait();
+    LockGuard lg(mutex);
     for(int i=0; i<knownObjects.size(); i++)
         b.addString(knownObjects[i].first.c_str());
-    mutex->post();
     return true;
 }
 
 bool linearClassifierThread::changeName(const string &old_name, const string &new_name)
 {
-    int j=-1;
-    int k=-1;
+    LockGuard lg(mutex);
 
-    mutex->wait();
+    int j=-1; int k=-1;    
     for (size_t i=0; i<knownObjects.size(); i++)
     {
         if (knownObjects[i].first==old_name)
@@ -62,10 +55,7 @@ bool linearClassifierThread::changeName(const string &old_name, const string &ne
     }
 
     if ((j<0) || (k>=0))
-    {
-        mutex->post();
         return false;
-    }
 
     knownObjects[j].first=new_name;
 
@@ -73,13 +63,11 @@ bool linearClassifierThread::changeName(const string &old_name, const string &ne
     string new_path=currPath+"/"+new_name;
     yarp::os::rename(old_path.c_str(),new_path.c_str());
 
-    mutex->post();
     return true;
 }
 
 void linearClassifierThread::checkKnownObjects()
 {
-
     knownObjects.clear();
     linearClassifiers.clear();
 
@@ -87,13 +75,12 @@ void linearClassifierThread::checkKnownObjects()
     {
         createFullPath(currPath.c_str());
         return;
-
     }
 
     vector<string> files;
     getdir(currPath,files);
 
-    for (int i=0; i< files.size(); i++)
+    for (int i=0; i<files.size(); i++)
     {
         if(!files[i].compare(".") || !files[i].compare("..") || !files[i].compare("svmmodel"))
             continue;
@@ -122,10 +109,7 @@ void linearClassifierThread::checkKnownObjects()
 
         pair<string, vector<string> > obj(files[i],tmpFiles);
         knownObjects.push_back(obj);
-
-
     }
-
 }
 
 bool linearClassifierThread::threadInit() 
@@ -145,13 +129,9 @@ bool linearClassifierThread::threadInit()
         return false; 
     }
 
-    trainClassifiers();
-
-
+    trainClassifiersHelper();
     return true;
 }
-
-
 
 void linearClassifierThread::run()
 {
@@ -159,8 +139,11 @@ void linearClassifierThread::run()
     while (!isStopping())
     {
         Bottle *p=featuresPort.read();
-        if (p==NULL)
+        if (p==NULL) {
             continue;
+        }
+
+        LockGuard lg(mutex);
 
         vector<double> feature;
         feature.resize(p->size());
@@ -168,28 +151,21 @@ void linearClassifierThread::run()
         for (int i=0; i<p->size(); i++)
             feature[i]=p->get(i).asDouble();
     
-        mutex->wait();
         if(currentState==STATE_DONOTHING)
-        {   
-            mutex->post();
             continue;
-        }
 
         if(currentState==STATE_SAVING)
         {
             for (int i=0; i<feature.size(); i++)
                 objFeatures << feature[i] << " ";
             objFeatures << endl;
-
         }
 
         if(currentState==STATE_RECOGNIZING)
         {
             if(linearClassifiers.size()==0)
-            {
-                mutex->post();
                 continue;
-            }
+
             //cout << "ISTANT SCORES: ";
             double maxVal=-1000;
             double minValue=1000;
@@ -210,17 +186,17 @@ void linearClassifierThread::run()
             }
             countBuffer[current%bufferSize][idWin]=1;
 
-
             vector<double> avgScores(linearClassifiers.size(),0.0);
-            vector<double> bufferVotes(linearClassifiers.size(),0.0);
-            
+            vector<double> bufferVotes(linearClassifiers.size(),0.0);            
 
             for(int i =0; i<bufferSize; i++)
+            {
                 for(int k =0; k<linearClassifiers.size(); k++)
                 {
                     avgScores[k]=avgScores[k]+bufferScores[i][k];
                     bufferVotes[k]=bufferVotes[k]+countBuffer[i][k];
                 }
+            }
 
             double maxValue=-100;
             double maxVote=0;
@@ -235,12 +211,12 @@ void linearClassifierThread::run()
                     maxValue=avgScores[i];
                     indexClass=i;
                 }
+
                 if(bufferVotes[i]>maxVote)
                 {
                     maxVote=bufferVotes[i];
                     indexMaxVote=i;
                 }
-                //cout  << knownObjects[i].first << " S: " << avgScores[i] << " V: " << bufferVotes[i] << " " ;
             }
 
             string winnerClass=knownObjects[indexClass].first;
@@ -271,14 +247,9 @@ void linearClassifierThread::run()
             }
 
             current++;
-
-
         }
-
-        mutex->post();
     }
 }
-
 
 void linearClassifierThread::threadRelease() 
 {
@@ -290,24 +261,22 @@ void linearClassifierThread::threadRelease()
     this->featuresPort.close();
     this->outputPort.close();
     this->scorePort.close();
-    delete mutex;
-
 }
-void linearClassifierThread::onStop() {
+
+void linearClassifierThread::onStop()
+{
     this->commandPort->interrupt();
     this->featuresPort.interrupt();
     this->outputPort.interrupt();
     this->scorePort.interrupt();
 }
 
-
-void linearClassifierThread::prepareObjPath(string objName)
-{
-    stopAll();
-    mutex->wait();
+void linearClassifierThread::prepareObjPath(const string &objName)
+{    
+    LockGuard lg(mutex);
+    stopAllHelper();
 
     pathObj=currPath+"/"+objName;
-
     if(yarp::os::stat(pathObj.c_str()))
     {
         createFullPath(pathObj.c_str());
@@ -320,20 +289,17 @@ void linearClassifierThread::prepareObjPath(string objName)
        
         for (int i=1; proceed; i++)
         {
-               sprintf(tmpPath,"%s/%d.txt",pathObj.c_str(),i);
-               proceed=!yarp::os::stat(tmpPath);
-               sprintf(tmpPath,"%s/%d.txt",pathObj.c_str(),i);
+           sprintf(tmpPath,"%s/%d.txt",pathObj.c_str(),i);
+           proceed=!yarp::os::stat(tmpPath);
+           sprintf(tmpPath,"%s/%d.txt",pathObj.c_str(),i);
         }
 
         pathObj=tmpPath;
-
     }
 
     objFeatures.open(pathObj.c_str(),fstream::out | fstream::out);
-    currentState=STATE_SAVING;
-    mutex->post();
+    currentState=STATE_SAVING;    
 }
-
 
 void linearClassifierThread::createFullPath(const char * path)
 {
@@ -348,20 +314,22 @@ void linearClassifierThread::createFullPath(const char * path)
         createFullPath(strPath.substr(0,found+1).c_str());
         yarp::os::mkdir(strPath.c_str());
     }
+}
 
+void linearClassifierThread::stopAllHelper()
+{
+    currentState=STATE_DONOTHING;
+    if(objFeatures.is_open())
+        objFeatures.close();
 }
 
 void linearClassifierThread::stopAll()
 {
-    mutex->wait();
-    currentState=STATE_DONOTHING;
-    if(objFeatures.is_open())
-        objFeatures.close();
-
-    mutex->post();
+    LockGuard lg(mutex);
+    stopAllHelper();
 }
 
-int linearClassifierThread::getdir(string dir, vector<string> &files)
+int linearClassifierThread::getdir(const string &dir, vector<string> &files)
 {
     DIR *dp;
     struct dirent *dirp;
@@ -400,19 +368,18 @@ bool linearClassifierThread::loadFeatures()
                 Features[i].push_back(tmpF[t]);
     
         }
-        if(cnt>0)
+
+        if (cnt>0)
             this->datasetSizes.push_back(cnt);
     }
     
     return true;
-
 }
 
-
-bool linearClassifierThread::trainClassifiers()
+bool linearClassifierThread::trainClassifiersHelper()
 {
-    stopAll();
-    mutex->wait();
+    stopAllHelper();
+
     if(linearClassifiers.size()>0)
         for (int i=0; i<linearClassifiers.size(); i++)
             linearClassifiers[i].freeModel();
@@ -420,10 +387,7 @@ bool linearClassifierThread::trainClassifiers()
     cout << "load features" << endl;
     loadFeatures();
     if(this->datasetSizes.size()==0)
-    {
-        mutex->post();
         return false;
-    }
 
     cout << "features loaded" << endl;
 
@@ -480,21 +444,24 @@ bool linearClassifierThread::trainClassifiers()
     }
 
     cout << "trained" << endl;
-    mutex->post();
-
-
+    
     return true;
-
 }
 
+bool linearClassifierThread::trainClassifiers()
+{
+    LockGuard lg(mutex);
+    return trainClassifiersHelper();
+}
 
 bool linearClassifierThread::startRecognition()
 {
-    stopAll();
+    LockGuard lg(mutex);
+    stopAllHelper();
+
     if(this->linearClassifiers.size()==0)
         return false;
-
-    mutex->wait();
+    
     currentState=STATE_RECOGNIZING;
 
     this->countBuffer.resize(bufferSize);
@@ -504,18 +471,15 @@ bool linearClassifierThread::startRecognition()
         bufferScores[i].resize(linearClassifiers.size());
         countBuffer[i].resize(linearClassifiers.size());
     }
-    mutex->post();
+
     return true;
 }
 
-bool linearClassifierThread::forgetClass(string className, bool retrain)
+bool linearClassifierThread::forgetClassHelper(const string &className, const bool retrain)
 {
-
     string classPath=currPath+"/"+className;
     if(yarp::os::stat(classPath.c_str()))
-    {
         return true;
-    }
 
     vector<string> files;
     getdir(classPath,files);
@@ -524,25 +488,34 @@ bool linearClassifierThread::forgetClass(string className, bool retrain)
     {
         if(!files[i].compare(".") || !files[i].compare(".."))
             continue;
+
         string feature=classPath+"/"+files[i];
         remove(feature.c_str());
     }
-    bool res=yarp::os::rmdir(classPath.c_str())==0;
 
-    if(res && retrain)
-        trainClassifiers();
+    bool res=(yarp::os::rmdir(classPath.c_str())==0);
+    if (res && retrain)
+        trainClassifiersHelper();
 
     return res;
 }
 
+bool linearClassifierThread::forgetClass(const string &className, const bool retrain)
+{
+    LockGuard lg(mutex);
+    return forgetClassHelper(className,retrain);
+}
+
 bool linearClassifierThread::forgetAll()
 {
+    LockGuard lg(mutex);
     checkKnownObjects();
 
     for (int i=0; i<knownObjects.size(); i++)
-        forgetClass(knownObjects[i].first, false);
+        forgetClassHelper(knownObjects[i].first,false);
 
-    trainClassifiers();
+    trainClassifiersHelper();
     return true;
-
 }
+
+

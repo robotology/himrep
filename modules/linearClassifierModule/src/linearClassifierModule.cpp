@@ -64,16 +64,13 @@ bool linearClassifierModule::respond(const Bottle& command, Bottle& reply)
         this->lCThread->prepareObjPath(obj);
         reply.addString("ack");
         return true;
-
     }
 
     if(command.get(0).asString()=="stop")
     {
-    
         this->lCThread->stopAll();
         reply.addString("ack");
         return true;
-
     } 
 
     if(command.get(0).asString()=="objList")
@@ -81,7 +78,6 @@ bool linearClassifierModule::respond(const Bottle& command, Bottle& reply)
         reply.addString("ack");
         this->lCThread->getClassList(reply.addList());        
         return true;
-
     } 
 
     if(command.get(0).asString()=="changeName")
@@ -117,7 +113,6 @@ bool linearClassifierModule::respond(const Bottle& command, Bottle& reply)
         return true;
     }
 
-
     reply.addString("nack");
     return true;
 }
@@ -129,8 +124,7 @@ bool linearClassifierModule::updateModule()
 }
 
 
-
 double linearClassifierModule::getPeriod()
 {
-    return 0.1;
+    return 1.0;
 }
