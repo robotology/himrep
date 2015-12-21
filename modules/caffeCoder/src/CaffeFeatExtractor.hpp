@@ -15,7 +15,11 @@
 #include "caffe/net.hpp"
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/io.hpp"
-#include "caffe/vision_layers.hpp"
+/*
+ * Old caffe headers
+ * #include "caffe/vision_layers.hpp"
+ */
+#include "caffe/layers/memory_data_layer.hpp"
 
 #include <string>
 
