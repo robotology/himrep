@@ -190,11 +190,10 @@ private:
         cvCvtColor((IplImage*)img.getIplImage(),ipl,CV_RGB2GRAY);
         
         //cvSmooth(ipl,ipl);  
-    if(dense)
-        siftGPU_extractor.extractDenseSift(ipl,&keypoints,&descriptors);
-    else
+        if(dense)
+            siftGPU_extractor.extractDenseSift(ipl,&keypoints,&descriptors);
+        else
             siftGPU_extractor.extractSift(ipl,&keypoints,&descriptors);
-
        
         if(dump_sift)
         {

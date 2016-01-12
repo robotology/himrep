@@ -36,12 +36,10 @@ class DictionaryLearning
     std::vector<double> rankScores;
     std::vector<int> rankIndices;
 
-
     cv::KDTree kdtree;
     int maxComparisons;
     
     vector<float> feat;
-
 
     std::string mappingType;
 
@@ -51,7 +49,6 @@ class DictionaryLearning
     bool usePCA;
     cv::PCA PCA;
     int dimPCA;
-
 
     void subMatrix(const yarp::sig::Matrix& A, const yarp::sig::Vector& indexes, yarp::sig::Matrix& Atmp);
     void max(const yarp::sig::Vector& x, double& maxVal, int& index);
