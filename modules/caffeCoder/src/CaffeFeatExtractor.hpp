@@ -4,7 +4,7 @@
 #include <string>
 
 // OpenCV
-#include <opencv2/opencv.h>
+#include <opencv2/opencv.hpp>
 
 // CUDA-C includes
 #include <cuda.h>

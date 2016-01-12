@@ -102,7 +102,7 @@ Linux
 #include <yarp/math/Math.h>
 #include <yarp/math/Rand.h>
 
-#include <opencv2/opencv.h>
+#include <opencv2/opencv.hpp>
 
 #include <cstdio>
 #include <string>

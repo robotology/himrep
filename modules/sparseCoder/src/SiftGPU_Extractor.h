@@ -2,7 +2,7 @@
 #ifndef __SIFT_GPU_EXTRACTOR_H__
 #define __SIFT_GPU_EXTRACTOR_H__
 
-#include <opencv2/opencv.h>
+#include <opencv2/opencv.hpp>
 
 #include "GL/gl.h"
 

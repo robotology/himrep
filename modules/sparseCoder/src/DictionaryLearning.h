@@ -8,7 +8,7 @@
 #include <string>
 #include <cmath>
 
-#include <opencv2/opencv.h>
+#include <opencv2/opencv.hpp>
 
 #include <yarp/sig/Vector.h>
 #include <yarp/os/Bottle.h>

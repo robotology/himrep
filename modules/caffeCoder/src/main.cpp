@@ -24,7 +24,7 @@
 #include <fstream>
 
 // OpenCV
-#include <opencv2/opencv.h>
+#include <opencv2/opencv.hpp>
 
 #include <yarp/os/Network.h>
 #include <yarp/os/RFModule.h>
