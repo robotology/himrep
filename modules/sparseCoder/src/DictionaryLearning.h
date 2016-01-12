@@ -1,5 +1,5 @@
 #include <deque>
-#include <stdio.h>
+#include <cstdio>
 #include <sstream>
 #include <vector>
 #include <iostream>
@@ -7,18 +7,14 @@
 #include <fstream>
 #include <string>
 #include <cmath>
+
+#include <opencv2/opencv.h>
+
 #include <yarp/sig/Vector.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Property.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/Time.h>
-#include <cv.h>
-#include <cvaux.h>
-#include <highgui.h>
-#include "opencv2/calib3d/calib3d.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
-
 
 #include "SiftGPU_Extractor.h"
 

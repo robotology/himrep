@@ -102,15 +102,9 @@ Linux
 #include <yarp/math/Math.h>
 #include <yarp/math/Rand.h>
 
-#include <highgui.h>
-#include <cv.h>
+#include <opencv2/opencv.h>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/features2d/features2d.hpp>
-
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <deque>
 #include <algorithm>

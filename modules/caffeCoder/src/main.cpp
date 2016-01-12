@@ -15,6 +15,17 @@
  * Public License for more details
  */
 
+// General includes
+#include <cstdio>
+#include <cstdlib> // getenv
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+
+// OpenCV
+#include <opencv2/opencv.h>
+
 #include <yarp/os/Network.h>
 #include <yarp/os/RFModule.h>
 #include <yarp/os/Time.h>
@@ -28,22 +39,6 @@
 #include <yarp/sig/Image.h>
 
 #include <yarp/math/Math.h>
-
-// OpenCV
-#include <opencv/highgui.h>
-#include <opencv/cv.h>
-
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
-// General includes
-#include <stdio.h>
-#include <stdlib.h> // getenv
-#include <string>
-#include <vector>
-#include <iostream>
-#include <fstream>
 
 #include "CaffeFeatExtractor.hpp"
 
@@ -102,7 +97,8 @@ private:
 
             // Convert the image
 
-            cv::cvtColor(cv::Mat((IplImage*)img.getIplImage()), matImg, CV_RGB2BGR);
+            cv::Mat tmp_mat=cv:cvarrToMat((IplImage*)img.getIplImage());
+            cv::cvtColor(tmp_mat, matImg, CV_RGB2BGR);
 
             // Extract the feature vector
 
