@@ -4,7 +4,12 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "GL/gl.h"
+#if defined(__APPLE__)
+   #include <OpenGL/gl.h>
+   #include <OpenGL/glu.h>
+#else
+   #include "GL/gl.h"
+#endif
 
 #if !defined(SIFTGPU_STATIC) && !defined(SIFTGPU_DLL_RUNTIME)
 // SIFTGPU_STATIC comes from compiler
