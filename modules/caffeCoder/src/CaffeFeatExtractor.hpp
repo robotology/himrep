@@ -31,7 +31,7 @@ class CaffeFeatExtractor {
     string pretrained_binary_proto_file;
     string feature_extraction_proto_file;
 
-    shared_ptr<Net<Dtype> > feature_extraction_net;
+    caffe::shared_ptr<Net<Dtype> > feature_extraction_net;
 
     int mean_width;
     int mean_height;
@@ -122,7 +122,7 @@ CaffeFeatExtractor<Dtype>::CaffeFeatExtractor(string _pretrained_binary_proto_fi
       mean_height = 0;
       mean_channels = 0;
 
-      shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
+      caffe::shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
 
       TransformationParameter tp = memory_data_layer->layer_param().transform_param();
 
@@ -177,7 +177,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
     vector<int> labels(images.size(), 0);
 
     // Get pointer to data layer to set the input
-    shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
+    caffe::shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
 
     // Set batch size
 
@@ -251,7 +251,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
 
         for (int i = 0; i < num_features; ++i) {
 
-            const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[i]);
+            const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[i]);
 
             int batch_size = feature_blob->num();
             int channels = feature_blob->channels();
@@ -307,7 +307,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
     vector<int> labels(images.size(), 0);
 
     // Get pointer to data layer to set the input
-    shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
+    caffe::shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
 
     // Set batch size
 
@@ -384,7 +384,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
     {
         results = feature_extraction_net->ForwardPrefilled();
 
-        const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
+        const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
 
         int batch_size = feature_blob->num();
         int channels = feature_blob->channels();
@@ -438,7 +438,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
     int label = 0;
 
     // Get pointer to data layer to set the input
-    shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
+    caffe::shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
 
     // Set batch size to 1
 
@@ -478,7 +478,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
 
     for (int f = 0; f < num_features; ++f) {
 
-        const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[f]);
+        const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[f]);
 
         int batch_size = feature_blob->num(); // should be 1
         if (batch_size!=1)
@@ -539,7 +539,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
     int label = 0;
 
     // Get pointer to data layer to set the input
-    shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
+    caffe::shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
 
     // Set batch size to 1
 
@@ -581,7 +581,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
     // depending on your net's architecture, the blobs will hold accuracy and/or labels, etc
     std::vector<Blob<Dtype>*> results = feature_extraction_net->ForwardPrefilled();
 
-    const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
+    const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
 
     int batch_size = feature_blob->num(); // should be 1
     if (batch_size!=1)
@@ -643,7 +643,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
     vector<int> labels(images.size(), 0);
 
     // Get pointer to data layer to set the input
-    shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
+    caffe::shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
 
     // Set batch size
 
@@ -718,7 +718,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
 
         for (int f = 0; f < num_features; ++f) {
 
-            const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[f]);
+            const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[f]);
 
             int batch_size = feature_blob->num();
 
@@ -779,7 +779,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
     vector<int> labels(images.size(), 0);
 
     // Get pointer to data layer to set the input
-    shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
+    caffe::shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
 
     // Set batch size
 
@@ -855,7 +855,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
     {
         results = feature_extraction_net->ForwardPrefilled();
 
-        const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
+        const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
 
         int batch_size = feature_blob->num();
 
@@ -914,7 +914,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
     int label = 0;
 
     // Get pointer to data layer to set the input
-    shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
+    caffe::shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
 
     // Set batch size to 1
 
@@ -953,7 +953,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
 
     for (int f = 0; f < num_features; ++f) {
 
-        const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[f]);
+        const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[f]);
 
         int batch_size = feature_blob->num(); // should be 1
         if (batch_size!=1)
@@ -1013,7 +1013,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
     int label = 0;
 
     // Get pointer to data layer to set the input
-    shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
+    caffe::shared_ptr<MemoryDataLayer<Dtype> > memory_data_layer = boost::dynamic_pointer_cast<caffe::MemoryDataLayer<Dtype> >(feature_extraction_net->layers()[0]);
 
     // Set batch size to 1
 
@@ -1055,7 +1055,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
     // depending on your net's architecture, the blobs will hold accuracy and/or labels, etc
     std::vector<Blob<Dtype>*> results = feature_extraction_net->ForwardPrefilled();
 
-    const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
+    const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
 
     int batch_size = feature_blob->num(); // should be 1
     if (batch_size!=1)
