@@ -185,6 +185,7 @@ double SVMLinear::predictModel(vector<double> features)
 
     double val=0;
     predict_values(modelLinearSVM,x,&val);
+    free(x);
     return val;
 
 }

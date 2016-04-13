@@ -102,15 +102,9 @@ Linux
 #include <yarp/math/Math.h>
 #include <yarp/math/Rand.h>
 
-#include <highgui.h>
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/features2d/features2d.hpp>
-
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <deque>
 #include <algorithm>
@@ -196,11 +190,10 @@ private:
         cvCvtColor((IplImage*)img.getIplImage(),ipl,CV_RGB2GRAY);
         
         //cvSmooth(ipl,ipl);  
-    if(dense)
-        siftGPU_extractor.extractDenseSift(ipl,&keypoints,&descriptors);
-    else
+        if(dense)
+            siftGPU_extractor.extractDenseSift(ipl,&keypoints,&descriptors);
+        else
             siftGPU_extractor.extractSift(ipl,&keypoints,&descriptors);
-
        
         if(dump_sift)
         {

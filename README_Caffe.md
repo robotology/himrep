@@ -76,7 +76,7 @@ Set the `Boost_DIR` environment variable to the installation path to allow Caffe
 
 ##### OpenCV installation
 
-Download the source code from [OpenCV - Downloads](http://opencv.org/downloads.html). We installed the version 2.4.10; OpenCV 3.0 is not supported yet by YARP and iCub software. You can do:
+Download the source code from [OpenCV - Downloads](http://opencv.org/downloads.html). We installed opencv-2.4.10, but newer versions are also supported. You can do:
 
 ```
 unzip OpenCV-$version.zip

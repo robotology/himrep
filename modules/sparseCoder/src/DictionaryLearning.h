@@ -1,5 +1,5 @@
 #include <deque>
-#include <stdio.h>
+#include <cstdio>
 #include <sstream>
 #include <vector>
 #include <iostream>
@@ -7,18 +7,14 @@
 #include <fstream>
 #include <string>
 #include <cmath>
+
+#include <opencv2/opencv.hpp>
+
 #include <yarp/sig/Vector.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Property.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/Time.h>
-#include <cv.h>
-#include <cvaux.h>
-#include <highgui.h>
-#include "opencv2/calib3d/calib3d.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
-
 
 #include "SiftGPU_Extractor.h"
 
@@ -40,12 +36,10 @@ class DictionaryLearning
     std::vector<double> rankScores;
     std::vector<int> rankIndices;
 
-
     cv::KDTree kdtree;
     int maxComparisons;
     
     vector<float> feat;
-
 
     std::string mappingType;
 
@@ -55,7 +49,6 @@ class DictionaryLearning
     bool usePCA;
     cv::PCA PCA;
     int dimPCA;
-
 
     void subMatrix(const yarp::sig::Matrix& A, const yarp::sig::Vector& indexes, yarp::sig::Matrix& Atmp);
     void max(const yarp::sig::Vector& x, double& maxVal, int& index);
