@@ -15,16 +15,36 @@
 #include "boost/make_shared.hpp"
 
 // Caffe
-#include "caffe/blob.hpp"
-#include "caffe/common.hpp"
-#include "caffe/net.hpp"
-#include "caffe/proto/caffe.pb.h"
-#include "caffe/util/io.hpp"
-/*
- * Old caffe headers
- * #include "caffe/vision_layers.hpp"
- */
-#include "caffe/layers/memory_data_layer.hpp"
+
+#define VALUE_TO_STRING(x) #x
+#define VALUE(x) VALUE_TO_STRING(x)
+#define VAR_NAME_VALUE(var) #var "="  VALUE(var)
+
+#ifdef CAFFE_VERSION
+
+	// new caffe headers
+
+	#pragma message(VAR_NAME_VALUE(CAFFE_VERSION))
+	#pragma message(VAR_NAME_VALUE(CAFFE_MAJOR))
+	#pragma message(VAR_NAME_VALUE(CAFFE_MINOR))
+	#pragma message(VAR_NAME_VALUE(CAFFE_PATCH))
+
+	#include "caffe/caffe.hpp"
+ 	#include "caffe/layers/memory_data_layer.hpp"
+
+#else
+
+	// old caffe headers
+
+	#include "caffe/blob.hpp"
+	#include "caffe/common.hpp"
+	#include "caffe/net.hpp"
+	#include "caffe/proto/caffe.pb.h"
+	#include "caffe/util/io.hpp"
+
+	#include "caffe/vision_layers.hpp"
+
+#endif
 
 using namespace std;
 using namespace caffe;

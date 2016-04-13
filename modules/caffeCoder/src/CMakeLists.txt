@@ -29,6 +29,25 @@ include_directories(${PROJECT_SOURCE_DIR})
 #  include_directories(${CUDA_INCLUDE_DIRS})
 #endif()
 
+get_target_property(CAFFE_VERSION caffe IMPORTED_SONAME_RELEASE)
+if(${CAFFE_VERSION})
+
+	STRING(REPLACE "." " " a ${CAFFE_VERSION})
+	SEPARATE_ARGUMENTS(a)
+	# LIST(GET a 1 CAFFE_LIBRARY_NAME)
+	LIST(GET a 2 CAFFE_MAJOR)
+	LIST(GET a 3 CAFFE_MINOR)
+	LIST(GET a 4 CAFFE_PATCH)
+	MESSAGE("CAFFE_VERSION        = ${CAFFE_MAJOR}.${CAFFE_MINOR}.${CAFFE_PATCH}")
+	
+	add_definitions(-DCAFFE_MINOR=${CAFFE_MINOR})
+	add_definitions(-DCAFFE_MAJOR=${CAFFE_MAJOR})
+	add_definitions(-DCAFFE_PATCH=${CAFFE_PATCH})
+	
+	add_definitions(-DCAFFE_VERSION=${CAFFE_VERSION})
+	
+endif()
+
 add_definitions(${Caffe_DEFINITIONS})    # ex. -DCPU_ONLY
 
 set(folder_source main.cpp)
