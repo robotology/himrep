@@ -29,24 +29,31 @@ include_directories(${PROJECT_SOURCE_DIR})
 #  include_directories(${CUDA_INCLUDE_DIRS})
 #endif()
 
-get_target_property(CAFFE_VERSION caffe IMPORTED_SONAME_RELEASE)
-if(${CAFFE_VERSION})
+get_target_property(CAFFE_SONAME caffe IMPORTED_SONAME_RELEASE)
 
-	STRING(REPLACE "." " " a ${CAFFE_VERSION})
-	SEPARATE_ARGUMENTS(a)
-	# LIST(GET a 1 CAFFE_LIBRARY_NAME)
-	LIST(GET a 2 CAFFE_MAJOR)
-	LIST(GET a 3 CAFFE_MINOR)
-	LIST(GET a 4 CAFFE_PATCH)
-	MESSAGE("CAFFE_VERSION        = ${CAFFE_MAJOR}.${CAFFE_MINOR}.${CAFFE_PATCH}")
-	
-	add_definitions(-DCAFFE_MINOR=${CAFFE_MINOR})
-	add_definitions(-DCAFFE_MAJOR=${CAFFE_MAJOR})
-	add_definitions(-DCAFFE_PATCH=${CAFFE_PATCH})
-	
-	add_definitions(-DCAFFE_VERSION=${CAFFE_VERSION})
-	
+if("${CAFFE_SONAME}" MATCHES "libcaffe.so.([0-9]+).([0-9]+).([0-9]+)(-(.+))?")
+    set(CAFFE_MAJOR "${CMAKE_MATCH_1}")
+    set(CAFFE_MINOR "${CMAKE_MATCH_2}")
+    set(CAFFE_PATCH "${CMAKE_MATCH_3}")
+    set(CAFFE_PATCH2 "${CMAKE_MATCH_5}")
+    set(CAFFE_VERSION_STRING "${CAFFE_MAJOR}.${CAFFE_MINOR}.${CAFFE_PATCH}")
+    if(NOT "${CAFFE_PATCH2}" STREQUAL "")
+        set(CAFFE_VERSION_STRING "${CAFFE_VERSION_STRING}-${CAFFE_PATCH2}")
+    endif()
+else()
+    set(CAFFE_MAJOR 0)
+    set(CAFFE_MINOR 0)
+    set(CAFFE_PATCH 0)
+    set(CAFFE_PATCH2 0)
+    set(CAFFE_VERSION_STRING unknown)
 endif()
+
+math(EXPR CAFFE_VERSION "${CAFFE_MAJOR}*10000 + ${CAFFE_MINOR}*100 + ${CAFFE_PATCH}")
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../caffe-version.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/caffe-version.h
+               @ONLY)
+set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
 add_definitions(${Caffe_DEFINITIONS})    # ex. -DCPU_ONLY
 
