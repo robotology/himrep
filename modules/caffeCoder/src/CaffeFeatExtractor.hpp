@@ -257,7 +257,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
 
     for (int b=0; b<num_batches; b++)
     {
-        results = feature_extraction_net->ForwardPrefilled();
+        results = feature_extraction_net->Forward();
 
         for (int i = 0; i < num_features; ++i) {
 
@@ -392,7 +392,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
 
     for (int b=0; b<num_batches; b++)
     {
-        results = feature_extraction_net->ForwardPrefilled();
+        results = feature_extraction_net->Forward();
 
         const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
 
@@ -484,7 +484,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
     // Run network and retrieve features!
 
     // depending on your net's architecture, the blobs will hold accuracy and/or labels, etc
-    std::vector<Blob<Dtype>*> results = feature_extraction_net->ForwardPrefilled();
+    std::vector<Blob<Dtype>*> results = feature_extraction_net->Forward();
 
     for (int f = 0; f < num_features; ++f) {
 
@@ -589,7 +589,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
     // Run network and retrieve features!
 
     // depending on your net's architecture, the blobs will hold accuracy and/or labels, etc
-    std::vector<Blob<Dtype>*> results = feature_extraction_net->ForwardPrefilled();
+    std::vector<Blob<Dtype>*> results = feature_extraction_net->Forward();
 
     const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
 
@@ -724,7 +724,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
 
     for (int b=0; b<num_batches; ++b)
     {
-        results = feature_extraction_net->ForwardPrefilled();
+        results = feature_extraction_net->Forward();
 
         for (int f = 0; f < num_features; ++f) {
 
@@ -863,7 +863,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
 
     for (int b=0; b<num_batches; ++b)
     {
-        results = feature_extraction_net->ForwardPrefilled();
+        results = feature_extraction_net->Forward();
 
         const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
 
@@ -959,7 +959,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
     // Run network and retrieve features!
 
     // depending on your net's architecture, the blobs will hold accuracy and/or labels, etc
-    std::vector<Blob<Dtype>*> results = feature_extraction_net->ForwardPrefilled();
+    std::vector<Blob<Dtype>*> results = feature_extraction_net->Forward();
 
     for (int f = 0; f < num_features; ++f) {
 
@@ -1011,12 +1011,10 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
 
     if (timing)
     {
+        cudaEventCreate(&start);
+        cudaEventCreate(&stop);
 
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-
-    cudaEventRecord(start, NULL);
-
+        cudaEventRecord(start, NULL);
     }
 
     // Initialize labels to zero
@@ -1063,7 +1061,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
     // Run network and retrieve features!
 
     // depending on your net's architecture, the blobs will hold accuracy and/or labels, etc
-    std::vector<Blob<Dtype>*> results = feature_extraction_net->ForwardPrefilled();
+    std::vector<Blob<Dtype>*> results = feature_extraction_net->Forward();
 
     const caffe::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net->blob_by_name(blob_names[0]);
 
@@ -1084,7 +1082,6 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
 
     if (timing)
     {
-
         // Record the stop event
         cudaEventRecord(stop, NULL);
 
