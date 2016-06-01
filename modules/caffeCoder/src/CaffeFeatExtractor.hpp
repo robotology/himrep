@@ -15,12 +15,22 @@
 #include "boost/make_shared.hpp"
 
 // Caffe
-#include "caffe/blob.hpp"
-#include "caffe/common.hpp"
-#include "caffe/net.hpp"
-#include "caffe/proto/caffe.pb.h"
-#include "caffe/util/io.hpp"
-#include "caffe/vision_layers.hpp"
+
+#include "caffe-version.h"
+
+#if (CAFFE_MAJOR >= 1)
+	// new caffe headers
+	#include "caffe/caffe.hpp"
+ 	#include "caffe/layers/memory_data_layer.hpp"
+#else
+	// old caffe headers
+	#include "caffe/blob.hpp"
+	#include "caffe/common.hpp"
+	#include "caffe/net.hpp"
+	#include "caffe/proto/caffe.pb.h"
+	#include "caffe/util/io.hpp"
+	#include "caffe/vision_layers.hpp"
+#endif
 
 using namespace std;
 using namespace caffe;
