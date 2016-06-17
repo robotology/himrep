@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2016 iCub Facility - Istituto Italiano di Tecnologia
  * Author: Giulia Pasquale
  * email:  giulia.pasquale@iit.it
  * Permission is granted to copy, distribute, and/or modify this program
@@ -80,19 +80,19 @@ private:
 
     // Data (specific for each method - instantiate only those are needed)
 
-    CaffeFeatExtractor<double>    *caffe_extractor;
+    CaffeFeatExtractor<float>    *caffe_extractor;
 
     void onRead(Image &img)
     {
 
-        // Read at specified rate
+    	// Read at specified rate
         if (Time::now() - last_read < rate)
             return;
 
         mutex.wait();
 
         // If something arrived...
-        if(img.width()>0 && img.height()>0)
+        if (img.width()>0 && img.height()>0)
         {
 
             // Convert the image
@@ -102,8 +102,9 @@ private:
 
             // Extract the feature vector
 
-            std::vector<double> codingVec;
-            float msecPerImage = caffe_extractor->extract_singleFeat_1D(matImg, codingVec);
+            std::vector<float> codingVecFloat;
+            float msecPerImage = caffe_extractor->extract_singleFeat_1D(matImg, codingVecFloat);
+            std::vector<double> codingVec(codingVecFloat.begin(), codingVecFloat.end());
 
             if (caffe_extractor->timing)
             {
@@ -190,7 +191,7 @@ public:
         bool timing = rf.check("timing",Value(false)).asBool();
 
         caffe_extractor = NULL;
-        caffe_extractor = new CaffeFeatExtractor<double>(pretrained_binary_proto_file,
+        caffe_extractor = new CaffeFeatExtractor<float>(pretrained_binary_proto_file,
                 feature_extraction_proto_file,
                 extract_features_blob_names,
                 compute_mode,
