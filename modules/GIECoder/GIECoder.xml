@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+ 
+<module>
+    
+   <name>GIECoder</name>
+   <doxygen-group>icub_module</doxygen-group>
+   <description>The module computes a vectorial representation of the input image using Caffe C++ library.</description>
+   <copypolicy>Released under the terms of the GNU GPL v2.0</copypolicy>
+   <version>1.0</version>
+   
+   <description-long>
+
+    @subsection sec-intro Introduction
+
+    The input image is passed through a feed-forward Convolutional Neural Network (CNN) model that has been previously learned. The image representation can be extracted as the output of any layer in the network. Usually the latest convolutional layer is chosen and the output is a 1-dimensional vector, than is then fed to a classifier (e.g., linear SVM/RLS).
+
+    </description-long>
+
+    <arguments>
+
+    <param default="GIECoder" desc="name of the module"> name </param>
+    <param default="GIECoder.ini" desc="configuration file name"> from </param>
+    <param default="himrep" desc="select the current context"> context </param>
+
+    <param default="$Caffe_ROOT/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel" desc="Absolute path to the .caffemodel file containing the weights of the network used."> pretrained_binary_proto_file </param>
+    <param default="imagenet_val_cutfc6.prototxt" desc="Name of the .prototxt file containing the definition of the network (or part of the network) used."> feature_extraction_proto_file </param>
+    <param default="fc6" desc="Tag (defined in the .prototxt) of the layer at which we want to extract the features."> extract_features_blob_names </param>
+    <param default="GPU" desc="[GPU|gpu|CPU|cpu] passed to Caffe initialization."> compute_mode </param>
+    <param default="0" desc="GPU device chosen by Caffe to run the computations (used if compute_mode is set to GPU|gpu)."> device_id </param>
+    <param default="false" desc="[true|false] depending on whether you desire to read in the stdout the time to extract the features."> timing </param>
+
+    </arguments>
+
+    <authors>
+        <author email="giulia.pasquale@iit.it"> Giulia Pasquale</author>
+    </authors>
+
+    <data>
+
+       <input>
+            <type>rpc</type>
+            <port>/GIECoder/rpc</port>
+            <description>Receiveds the following commands and provides replies: (notation: [.] identifies a vocab, "." specifies a string) 
+            -# <b>help</b> <i>[help]</i>: print the available commands
+            -# <b>start saving features</b> <i>[dump] "path-to-file" "a"</i>: starts to save features in a binary file. "a" (optional) stands for "append". "path-to-file" (optional) is set to: contextPath + "/codes.bin" if not provided
+            -# <b>stop saving features</b> <i>[stop]</i>: stop saving features
+            </description>
+        </input>
+
+        <input>
+            <type>Image</type>
+            <port>/GIECoder/img:i</port>
+            <required>yes</required>
+            <priority>yes</priority>
+            <description>Feed images to GIECoder using this port.</description>
+        </input>
+
+         <output>
+            <type>Image</type>
+            <port>/GIECoder/img:o</port>
+            <description>Output image (equal to the input).</description>
+        </output>
+
+        <output>
+            <type>Vector</type>
+            <port>/GIECoder/code:o</port>
+            <description>Output vectorial representation of the image.</description>
+        </output>
+
+    </data>
+
+</module>
+
