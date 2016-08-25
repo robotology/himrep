@@ -3,7 +3,9 @@
 # CopyPolicy: Released under the terms of the GNU GPL v2.0.
 
 add_subdirectory(linearClassifierModule)
-add_subdirectory(sparseCoder)
+#add_subdirectory(sparseCoder)
+
+add_subdirectory(GIECoder)
 
 find_package(Caffe)
 if (Caffe_FOUND)
