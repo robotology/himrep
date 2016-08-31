@@ -22,6 +22,13 @@ bool GIEFeatExtractor::cudaAllocMapped( void** cpuPtr, void** gpuPtr, size_t siz
 	return true;
 }
 
+bool GIEFeatExtractor::cudaFreeMapped(void *cpuPtr)
+{
+    if ( CUDA_FAILED( cudaFreeHost(cpuPtr) ) )
+        return false;
+    std::cout << "cudaFreeMapped: OK" << std::endl;
+}
+
 bool GIEFeatExtractor::caffeToGIEModel( const std::string& deployFile,				// name for caffe prototxt
 					                    const std::string& modelFile,				// name for model 
 					                    const std::vector<std::string>& outputs,    // network outputs
@@ -99,7 +106,6 @@ GIEFeatExtractor::GIEFeatExtractor(string _caffemodel_file,
 	mInfer   = NULL;
 	mContext = NULL;
 	
-    meanBlob = NULL;
     meanR = -1;
     meanG = -1;
     meanB = -1;
@@ -141,7 +147,26 @@ GIEFeatExtractor::GIEFeatExtractor(string _caffemodel_file,
 
 bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfile, float _meanR, float _meanG, float _meanB, string _prototxt_file, int _resizeWidth, int _resizeHeight, string _blob_name)
 {
-	// Assign specified .caffemodel, .binaryproto, .prototxt files     
+	
+    cudaDeviceProp prop;
+    int whichDevice;
+
+    if ( CUDA_FAILED( cudaGetDevice(&whichDevice)) )
+       return -1;
+ 
+    if ( CUDA_FAILED( cudaGetDeviceProperties(&prop, whichDevice)) )
+       return -1;
+
+    if (prop.canMapHostMemory != 1)
+    {
+        std::cout << "Device cannot map memory!" << std::endl;
+        return -1;
+    }
+
+    if ( CUDA_FAILED( cudaSetDeviceFlags(cudaDeviceMapHost)) )
+        return -1;
+
+    // Assign specified .caffemodel, .binaryproto, .prototxt files     
     caffemodel_file  = _caffemodel_file;
 	binaryproto_meanfile = _binaryproto_meanfile;
     meanR = _meanR;
@@ -226,8 +251,19 @@ bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfil
     // Mean image initialization
     if (binaryproto_meanfile!="")
     {
-	    meanBlob = nvcaffeparser1::CaffeParser::parseBinaryProto(binaryproto_meanfile.c_str());
+	    nvcaffeparser1::IBinaryProtoBlob* meanBlob = nvcaffeparser1::CaffeParser::parseBinaryProto(binaryproto_meanfile.c_str());
         resizeDims = meanBlob->getDimensions();
+        const float *meanData = reinterpret_cast<const float*>(meanBlob->getData());  // expected to be float* (c,h,w)
+        float *meanDataChangeable = (float *) malloc(resizeDims.w*resizeDims.h*resizeDims.c*resizeDims.n*sizeof(float));
+        memcpy(meanDataChangeable, meanData, resizeDims.w*resizeDims.h*resizeDims.c*resizeDims.n*sizeof(float) );
+        
+        meanBlob->destroy();
+
+        cv::Mat tmpMat(resizeDims.h, resizeDims.w, CV_32FC3, meanDataChangeable);
+        tmpMat.copyTo(meanMat);
+
+        free(meanDataChangeable);
+        
     }
     else
     {
@@ -254,37 +290,41 @@ GIEFeatExtractor::~GIEFeatExtractor()
 		mInfer = NULL;
 	}
 
-    if( meanBlob != NULL )
-	{
-		meanBlob->destroy();
-		meanBlob = NULL;
-	}
+    cudaFreeMapped(mOutputCPU);
+    cudaFreeMapped(mInputCPU);
 }
 
-float GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &features)
+bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &features, float (&times)[2])
 {
 
     // Check input image 
-    if (imMat.rows==0 || imMat.cols==0)
+    if (imMat.empty())
 	{
-		std::cout << "GIEFeatExtractor::extract_singleFeat_1D(): invalid parameters" << std::endl;
+		std::cout << "GIEFeatExtractor::extract_singleFeat_1D(): empty imMat!" << std::endl;
 		return -1;
 	}
 
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
     // Start timing
-    cudaEvent_t start, stop;
+    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
     if (timing)
     {
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, NULL);
+        cudaEventCreate(&startPrep);
+        cudaEventCreate(&startNet);
+        cudaEventCreate(&stopPrep);
+        cudaEventCreate(&stopNet);
+        cudaEventRecord(startPrep, NULL);
+        cudaEventRecord(startNet, NULL);
     }
 
     // Image preprocessing
-    // transpose and convert to float
-    imMat = imMat.t();
+
+    // convert to float (with range 0-255)
     imMat.convertTo(imMat, CV_32FC3);
     
+    // resize 
     if (imMat.rows != resizeDims.h || imMat.cols != resizeDims.w)
     {
         if (imMat.rows > resizeDims.h || imMat.cols > resizeDims.w)
@@ -297,23 +337,22 @@ float GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &fea
         }
     }
 
+    // subtract mean 
     if (meanR==-1)
     {
-        const float *meanData = reinterpret_cast<const float*>(meanBlob->getData());  // expected to be float* (c,h,w)
-        for (int r=0; r<imMat.rows;r++)
+        if (!meanMat.empty() && imMat.rows==meanMat.rows && imMat.cols==meanMat.cols && imMat.channels()==meanMat.channels() && imMat.type()==meanMat.type())
         {
-            for (int c=0; c<imMat.cols;c++)
-            {
-                int meanOffset = (imMat.cols*r + c)*imMat.channels();
-                for (int p=0; p<imMat.channels();p++)
-                    imMat.at<Vec3f>(r,c)[p] = imMat.at<Vec3f>(r,c)[p] - meanData[meanOffset+p];
-            }
+            imMat = imMat - meanMat;
+        }
+        else
+        {
+            std::cout << "GIEFeatExtractor::extract_singleFeat_1D(): cannot subtract mean image!" << std::endl;
+            return -1;
         }
     }
     else
     {  
-        cv::Scalar meanPixel(meanR, meanG, meanB);
-        cv::subtract(imMat, meanPixel, imMat);
+        imMat = imMat - cv::Scalar(meanR, meanG, meanB);
     }
 
     // crop to input dimension (central crop)
@@ -326,18 +365,26 @@ float GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &fea
         cv::resize(imMat, imMat, cv::Size(mHeight, mWidth), 0, 0, CV_INTER_LINEAR);
     }
 
-    // convert from cv::Mat (h,w,c) to float* (c,h,w)    
-    for (int r=0; r<imMat.rows;r++)
-        for (int c=0; c<imMat.cols;c++)
-        {
-            int inputOffset = (imMat.cols*r + c)*imMat.channels();
-            for (int p=0; p<imMat.channels();p++)
-                mInputCPU[inputOffset+p] = imMat.at<Vec3f>(r,c)[p];
-        }
+     if ( !imMat.isContinuous() ) 
+          imMat = imMat.clone();
 
-	// process with GIE
+    // copy 
+    CUDA( cudaMemcpy(mInputCPU, imMat.data, mInputSize, cudaMemcpyDefault) );
+    // memcpy(mInputCPU, imMat.data);
+
 	void* inferenceBuffers[] = { mInputCUDA, mOutputCUDA };
-	
+
+    if (timing)
+    {
+        // Record the stop event
+        cudaEventRecord(stopPrep, NULL);
+
+        // Wait for the stop event to complete
+        cudaEventSynchronize(stopPrep);
+
+        cudaEventElapsedTime(times, startPrep, stopPrep);
+    }
+
 	mContext->execute(1, inferenceBuffers);
 	//CUDA(cudaDeviceSynchronize());
 
@@ -346,20 +393,16 @@ float GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &fea
     if (timing)
     {
         // Record the stop event
-        cudaEventRecord(stop, NULL);
+        cudaEventRecord(stopNet, NULL);
 
         // Wait for the stop event to complete
-        cudaEventSynchronize(stop);
+        cudaEventSynchronize(stopNet);
 
-        float msecTotal = 0.0f;
-        cudaEventElapsedTime(&msecTotal, start, stop);
+        cudaEventElapsedTime(times+1, startNet, stopNet);
 
-        return msecTotal;
     }
-    else
-    {
-        return 0;
-    }
+
+    return 1;
 
 }
 

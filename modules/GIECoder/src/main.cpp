@@ -97,23 +97,26 @@ private:
 
             // Convert the image and check that it is continuous
 
-            cv::Mat tmp_mat=cv::cvarrToMat((IplImage*)img.getIplImage());
+            cv::Mat tmp_mat = cv::cvarrToMat((IplImage*)img.getIplImage());
             cv::cvtColor(tmp_mat, matImg, CV_RGB2BGR);
-            if ( !matImg.isContinuous() ) 
-                matImg = matImg.clone();
 
             // Extract the feature vector
 
             std::vector<float> codingVecFloat;
-            float msecPerImage = gie_extractor->extract_singleFeat_1D(matImg, codingVecFloat);
+            float times[2];
+            if (gie_extractor->extract_singleFeat_1D(matImg, codingVecFloat, times)==-1)
+            {
+                std::cout << "GIEFeatExtractor::extract_singleFeat_1D(): failed..." << std::endl;
+                return;
+            }
             std::vector<double> codingVec(codingVecFloat.begin(), codingVecFloat.end());
 
             if (gie_extractor->timing)
             {
-                std::cout << msecPerImage << " msec" << std::endl;
+                std::cout << times[0] << ": PREP " << times[1] << ": NET" << std::endl;
             }
 
-            if(dump_code)
+            if (dump_code)
             {
                 fwrite (&codingVec[0], sizeof(double), codingVec.size(), fout_code);
             }
@@ -121,14 +124,14 @@ private:
             Stamp stamp;
             this->getEnvelope(stamp);
 
-            if(port_out_code.getOutputCount())
+            if (port_out_code.getOutputCount())
             {
                 port_out_code.setEnvelope(stamp);
                 yarp::sig::Vector codingYarpVec(codingVec.size(), &codingVec[0]);
                 port_out_code.write(codingYarpVec);
             }
 
-            if(port_out_img.getOutputCount())
+            if (port_out_img.getOutputCount())
             {
                 port_out_img.write(img);
             }
