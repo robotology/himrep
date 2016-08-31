@@ -5,7 +5,7 @@
 add_subdirectory(linearClassifierModule)
 #add_subdirectory(sparseCoder)
 
-add_subdirectory(GIECoder)
+#add_subdirectory(GIECoder)
 
 find_package(Caffe)
 if (Caffe_FOUND)
