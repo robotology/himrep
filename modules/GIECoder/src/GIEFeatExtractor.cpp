@@ -297,15 +297,15 @@ GIEFeatExtractor::~GIEFeatExtractor()
 bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &features, float (&times)[2])
 {
 
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
     // Check input image 
     if (imMat.empty())
 	{
 		std::cout << "GIEFeatExtractor::extract_singleFeat_1D(): empty imMat!" << std::endl;
-		return -1;
+		return false;
 	}
-
-    times[0] = 0.0f;
-    times[1] = 0.0f;
 
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
@@ -347,7 +347,7 @@ bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &feat
         else
         {
             std::cout << "GIEFeatExtractor::extract_singleFeat_1D(): cannot subtract mean image!" << std::endl;
-            return -1;
+            return false;
         }
     }
     else
@@ -402,7 +402,7 @@ bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &feat
 
     }
 
-    return 1;
+    return true;
 
 }
 

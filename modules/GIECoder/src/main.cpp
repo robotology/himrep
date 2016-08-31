@@ -104,7 +104,7 @@ private:
 
             std::vector<float> codingVecFloat;
             float times[2];
-            if (gie_extractor->extract_singleFeat_1D(matImg, codingVecFloat, times)==-1)
+            if (!gie_extractor->extract_singleFeat_1D(matImg, codingVecFloat, times))
             {
                 std::cout << "GIEFeatExtractor::extract_singleFeat_1D(): failed..." << std::endl;
                 return;
@@ -153,15 +153,15 @@ public:
         // Data initialization (specific for Caffe method)
 
         // Binary file (.caffemodel) containing the network's weights
-        string caffemodel_file = rf.check("caffemodel_file", Value("googlenet.prototxt")).asString().c_str();
+        string caffemodel_file = rf.check("caffemodel_file", Value("/usr/local/src/robot/GIE/models/bvlc_googlenet/bvlc_googlenet.caffemodel")).asString().c_str();
         cout << "Setting .caffemodel file to " << caffemodel_file << endl;
            
         // Text file (.prototxt) defining the network structure
-        string prototxt_file = rf.check("prototxt_file", Value("googlenet.prototxt")).asString().c_str();
+        string prototxt_file = rf.check("prototxt_file", Value("/usr/local/src/robot/GIE/models/bvlc_googlenet/deploy.prototxt")).asString().c_str();
         cout << "Setting .prototxt file to " << prototxt_file << endl;
 
         // Name of blobs to be extracted
-        string blob_name = rf.check("blob_name", Value("fc6")).asString().c_str();
+        string blob_name = rf.check("blob_name", Value("pool5/7x7_s1")).asString().c_str();
 
         // Boolean flag for timing or not the feature extraction
         bool timing = rf.check("timing",Value(false)).asBool();
@@ -171,15 +171,7 @@ public:
         int resizeWidth = -1, resizeHeight = -1;
         if (rf.find("binaryproto_meanfile").isNull() && rf.find("meanR").isNull())
         {
-            string Caffe_ROOT = string( getenv("Caffe_ROOT") );
-            if (Caffe_ROOT!="")
-            {
-                binaryproto_meanfile = Caffe_ROOT + "/data/ilsvrc12/imagenet_mean.binaryproto";
-                cout << "Setting .binaryproto file to " << binaryproto_meanfile << endl;
-            } else
-            {
-                cout << "ERROR: empty env variable 'Caffe_ROOT' and missing mean info!!!!!" << endl;
-            }
+            cout << "ERROR: missing mean info!!!!!" << endl;
         }
         else if (rf.find("binaryproto_meanfile").isNull())
         {
@@ -194,12 +186,12 @@ public:
         } 
         else if (rf.find("meanR").isNull())
         {
-            binaryproto_meanfile = rf.check("binaryproto_meanfile", Value("imagenet_mean.binaryproto")).asString().c_str();
+            binaryproto_meanfile = rf.check("binaryproto_meanfile", Value("/usr/local/src/robot/GIE/data/ilsvrc12/imagenet_mean.binaryproto")).asString().c_str();
             cout << "Setting .binaryproto file to " << binaryproto_meanfile << endl;
         }
         else
         {
-            std::cout << "ERROR: need either mean file (.binaryproto) or mean pixel values!" << std::endl;
+            std::cout << "ERROR: need EITHER mean file (.binaryproto) OR mean pixel values!" << std::endl;
         }
 
         gie_extractor = new GIEFeatExtractor(caffemodel_file, binaryproto_meanfile, meanR, meanG, meanB,
