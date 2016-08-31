@@ -163,8 +163,8 @@ bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfil
         return -1;
     }
 
-    if ( CUDA_FAILED( cudaSetDeviceFlags(cudaDeviceMapHost)) )
-        return -1;
+    //if ( CUDA_FAILED( cudaSetDeviceFlags(cudaDeviceMapHost)) )
+    //    return -1;
 
     // Assign specified .caffemodel, .binaryproto, .prototxt files     
     caffemodel_file  = _caffemodel_file;
@@ -352,7 +352,7 @@ bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &feat
     }
     else
     {  
-        imMat = imMat - cv::Scalar(meanR, meanG, meanB);
+        imMat = imMat - cv::Scalar(meanB, meanG, meanR);
     }
 
     // crop to input dimension (central crop)
