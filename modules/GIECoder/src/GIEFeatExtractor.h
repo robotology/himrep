@@ -31,6 +31,8 @@ class Logger : public nvinfer1::ILogger
 class GIEFeatExtractor {
 
 protected:
+    
+    bool cudaFreeMapped(void *cpuPtr);
 
     bool cudaAllocMapped( void** cpuPtr, void** gpuPtr, size_t size );
 
@@ -49,7 +51,7 @@ protected:
 	nvinfer1::ICudaEngine* mEngine;
 	nvinfer1::IExecutionContext* mContext;
 
-    nvcaffeparser1::IBinaryProtoBlob* meanBlob;
+    cv::Mat meanMat;
     float meanR;
     float meanG;
     float meanB;
@@ -85,7 +87,7 @@ public:
 
     ~GIEFeatExtractor();
 
-    float extract_singleFeat_1D(cv::Mat &image, vector<float> &features);
+    bool extract_singleFeat_1D(cv::Mat &image, vector<float> &features,  float (&times)[2]);
 };
 
 #endif /* GIEFEATEXTRACTOR_H_ */
