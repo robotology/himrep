@@ -1109,15 +1109,15 @@ template<class Dtype>
 bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dtype> &features, float (&times)[2])
 {
 
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
     // Check input image
     if (image.empty())
     {
         std::cout << "CaffeFeatExtractor::extract_singleFeat_1D(): empty imMat!" << std::endl;
         return false;
     }
-
-    times[0] = 0.0f;
-    times[1] = 0.0f;
 
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
