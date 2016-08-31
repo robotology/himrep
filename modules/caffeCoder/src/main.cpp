@@ -103,16 +103,22 @@ private:
             // Extract the feature vector
 
             std::vector<float> codingVecFloat;
-            float msecPerImage = caffe_extractor->extract_singleFeat_1D(matImg, codingVecFloat);
+            float times[2];
+            caffe_extractor->extract_singleFeat_1D(matImg, codingVecFloat, times);
+            if (!caffe_extractor->extract_singleFeat_1D(matImg, codingVecFloat, times))
+            {
+                std::cout << "CaffeFeatExtractor::extract_singleFeat_1D(): failed..." << std::endl;
+                return;
+            }
             std::vector<double> codingVec(codingVecFloat.begin(), codingVecFloat.end());
 
             if (caffe_extractor->timing)
             {
-                cout << msecPerImage << " msec" << endl;
+                std::cout << times[0] << ": PREP " << times[1] << ": NET" << std::endl;
             }
 
             // Dump if required
-            if(dump_code)
+            if (dump_code)
             {
                 fwrite (&codingVec[0], sizeof(double), codingVec.size(), fout_code);
             }
@@ -149,51 +155,30 @@ public:
         // Data initialization (specific for Caffe method)
 
         // Binary file (.caffemodel) containing the network's weights
-        string pretrained_binary_proto_file;
-        if (rf.find("pretrained_binary_proto_file").isNull())
-        {
-            pretrained_binary_proto_file = "models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel";
-
-            string Caffe_ROOT = string( getenv("Caffe_ROOT") );
-            if (Caffe_ROOT!="")
-            {
-                pretrained_binary_proto_file = Caffe_ROOT + "/" + pretrained_binary_proto_file;
-                cout << "Setting .caffemodel file to " << pretrained_binary_proto_file << endl;
-            } else
-            {
-                cout << "Empty env variable 'Caffe_ROOT' and missing 'pretrained_binary_proto_file' in .ini, setting .caffemodel file to ''" << endl;
-                pretrained_binary_proto_file = "";
-            }
-        }
-        else
-        {
-            pretrained_binary_proto_file = rf.find("pretrained_binary_proto_file").asString().c_str();
-            cout << "Setting .caffemodel file to " << pretrained_binary_proto_file << endl;
-        }
+        string caffemodel_file = rf.check("caffemodel_file", Value("/usr/local/src/robot/caffe/models/bvlc_googlenet/bvlc_googlenet.caffemodel")).asString().c_str();
+        cout << "Setting .caffemodel file to " << caffemodel_file << endl;
 
         // Text file (.prototxt) defining the network structure
-        string feature_extraction_proto_filename = rf.check("feature_extraction_proto_file", Value("imagenet_val_cutfc6.prototxt")).asString().c_str();
-        string feature_extraction_proto_file = rf.findFile(feature_extraction_proto_filename);
-        if (feature_extraction_proto_file == "")
-        {
-            feature_extraction_proto_file = contextPath + "/" + feature_extraction_proto_filename;
-        }
-        cout << "Setting .prototxt file to " << feature_extraction_proto_file << endl;
+        string prototxt_file = rf.check("prototxt_file", Value(contextPath + "/bvlc_googlenet_val_cutpool5.prototxt")).asString().c_str();
+        cout << "Setting .prototxt file to " << prototxt_file << endl;
 
         // Name of blobs to be extracted
-        string extract_features_blob_names = rf.check("extract_features_blob_names", Value("fc6")).asString().c_str();
+        string blob_names = rf.check("blob_names", Value("pool5/7x7_s1")).asString().c_str();
+
+        // Boolean flag for timing or not the feature extraction
+        bool timing = rf.check("timing",Value(false)).asBool();
 
         // Compute mode and eventually GPU ID to be used
         string compute_mode = rf.check("compute_mode", Value("GPU")).asString();
         int device_id = rf.check("device_id", Value(0)).asInt();
 
-        // Boolean flag for timing or not the feature extraction
-        bool timing = rf.check("timing",Value(false)).asBool();
+        int resizeWidth = rf.check("resizeWidth", Value(256)).asDouble();
+        int resizeHeight = rf.check("resizeHeight", Value(256)).asDouble();
 
         caffe_extractor = NULL;
-        caffe_extractor = new CaffeFeatExtractor<float>(pretrained_binary_proto_file,
-                feature_extraction_proto_file,
-                extract_features_blob_names,
+        caffe_extractor = new CaffeFeatExtractor<float>(caffemodel_file,
+                prototxt_file, resizeWidth, resizeHeight,
+                blob_names,
                 compute_mode,
                 device_id,
                 timing);
