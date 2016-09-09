@@ -8,7 +8,7 @@ set(PROJECTNAME GIECoder)
 project(${PROJECTNAME})
 
 # setup GIE
-set(GIE_PATH "$ENV{ROBOT_CODE}/GIE" CACHE FILEPATH "Path to GPU Inference Engine")
+#set(GIE_PATH "$ENV{ROBOT_CODE}/GIE" CACHE FILEPATH "Path to GPU Inference Engine")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")	# -std=gnu++11
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
@@ -28,8 +28,8 @@ set(
 include_directories(${YARP_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-include_directories(${GIE_PATH}/include)
-link_directories(${GIE_PATH}/lib)
+#include_directories(${GIE_PATH}/include)
+#link_directories(${GIE_PATH}/lib)
 
 include_directories(${PROJECT_SOURCE_DIR})
 
