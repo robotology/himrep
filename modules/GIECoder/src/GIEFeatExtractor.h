@@ -12,8 +12,8 @@
 #include <cuda_runtime.h>
 
 // GIE
-//#include "Infer.h"
-#include "caffeParser.h"
+#include "NvInfer.h"
+#include "NvCaffeParser.h"
 #include "cudaUtility.h"
 
 using namespace cv;
@@ -21,11 +21,11 @@ using namespace cv;
 // Logger for GIE info/warning/errors
 class Logger : public nvinfer1::ILogger			
 {
-	void log( Severity severity, const char* msg ) override
-	{
-		if( severity != Severity::kINFO )
-			std::cout << msg << std::endl;
-	}
+    void log( Severity severity, const char* msg ) override
+    {
+    if( severity != Severity::kINFO )
+        std::cout << msg << std::endl;
+    }
 };
 
 class GIEFeatExtractor {
@@ -36,11 +36,12 @@ protected:
 
     bool cudaAllocMapped( void** cpuPtr, void** gpuPtr, size_t size );
 
-    bool caffeToGIEModel( const std::string& deployFile,			// name for caffe prototxt
-					      const std::string& modelFile,				// name for model 
+    bool caffeToGIEModel( const std::string& deployFile,			        // name for caffe prototxt
+					      const std::string& modelFile,	        // name for model
+                                              const std::string& binaryprotoFile,             // name for .binaryproto
 					      const std::vector<std::string>& outputs,  // network outputs
-					      unsigned int maxBatchSize,				// batch size - NB must be at least as large as the batch we want to run with)
-					      std::ostream& gieModelStream);			// output stream for the GIE model
+					      unsigned int maxBatchSize,		// batch size - NB must be at least as large as the batch we want to run with)
+					      std::ostream& gieModelStream);		// output stream for the GIE model
 
     bool init(string _caffemodel_file,
             string _binaryproto_meanfile, float meanR, float meanG, float meanB, 
@@ -48,8 +49,8 @@ protected:
             string _blob_name);
 
     nvinfer1::IRuntime* mInfer;
-	nvinfer1::ICudaEngine* mEngine;
-	nvinfer1::IExecutionContext* mContext;
+    nvinfer1::ICudaEngine* mEngine;
+    nvinfer1::IExecutionContext* mContext;
 
     cv::Mat meanMat;
     float meanR;
@@ -58,18 +59,18 @@ protected:
     nvinfer1::Dims4 resizeDims;
 
     uint32_t mWidth;
-	uint32_t mHeight;
-	uint32_t mInputSize;
-	float*   mInputCPU;
-	float*   mInputCUDA;
+    uint32_t mHeight;
+    uint32_t mInputSize;
+    float*   mInputCPU;
+    float*   mInputCUDA;
 	
-	uint32_t mOutputSize;
+    uint32_t mOutputSize;
     uint32_t mOutputDims;
-	float*   mOutputCPU;
-	float*   mOutputCUDA;
+    float*   mOutputCPU;
+    float*   mOutputCUDA;
 
     Logger  gLogger;
-    
+
 public:
 
     string prototxt_file;
