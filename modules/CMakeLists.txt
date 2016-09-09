@@ -12,7 +12,7 @@ if (BUILD_GIE)
 	add_subdirectory(GIECoder)
 endif()
 
-if (BUILD_CAFFE)
+if (BUILD_caffe)
 	find_package(Caffe)
 	if (Caffe_FOUND)
     		message(STATUS "Caffe is found => caffeCoder will be compiled")
