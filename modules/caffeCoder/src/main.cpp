@@ -163,7 +163,8 @@ public:
         cout << "Setting .prototxt file to " << prototxt_file << endl;
 
         // Name of blobs to be extracted
-        string blob_names = rf.check("blob_names", Value("pool5/7x7_s1")).asString().c_str();
+        string blob_name = rf.check("blob_name", Value("pool5/7x7_s1")).asString().c_str();
+        cout << "Setting blob_names to " << blob_name << endl;
 
         // Boolean flag for timing or not the feature extraction
         bool timing = rf.check("timing",Value(false)).asBool();
@@ -186,7 +187,7 @@ public:
         caffe_extractor = NULL;
         caffe_extractor = new CaffeFeatExtractor<float>(caffemodel_file,
                 prototxt_file, resizeWidth, resizeHeight,
-                blob_names,
+                blob_name,
                 compute_mode,
                 device_id,
                 timing);
