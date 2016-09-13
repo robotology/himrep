@@ -36,12 +36,12 @@ protected:
 
     bool cudaAllocMapped( void** cpuPtr, void** gpuPtr, size_t size );
 
-    bool caffeToGIEModel( const std::string& deployFile,			        // name for caffe prototxt
-					      const std::string& modelFile,	        // name for model
-                                              const std::string& binaryprotoFile,             // name for .binaryproto
+    bool caffeToGIEModel( const std::string& deployFile,		    // name for caffe prototxt
+					      const std::string& modelFile,	            // name for model
+                          const std::string& binaryprotoFile,       // name for .binaryproto
 					      const std::vector<std::string>& outputs,  // network outputs
-					      unsigned int maxBatchSize,		// batch size - NB must be at least as large as the batch we want to run with)
-					      std::ostream& gieModelStream);		// output stream for the GIE model
+					      unsigned int maxBatchSize,		        // batch size - NB must be at least as large as the batch we want to run with)
+					      std::ostream& gieModelStream);		    // output stream for the GIE model
 
     bool init(string _caffemodel_file,
             string _binaryproto_meanfile, float meanR, float meanG, float meanB, 
@@ -52,10 +52,10 @@ protected:
     nvinfer1::ICudaEngine* mEngine;
     nvinfer1::IExecutionContext* mContext;
 
-    cv::Mat meanMat;
-    float meanR;
-    float meanG;
-    float meanB;
+    //cv::Mat meanMat;
+    float *meanData;
+    vector<float> mean_values;
+
     nvinfer1::Dims4 resizeDims;
 
     uint32_t mWidth;
