@@ -31,7 +31,7 @@ bool GIEFeatExtractor::cudaFreeMapped(void *cpuPtr)
 
 bool GIEFeatExtractor::caffeToGIEModel( const std::string& deployFile,			// name for .prototxt
 					const std::string& modelFile,	                // name for .caffemodel
-                                        const std::string& binaryprotoFile,             // name for .binaryproto
+                    const std::string& binaryprotoFile,             // name for .binaryproto
 					const std::vector<std::string>& outputs,        // network outputs
 					unsigned int maxBatchSize,			// batch size - NB must be at least as large as the batch we want to run with)
 					std::ostream& gieModelStream)		        // output stream for the GIE model
@@ -68,15 +68,22 @@ bool GIEFeatExtractor::caffeToGIEModel( const std::string& deployFile,			// name
 
         nvcaffeparser1::IBinaryProtoBlob* meanBlob = parser->parseBinaryProto(binaryprotoFile.c_str());
         resizeDims = meanBlob->getDimensions();
-        const float *meanData = reinterpret_cast<const float*>(meanBlob->getData());  // expected to be float* (c,h,w)
-        float *meanDataChangeable = (float *) malloc(resizeDims.w*resizeDims.h*resizeDims.c*resizeDims.n*sizeof(float));
-        memcpy(meanDataChangeable, meanData, resizeDims.w*resizeDims.h*resizeDims.c*resizeDims.n*sizeof(float) );
+
+        const float *meanDataConst = reinterpret_cast<const float*>(meanBlob->getData());  // expected to be float* (c,h,w)
+        
+        meanData = (float *) malloc(resizeDims.w*resizeDims.h*resizeDims.c*resizeDims.n*sizeof(float));
+        memcpy(meanData, meanDataConst, resizeDims.w*resizeDims.h*resizeDims.c*resizeDims.n*sizeof(float) );
+
+        //cv::Mat tmpMat(resizeDims.h, resizeDims.w, CV_8UC3, meanDataChangeable);
+
+        //cv::cvtColor(tmpMat, tmpMat, CV_RGB2BGR);
+        //std::cout << "converted" << std::endl;
+
+        //tmpMat.copyTo(meanMat);
+
         meanBlob->destroy();
-        cv::Mat tmpMat(resizeDims.h, resizeDims.w, CV_32FC3, meanDataChangeable);
-        cv::cvtColor(tmpMat, tmpMat, CV_RGB2BGR);
-        std::cout << "converted" << std::endl;
-        tmpMat.copyTo(meanMat);
-        free(meanDataChangeable);
+        //free(meanDataChangeable);
+
     }
 
     // the caffe file has no notion of outputs, so we need to manually say which tensors the engine should generate
@@ -127,9 +134,6 @@ GIEFeatExtractor::GIEFeatExtractor(string _caffemodel_file,
     mInfer   = NULL;
     mContext = NULL;
 
-    meanR = -1;
-    meanG = -1;
-    meanB = -1;
     resizeDims.n = -1;
     resizeDims.c = -1;
     resizeDims.w = -1;
@@ -173,15 +177,15 @@ bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfil
     int whichDevice;
 
     if ( CUDA_FAILED( cudaGetDevice(&whichDevice)) )
-       return -1;
+       return false;
  
     if ( CUDA_FAILED( cudaGetDeviceProperties(&prop, whichDevice)) )
-       return -1;
+       return false;
 
     if (prop.canMapHostMemory != 1)
     {
-        std::cout << "Device cannot map memory!" << std::endl;
-        return -1;
+       std::cout << "Device cannot map memory!" << std::endl;
+       return false;
     }
 
     //if ( CUDA_FAILED( cudaSetDeviceFlags(cudaDeviceMapHost)) )
@@ -190,9 +194,11 @@ bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfil
     // Assign specified .caffemodel, .binaryproto, .prototxt files     
     caffemodel_file  = _caffemodel_file;
     binaryproto_meanfile = _binaryproto_meanfile;
-    meanR = _meanR;
-    meanG = _meanG;
-    meanB = _meanB;
+    
+    mean_values.push_back(_meanB);
+    mean_values.push_back(_meanG);
+    mean_values.push_back(_meanR);
+
     prototxt_file = _prototxt_file;
     
     //Assign blob to be extracted
@@ -300,6 +306,9 @@ GIEFeatExtractor::~GIEFeatExtractor()
 
     cudaFreeMapped(mOutputCPU);
     cudaFreeMapped(mInputCPU);
+
+    if (mean_values[0]==-1)
+        free(meanData);
 }
 
 bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &features, float (&times)[2])
@@ -328,22 +337,53 @@ bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &feat
     }
 
     // Image preprocessing
-
-    // convert to float (with range 0-255)
-    imMat.convertTo(imMat, CV_32FC3);
-    
-    // resize 
+ 
+    // resize (to 256x256 or to the size of the mean mean image)
     if (imMat.rows != resizeDims.h || imMat.cols != resizeDims.w)
     {
-        if (imMat.rows > resizeDims.h || imMat.cols > resizeDims.w)
-        {
-            cv::resize(imMat, imMat, cv::Size(resizeDims.h, resizeDims.w), 0, 0, CV_INTER_LANCZOS4);
-        }
-        else
-        {
-            cv::resize(imMat, imMat, cv::Size(resizeDims.h, resizeDims.w), 0, 0, CV_INTER_LINEAR);
-        }
+       if (imMat.rows > resizeDims.h || imMat.cols > resizeDims.w)
+       {
+           cv::resize(imMat, imMat, cv::Size(resizeDims.h, resizeDims.w), 0, 0, CV_INTER_LANCZOS4);
+       }
+       else
+       {
+           cv::resize(imMat, imMat, cv::Size(resizeDims.h, resizeDims.w), 0, 0, CV_INTER_LINEAR);
+       }
     }
+
+    // crop and subtract the mean image or the mean pixel
+    int h_off = (imMat.rows - mHeight) / 2;
+    int w_off = (imMat.cols - mWidth) / 2;
+
+    cv::Mat cv_cropped_img = imMat;
+    cv::Rect roi(w_off, h_off, mWidth, mHeight);
+    cv_cropped_img = imMat(roi);
+
+    int top_index;
+    for (int h = 0; h < mHeight; ++h)
+    {
+       const uchar* ptr = cv_cropped_img.ptr<uchar>(h);
+       int img_index = 0;
+       for (int w = 0; w < mWidth; ++w)
+       {
+           for (int c = 0; c < imMat.channels(); ++c)
+           {
+               top_index = (c * mHeight + h) * mWidth + w;
+               float pixel = static_cast<float>(ptr[img_index++]);
+               if (mean_values[0]==-1)
+               {
+                   int mean_index = (c * imMat.rows + h_off + h) * imMat.cols + w_off + w;
+                   mInputCPU[top_index] = pixel - meanData[mean_index];
+                }
+                else
+                {
+                    mInputCPU[top_index] = pixel - mean_values[c]; 
+                }
+            }
+         }
+      }
+
+    /*
 
     // subtract mean 
     if (meanR==-1)
@@ -374,12 +414,15 @@ bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &feat
         cv::resize(imMat, imMat, cv::Size(mHeight, mWidth), 0, 0, CV_INTER_LINEAR);
     }
 
-     if ( !imMat.isContinuous() ) 
-          imMat = imMat.clone();
+    // convert to float (with range 0-255)
+    imMat.convertTo(imMat, CV_32FC3);
+
+    if ( !imMat.isContinuous() ) 
+          imMat = imMat.clone();*/
 
     // copy 
     //CUDA( cudaMemcpy(mInputCPU, imMat.data, mInputSize, cudaMemcpyDefault) );
-    memcpy(mInputCPU, imMat.data, mInputSize);
+    //memcpy(mInputCPU, imMat.data, mInputSize);
 
     void* inferenceBuffers[] = { mInputCUDA, mOutputCUDA };
 
