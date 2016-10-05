@@ -96,7 +96,7 @@ make
 make install
 ```
 
-Where in the CMake configuration you should have set the installation path (CMAKE_INSTALL_PREFIX) to one of your choice. In this case, set the `OpenCV_DIR` environment variable to the installation path to allow Caffe finding it.
+Where in the CMake configuration you should have set the installation path (`CMAKE\_INSTALL\_PREFIX`) to one of your choice. In this case, set the `OpenCV_DIR` environment variable to the installation path to allow Caffe finding it.
 
 ##### Other packages
 
@@ -125,7 +125,15 @@ snappy:<br>
 
 ##### Caffe compilation
 
-At present we support the first and only [Caffe release candidate 3](https://github.com/BVLC/caffe/releases) that is version 1.0.0.rc3. You can download it from the linked page.
+Since Caffe is under active development, and we try to be compatible with the changes progressively introduced in the framework, we periodically check the compatibility of `himrep` modules against Caffe's `master` branch. At present the latest commit that we verified to work with `CaffeCoder` is `b2982c7eef65a1b94db6f22fb8bb7caa986e6f29`, hence you should clone Caffe's `master` branch and checkout to this commit:
+
+```
+git clone https://www.github.com/BVLC/caffe.git
+cd caffe
+git checkout b2982c7eef65a1b94db6f22fb8bb7caa986e6f29
+```
+But of course you can try building `CaffeCoder` with latest Caffe's `master` commit.
+Note that at present [Caffe RC3](https://github.com/BVLC/caffe/releases) is not compatible anymore with `CaffeCoder`.
 
 In order to be able to link Caffe from an external project via CMake (as this application does) you should compile Caffe via CMake and not manually editing the Makefile.config.
 
