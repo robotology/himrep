@@ -1,0 +1,66 @@
+
+  /**
+  *
+  * @ingroup icub_module
+  * \defgroup GIECoder GIECoder
+  * The module computes a vectorial representation of the input image using TensorRT library.
+  * Version:1.0
+  * \author  Giulia Pasqualegiulia.pasquale@iit.it
+  * \n
+  * \copyright Released under the terms of the GNU GPL v2.0
+  * \section intro_sec Description
+  *
+  
+
+    @subsection sec-intro Introduction
+
+    The input image is passed through a feed-forward Convolutional Neural Network (CNN) model that has been previously learned. The image representation can be extracted as the output of any layer in the network. Usually the latest convolutional layer is chosen and the output is a 1-dimensional vector, than is then fed to a classifier (e.g., linear SVM/RLS).
+
+    
+  * \section parameters_sec Parameters
+  
+  *- -- name : name of the module
+  *- -- from : configuration file name
+  *- -- context : select the current context
+  *- -- caffemodel_file : Absolute path to the .caffemodel file containing the weights of the network used.
+  *- -- prototxt_file : Absolute path to the .prototxt file containing the definition of the network (or part of the network) used.
+  *- -- blob_name : Tag (defined in the .prototxt) of the layer at which we want to extract the features.
+  *- -- compute_mode : [GPU|gpu|CPU|cpu] passed to Caffe initialization.
+  *- -- device_id : GPU device chosen by Caffe to run the computations (used if compute_mode is set to GPU|gpu).
+  *- -- timing : [true|false] depending on whether you desire to read in the stdout the time to extract the features.
+  *- -- resizeWidth : Integer specifying the width to which resize (anysotropically) the image before feeding it to the network. This is used if the mean pixel is subtracted from the input image and must be coupled with `resizeHeight`.
+  *- -- resizeHeight : Integer specifying the height to which resize (anysotropically) the image before feeding it to the network. This is used if the mean pixel is subtracted from the input image and must be coupled with `resizeWidth`.
+  *- -- dump_code : Path where to save the features extracted from each image in a binary format.
+  *- -- binaryproto_meanfile : Absolute path to the .binaryproto file containing the mean image of the training set to be subtracted from each image before being fed to the network..
+  *- -- meanR : Integer in [0 255] specifying the RED pixel value to be subtracted from each image before feeding it to the network. This must be coupled with `meanB` and `meanG` parameters.
+  *- -- meanG : Integer in [0 255] specifying the GREEN pixel value to be subtracted from each image before feeding it to the network. This must be coupled with `meanB` and `meanR` parameters.
+  *- -- meanB : Integer in [0 255] specifying the BLUE pixel value to be subtracted from each image before feeding it to the network. This must be coupled with `meanR` and `meanG` parameters.
+  * \section inputports_sec Input Ports
+  * 
+  *- /GIECoder/rpc [rpc]  [default carrier:]: Receiveds the following commands and provides replies: (notation: [.] identifies a vocab, "." specifies a string)
+            -# <b>help</b> <i>[help]</i>: print the available commands
+            -# <b>start saving features</b> <i>[dump] "path-to-file" "a"</i>: starts to save features in a binary file. "a" (optional) stands for "append". "path-to-file" (optional) is set to: contextPath + "/codes.bin" if not provided
+            -# <b>stop saving features</b> <i>[stop]</i>: stop saving features
+            
+  *
+  
+  *- /GIECoder/img:i [Image]  [default carrier:]: Feed images to GIECoder using this port.
+  *
+  
+  * \section outputports_sec Output Ports
+  * 
+  *- /GIECoder/img:o [Image]  [default carrier:]: Output image (equal to the input).
+  *
+  
+  *- /GIECoder/code:o [Vector]  [default carrier:]: Output vectorial representation of the image.
+  *
+  
+  *
+  * \section services_sec Services
+  * 
+  *
+  * 
+  *
+  *
+  **/
+
