@@ -7,8 +7,10 @@
 #include <opencv2/opencv.hpp>
 
 // CUDA-C includes
-#include <cuda.h>
-#include <cuda_runtime.h>
+#ifdef HAS_CUDA
+    #include <cuda.h>
+    #include <cuda_runtime.h>
+#endif
 
 // Boost
 #include "boost/algorithm/string.hpp"
@@ -182,8 +184,10 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
         Caffe::set_mode(Caffe::CPU);
     }
 
-    cudaEvent_t start, stop;
-
+    #ifdef HAS_CUDA
+        cudaEvent_t start, stop;
+    #endif
+    
     if (timing)
     {
         cudaEventCreate(&start);
@@ -319,7 +323,9 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
         Caffe::set_mode(Caffe::CPU);
     }
 
-    cudaEvent_t start, stop;
+    #ifdef HAS_CUDA
+        cudaEvent_t start, stop;
+    #endif
 
     if (timing)
     {
@@ -458,7 +464,9 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
         Caffe::set_mode(Caffe::CPU);
     }
 
-    cudaEvent_t start, stop;
+    #ifdef HAS_CUDA
+        cudaEvent_t start, stop;
+    #endif
 
     if (timing)
     {
@@ -566,7 +574,9 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
         Caffe::set_mode(Caffe::CPU);
     }
 
-    cudaEvent_t start, stop;
+    #ifdef HAS_CUDA
+        cudaEvent_t start, stop;
+    #endif
 
     if (timing)
     {
@@ -678,7 +688,9 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
         Caffe::set_mode(Caffe::CPU);
     }
 
-    cudaEvent_t start, stop;
+    #ifdef HAS_CUDA
+        cudaEvent_t start, stop;
+    #endif
 
     if (timing)
     {
@@ -822,7 +834,9 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
         Caffe::set_mode(Caffe::CPU);
     }
 
-    cudaEvent_t start, stop;
+    #ifdef HAS_CUDA
+        cudaEvent_t start, stop;
+    #endif
 
     if (timing)
     {
@@ -964,7 +978,9 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
         Caffe::set_mode(Caffe::CPU);
     }
 
-    cudaEvent_t start, stop;
+    #ifdef HAS_CUDA
+        cudaEvent_t start, stop;
+    #endif
 
     if (timing)
     {
@@ -1070,7 +1086,9 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
         Caffe::set_mode(Caffe::CPU);
     }
 
-    cudaEvent_t start, stop;
+    #ifdef HAS_CUDA
+        cudaEvent_t start, stop;
+    #endif
 
     if (timing)
     {

@@ -184,12 +184,20 @@ public:
         string extract_features_blob_names = rf.check("extract_features_blob_names", Value("fc6")).asString().c_str();
 
         // Compute mode and eventually GPU ID to be used
-        string compute_mode = rf.check("compute_mode", Value("GPU")).asString();
-        int device_id = rf.check("device_id", Value(0)).asInt();
-
-        // Boolean flag for timing or not the feature extraction
-        bool timing = rf.check("timing",Value(false)).asBool();
-
+        int device_id;
+        bool timing;
+        string compute_mode;
+        
+        #ifdef HAS_CUDA
+            compute_mode = rf.check("compute_mode", Value("GPU")).asString();
+            device_id = rf.check("device_id", Value(0)).asInt();
+            timing = rf.check("timing",Value(false)).asBool(); // flag for timing feature extraction
+        #else
+            compute_mode = "CPU";
+            device_id = -1;
+            timing = false;
+        #endif
+        
         caffe_extractor = NULL;
         caffe_extractor = new CaffeFeatExtractor<float>(pretrained_binary_proto_file,
                 feature_extraction_proto_file,
