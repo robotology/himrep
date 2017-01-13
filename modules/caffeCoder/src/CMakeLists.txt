@@ -10,26 +10,13 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(OpenCV REQUIRED)
 
-if (NOT Caffe_CPU_ONLY)
-
-    add_definitions(-DHAS_CUDA)
-    
-    find_package(CUDA REQUIRED)
-    
-    list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_20,code=sm_20)
-    list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30)
-    list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_35,code=sm_35)
-    list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_50,code=sm_50)
-    
-endif()
-
 include_directories(${YARP_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${Caffe_INCLUDE_DIRS})
 
 include_directories(${PROJECT_SOURCE_DIR})
 
-#if(NOT CPU_ONLY)
+#if(NOT Caffe_CPU_ONLY)
   #no need to use the following instruction because this is automatically done by CUDA_ADD_EXECUTABLE
   #include_directories(${CUDA_INCLUDE_DIRS})
 #endif()
