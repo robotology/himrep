@@ -1,0 +1,79 @@
+\doxysection{linear\+Classifier}
+\label{group__icub__linearClassifier}\index{linearClassifier@{linearClassifier}}
+
+
+The module implements a linear classifier wrapped around liblinear library.  
+
+
+The module implements a linear classifier wrapped around liblinear library. 
+
+\hypertarget{group__GIECoder_intro_sec}{}\doxysubsection{Description}\label{group__GIECoder_intro_sec}
+This module is responsible for learning and classify feature vectors. Input features are passed, the output are the scores of SVM machines. The module provides training methods with real-\/time performances.
+
+The commands sent as bottles to the module port /linear\+Classifier/rpc are the following\+:
+
+(notation\+: \mbox{[}.\mbox{]} identifies a vocab, $<$.$>$ specifies a double, \char`\"{}.\char`\"{} specifies a string)
+
+{\bfseries{SAVE}} ~\newline
+format\+: \mbox{[}save\mbox{]} \char`\"{}class\+\_\+name\char`\"{} ~\newline
+action\+: starts to dump feature vector in the \char`\"{}class\+\_\+name\char`\"{} folder.
+
+{\bfseries{STOP}} ~\newline
+format\+: \mbox{[}stop\mbox{]} ~\newline
+action\+: stops all the current activities, the module will be waiting for new commands.
+
+{\bfseries{TRAIN}} ~\newline
+format\+: \mbox{[}train\mbox{]} ~\newline
+action\+: starts the training process by reading all the database previously acquired via the \mbox{[}save\mbox{]} command.
+
+{\bfseries{FORGET}} ~\newline
+format\+: \mbox{[}forget\mbox{]} \char`\"{}class\char`\"{} ~\newline
+action\+: forgets the \char`\"{}class\char`\"{}, deleting all the feature vectors in the database. If \char`\"{}class\char`\"{}=\char`\"{}all\char`\"{} all the classes are forgotten.
+
+{\bfseries{LIST}} ~\newline
+format\+: \mbox{[}obj\+List\mbox{]} ~\newline
+action\+: retrieves the current classes saved in the database.
+
+{\bfseries{CHANGE NAME}} ~\newline
+format\+: \mbox{[}change\+Name\mbox{]} \char`\"{}old\+\_\+name\char`\"{} \char`\"{}new\+\_\+name\char`\"{} ~\newline
+action\+: change the current name of a known object with a new name.
+
+{\bfseries{RECOGNIZE}} ~\newline
+format\+: \mbox{[}recognize\mbox{]} ~\newline
+action\+: starts the recognition process.\hypertarget{group__icub__sparseCoder_lib_sec}{}\doxysubsection{Libraries}\label{group__icub__sparseCoder_lib_sec}
+
+\begin{DoxyItemize}
+\item YARP libraries.
+\item liblinear
+\end{DoxyItemize}\hypertarget{group__icub__sparseCoder_portsc_sec}{}\doxysubsection{Ports Created}\label{group__icub__sparseCoder_portsc_sec}
+
+\begin{DoxyItemize}
+\item {\itshape /linear\+Classifier/features}\+:i receives feature vector.
+\item {\itshape /linear\+Classifier/classification}\+:o streams out the current class winner name.
+\item {\itshape /linear\+Classifier/scores}\+:o streams out the scores for the received input in the format \char`\"{}class\char`\"{} \char`\"{}score\char`\"{}.
+\item {\itshape /linear\+Classifier/rpc} receives requests for SIFT dump or dictionary learning.
+\end{DoxyItemize}\hypertarget{group__GIECoder_parameters_sec}{}\doxysubsection{Parameters}\label{group__GIECoder_parameters_sec}
+--Buffer\+Size {\itshape buffer} 
+\begin{DoxyItemize}
+\item specify the buffer\+Size for weighting the output scores.
+\end{DoxyItemize}
+
+--CSVM {\itshape value} 
+\begin{DoxyItemize}
+\item specify the value for the regularization parameter used during the training.
+\end{DoxyItemize}
+
+--Weighted\+SVM {\itshape }\mbox{[}0 $\vert$ 1\mbox{]}
+\begin{DoxyItemize}
+\item Useful parameter of unbalanced dataset. If 1 it weights positive examples such as their contribution is equal to the negative ones.
+\end{DoxyItemize}
+
+--database\+Folder {\itshape database} 
+\begin{DoxyItemize}
+\item specify the database folder were feature vector will be stored.
+\end{DoxyItemize}\hypertarget{group__icub__sparseCoder_tested_os_sec}{}\doxysubsection{Tested OS}\label{group__icub__sparseCoder_tested_os_sec}
+Linux, Windows 7
+
+\begin{DoxyAuthor}{Author}
+Sean Ryan Fanello 
+\end{DoxyAuthor}

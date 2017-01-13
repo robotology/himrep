@@ -1,0 +1,137 @@
+
+\begin{DoxyItemize}
+\item \href{\#description}{\texttt{ Description}}
+\item \href{\#installation}{\texttt{ Installation}}
+\begin{DoxyItemize}
+\item \href{\#dependencies}{\texttt{ Dependencies}}
+\item \href{\#compilation}{\texttt{ Compilation}}
+\end{DoxyItemize}
+\item \href{\#setup}{\texttt{ Setup}}
+\begin{DoxyItemize}
+\item \href{\#download-binary-caffe-models-caffemodel}{\texttt{ Download binary Caffe models (.caffemodel)}}
+\item \href{\#configure-ini}{\texttt{ Configure .ini}}
+\end{DoxyItemize}
+\item \href{\#detailed-explanation}{\texttt{ Detailed explanation}}
+\item \href{\#license}{\texttt{ License}}
+\end{DoxyItemize}\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md20}{}\doxysection{Description}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md20}
+This module is a basic YARP wrapper for \href{https://developer.nvidia.com/tensorrt}{\texttt{ Tensor\+RT}}, which receives as input a stream of images (of type {\ttfamily yarp\+::sig\+::\+Image}), feeds them to a Convolutional Neural Network (CNN) model and produces as output a corresponding stream of vectors (of type {\ttfamily yarp\+::sig\+::\+Vector}), which can be extracted from any CNN layer.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md21}{}\doxysection{Installation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md21}
+\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md22}{}\doxysubsection{Dependencies}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md22}
+The libraries that are needed to compile this module are\+:
+
+
+\begin{DoxyItemize}
+\item \href{https://github.com/robotology/yarp}{\texttt{ YARP}}
+\item \href{https://github.com/robotology/icub-main}{\texttt{ i\+Cub}}
+\item \href{http://opencv.org/releases.html}{\texttt{ Open\+CV}}
+\item \href{https://developer.nvidia.com/tensorrt}{\texttt{ Tensor\+RT}}
+\item \href{https://developer.nvidia.com/cuda-zone}{\texttt{ CUDA}} and \href{https://developer.nvidia.com/cudnn}{\texttt{ cu\+DNN}}\+: these are dependencies of Tensor\+RT and also of the module itself
+\end{DoxyItemize}\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md23}{}\doxysubsection{Compilation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md23}
+Provided that the dependencies are satified, you can compile this module just by setting the {\ttfamily BUILD\+\_\+\+GIECoder} flag to {\ttfamily ON} as explained \href{https://www.github.com/robotology/himrep/README/\#compilation}{\texttt{ here}}.
+
+When you run the {\ttfamily ccmake} command, ensure also that\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Tensor\+RT} is correctly found on the system
+\item the flag {\ttfamily CUDA\+\_\+\+USE\+\_\+\+STATIC\+\_\+\+CUDA\+\_\+\+RUNTIME} is set to {\ttfamily OFF}
+\end{DoxyItemize}\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md24}{}\doxysection{Setup}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md24}
+This module can use arbitrary Caffe models. In the following, we report istructions on how to setup the module to use either one of two well-\/known models, {\ttfamily Res\+Net-\/50} and {\ttfamily Caffe\+Net}.
+
+If you are not interested in the details, you can execute the following instructions and use one of these two models with the default module parameters. We provide a little more explanataion hereafter for those who want to try different or custom Caffe models and settings.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md25}{}\doxysubsection{Download binary Caffe models (.\+caffemodel)}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md25}
+If you don\textquotesingle{}t have setted it already, for convenience, set the {\ttfamily Caffe\+\_\+\+ROOT} env variable pointing to your {\ttfamily caffe} source code directory.
+
+For {\ttfamily Caffe\+Net} we can follow the instructions on \href{http://caffe.berkeleyvision.org/model_zoo.html}{\texttt{ caffe}} website\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ cd \$Caffe\_ROOT}
+\DoxyCodeLine{\$ scripts/download\_model\_binary.py models/bvlc\_reference\_caffenet}
+\DoxyCodeLine{\# for this model we need also to get the mean image of the training set of ILSVRC }
+\DoxyCodeLine{\$ ./data/ilsvrc12/get\_ilsvrc\_aux.sh}
+
+\end{DoxyCode}
+
+
+For {\ttfamily Res\+Net-\/50} we can get the weights as indicated \href{https://github.com/KaimingHe/deep-residual-networks}{\texttt{ here}}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ cd \$Caffe\_ROOT/models}
+\DoxyCodeLine{\$ mkdir ResNet50}
+\DoxyCodeLine{\$ cd ResNet50}
+
+\end{DoxyCode}
+
+
+by downloading, in this folder, the {\ttfamily Res\+Net-\/50-\/model.\+caffemodel} and the {\ttfamily Res\+Net-\/50-\/deploy.\+prototxt} files from the \href{https://onedrive.live.com/?authkey=\%21AAFW2-FVoxeVRck&id=4006CBB8476FF777\%2117887&cid=4006CBB8476FF777}{\texttt{ One\+Drive link}} specified at the webpage.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md26}{}\doxysubsection{Configure .\+ini}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md26}
+We have now to customize the module\textquotesingle{}s {\ttfamily .ini} file in order to use the downloaded Caffe model. Some {\ttfamily .ini} examples are provided (e.\+g. for the two networks considered here plus {\ttfamily Goog\+Le\+Net}) with the source code of the module (inside {\ttfamily app/conf}). Therefore we can import such {\ttfamily .ini} files from {\ttfamily himrep} for the {\ttfamily Caffe\+Net} and {\ttfamily Res\+Net-\/50} by doing\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\# CaffeNet}
+\DoxyCodeLine{\$ yarp-\/config context -\/-\/import himrep caffeCoder\_caffenet.ini}
+\DoxyCodeLine{\$ yarp-\/config context -\/-\/import himrep caffeCoder\_resnet.ini}
+
+\end{DoxyCode}
+
+
+For each of them we must set the following variables to the correct paths\+: {\ttfamily caffemodel\+\_\+file} and {\ttfamily prototxt\+\_\+file}.
+
+For {\ttfamily Caffe\+Net} do\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ cd \string~/.local/share/yarp/contexts/himrep}
+\DoxyCodeLine{\$ gedit caffeCoder\_caffenet.ini}
+
+\end{DoxyCode}
+
+
+And then set\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{caffemodel\_file \$Caffe\_ROOT/models/bvlc\_reference\_caffenet/bvlc\_reference\_caffenet.caffemodel}
+\DoxyCodeLine{prototxt\_file \$Caffe\_ROOT/models/bvlc\_reference\_caffenet/deploy.prototxt}
+
+\end{DoxyCode}
+
+
+replacing the {\ttfamily \$\+Caffe\+\_\+\+ROOT} env variable with its full value.
+
+For {\ttfamily Res\+Net-\/50} do\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{gedit caffeCoder\_resnet.ini}
+
+\end{DoxyCode}
+
+
+And then set\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{caffemodel\_file \$Caffe\_ROOT/models/ResNet-\/50/ResNet-\/50-\/model.caffemodel}
+\DoxyCodeLine{prototxt\_file \$Caffe\_ROOT/models/ResNet-\/50/ResNet-\/50-\/deploy.prototxt}
+
+\end{DoxyCode}
+
+
+replacing the {\ttfamily \$\+Caffe\+\_\+\+ROOT} env variable with its full value.
+
+For other parameters and input and output ports we refer to the module documentation \href{http://robotology.github.io/himrep/doxygen/doc/html/group__GIECoder.html}{\texttt{ here}}.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md27}{}\doxysection{Detailed explanation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md27}
+In Caffe, the weights of network models are stored in a {\ttfamily .caffemodel} file, whose absolute path must be provided to the {\ttfamily GIECoder} in the {\ttfamily caffemodel\+\_\+file} parameter. The network definition file to be used in inference mode instead is usually the {\ttfamily deploy.\+prototxt} and its absolute path must be provided to the {\ttfamily GIECoder} in the {\ttfamily prototxt\+\_\+file} parameter.
+
+In Caffe\textquotesingle{}s \href{http://caffe.berkeleyvision.org/model_zoo.html}{\texttt{ Model Zoo}} there are many models available with related descriptions and usage instructions. You can use them with {\ttfamily GIECoder}, just by passing the path to their {\ttfamily deploy.\+prototxt} (and ensuring that Tensor\+RT can convert them correctly, by checking, e.\+g., that there are no layer kinds which are not supported by the engine).
+
+In order to correctly use a network in inference mode, the mean image (or pixel) of the training set that has been used to learn the model parameters must be subtracted from any image that is fed to the model. The mean image is usully stored in Caffe with a {\ttfamily .binaryproto} file. You will need to specify this information in the {\ttfamily .ini}\+:
+
+
+\begin{DoxyItemize}
+\item if the mean image is subtracted, the {\ttfamily .binaryproto} file must be pointed by the {\ttfamily binaryproto\+\_\+meanfile} parameter;
+\item if the mean pixel is subtracted, you will need to specify, in the {\ttfamily .ini} file, five additional parameters\+: three of them are the R, G, B, values of the pixel ({\ttfamily meanR}, {\ttfamily meanG}, {\ttfamily meanB}) and two of them are the width and height to which the input image will be resized before being fed to the network ({\ttfamily resize\+Width} and {\ttfamily resize\+Height}).
+\end{DoxyItemize}
+
+Another important parameter to be set in the {\ttfamily .ini} file is the tag/name of the output of the layer we want to read. This can be specified by setting the {\ttfamily blob\+\_\+name} parameter.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md28}{}\doxysection{License}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_GIECoder_README_autotoc_md28}
+Material included here is Copyright of {\itshape i\+Cub Facility -\/ Istituto Italiano di Tecnologia} and is released under the terms of the GPL v2.\+0 or later. See the file LICENSE for details. 

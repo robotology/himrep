@@ -1,0 +1,319 @@
+
+\begin{DoxyItemize}
+\item \href{\#description}{\texttt{ Description}}
+\item \href{\#installation}{\texttt{ Installation}}
+\begin{DoxyItemize}
+\item \href{\#dependencies}{\texttt{ Dependencies}}
+\item \href{\#compilation}{\texttt{ Compilation}}
+\end{DoxyItemize}
+\item \href{\#setup}{\texttt{ Setup}}
+\begin{DoxyItemize}
+\item \href{\#download-binary-caffe-models-caffemodel}{\texttt{ Download binary Caffe models (.caffemodel)}}
+\item \href{\#configure-prototxt-and-ini-with-absolute-paths}{\texttt{ Configure .prototxt and .ini with absolute paths}}
+\end{DoxyItemize}
+\item \href{\#detailed-explanation}{\texttt{ Detailed explanation}}
+\item \href{\#additional-notes-on-caffe-installation}{\texttt{ Additional notes on Caffe installation}}
+\item \href{\#citation}{\texttt{ Citation}}
+\item \href{\#license}{\texttt{ License}}
+\end{DoxyItemize}\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md0}{}\doxysection{Description}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md0}
+This module is a basic YARP wrapper for \href{http://caffe.berkeleyvision.org/}{\texttt{ Caffe}}, which receives as input a stream of images (of type {\ttfamily yarp\+::sig\+::\+Image}), feeds them to a Convolutional Neural Network (CNN) model and produces as output a corresponding stream of vectors (of type {\ttfamily yarp\+::sig\+::\+Vector}), which can be extracted from any CNN layer.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md1}{}\doxysection{Installation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md1}
+\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md2}{}\doxysubsection{Dependencies}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md2}
+The libraries that are needed to compile this module are\+:
+
+
+\begin{DoxyItemize}
+\item \href{https://github.com/robotology/yarp}{\texttt{ YARP}}
+\item \href{https://github.com/robotology/icub-main}{\texttt{ i\+Cub}}
+\item \href{http://opencv.org/releases.html}{\texttt{ Open\+CV}}
+\item \href{https://www.github.com/BVLC/caffe.git}{\texttt{ Caffe}}
+\item \href{https://developer.nvidia.com/cuda-zone}{\texttt{ CUDA}}\+: this is an optional dependency of Caffe and also of this module. However, we strongly recommend to rely on a powerful enough NVIDIA CUDA-\/enabled GPU (with Compute Capability $>$= 3.\+0) in order to achieve a good frame rate.
+\end{DoxyItemize}\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md3}{}\doxysubsection{Compilation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md3}
+Provided that the dependencies are satified, you can compile this module just by setting the {\ttfamily BUILD\+\_\+caffe\+Coder} flag to {\ttfamily ON} as explained \href{https://www.github.com/robotology/himrep\#compilation}{\texttt{ here}}.
+
+When you run the {\ttfamily ccmake} command, ensure also that\+:
+
+
+\begin{DoxyItemize}
+\item the {\ttfamily Caffe\+\_\+\+DIR} flag is correctly pointing to a valid Caffe installation
+\item the flag {\ttfamily CUDA\+\_\+\+USE\+\_\+\+STATIC\+\_\+\+CUDA\+\_\+\+RUNTIME} is set to {\ttfamily OFF}
+\end{DoxyItemize}\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md4}{}\doxysection{Setup}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md4}
+This module can use arbitrary Caffe models\+: the only contraint is that the model must have an input data layer of kind \href{http://caffe.berkeleyvision.org/tutorial/layers/memorydata.html}{\texttt{ Memory\+Data}}. However, this can be easily achieved for most models just by replacing the input data layer in the model definition file. In the following, we report istructions on how to setup the module to use either one of two well-\/known models, {\ttfamily Res\+Net-\/50} and {\ttfamily Caffe\+Net}.
+
+The setup procedure basically follows the \href{http://caffe.berkeleyvision.org/gathered/examples/feature_extraction.html}{\texttt{ Extracting Features}} example provided with Caffe. If you are not interested in the details, you can execute the following instructions and use one of these two models with the default module parameters. We provide a little more explanataion hereafter for those who want to try different or custom Caffe models and settings.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md5}{}\doxysubsection{Download binary Caffe models (.\+caffemodel)}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md5}
+If you don\textquotesingle{}t have setted it already, for convenience, set the {\ttfamily Caffe\+\_\+\+ROOT} env variable pointing to your {\ttfamily caffe} source code directory.
+
+For {\ttfamily Caffe\+Net} we can follow the instructions on \href{http://caffe.berkeleyvision.org/model_zoo.html}{\texttt{ caffe}} website\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ cd \$Caffe\_ROOT}
+\DoxyCodeLine{\$ scripts/download\_model\_binary.py models/bvlc\_reference\_caffenet}
+\DoxyCodeLine{\# for this model we need also to get the mean image of the training set of ILSVRC}
+\DoxyCodeLine{\$ ./data/ilsvrc12/get\_ilsvrc\_aux.sh}
+
+\end{DoxyCode}
+
+
+For {\ttfamily Res\+Net-\/50} we can get the weights as indicated \href{https://github.com/KaimingHe/deep-residual-networks}{\texttt{ here}}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ cd \$Caffe\_ROOT/models}
+\DoxyCodeLine{\$ mkdir ResNet50}
+\DoxyCodeLine{\$ cd ResNet50}
+
+\end{DoxyCode}
+
+
+by downloading, in this folder, the {\ttfamily Res\+Net-\/50-\/model.\+caffemodel} file from the \href{https://onedrive.live.com/?authkey=\%21AAFW2-FVoxeVRck&id=4006CBB8476FF777\%2117887&cid=4006CBB8476FF777}{\texttt{ One\+Drive link}} specified at the webpage.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md6}{}\doxysubsection{Configure .\+prototxt and .\+ini with absolute paths}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md6}
+We have now to customize two files in order to use the downloaded Caffe model. These are provided for some Caffe models (the two considered here plus {\ttfamily Goog\+Le\+Net}) with the source code of the module (inside {\ttfamily app/conf}) and are\+:
+
+
+\begin{DoxyItemize}
+\item a {\ttfamily .ini} file for the {\ttfamily caffe\+Coder} module, specifying some parameters and pointing to the Caffe model\textquotesingle{}s binary and definition files
+\item the {\ttfamily .prototxt} Caffe model\textquotesingle{}s definition file, where we have replaced the input data layer with one of kind {\ttfamily Memory\+Data}
+\end{DoxyItemize}\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md7}{}\doxysubsubsection{File .\+prototxt\+: configuration}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md7}
+Import the {\ttfamily .prototxt} files from {\ttfamily himrep} for the {\ttfamily Caffe\+Net} and {\ttfamily Res\+Net-\/50} architectures in order to customize them for your system\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ yarp-\/config context -\/-\/import himrep bvlc\_reference\_caffenet\_val.prototxt}
+\DoxyCodeLine{\$ yarp-\/config context -\/-\/import himrep resnet\_val.prototxt}
+
+\end{DoxyCode}
+
+
+For {\ttfamily Caffe\+Net} we need to do\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ cd \string~/.local/share/yarp/contexts/himrep}
+\DoxyCodeLine{\$ gedit bvlc\_reference\_caffenet\_val.prototxt}
+
+\end{DoxyCode}
+
+
+At line 10, replace the following\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mean\_file: "{}/path/to/train\_mean.binaryproto"{}}
+
+\end{DoxyCode}
+
+
+with the correct absolute path to this file on your system (without using env variables). This is the binary file containing the mean image of the training set of ILSVRC we just downloaded. In this case this is\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mean\_file: "{}\$Caffe\_ROOT/data/ilsvrc12/imagenet\_mean.binaryproto"{}}
+
+\end{DoxyCode}
+
+
+where you must replace the {\ttfamily \$\+Caffe\+\_\+\+ROOT} env variable with its full value.
+
+For {\ttfamily Res\+Net-\/50} we do not need to modify anything.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md8}{}\doxysubsubsection{File .\+ini\+: configuration}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md8}
+Import the {\ttfamily .ini} files from {\ttfamily himrep} for the {\ttfamily Caffe\+Net} and {\ttfamily Res\+Net-\/50} in order to customize them on your system\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\# CaffeNet}
+\DoxyCodeLine{\$ yarp-\/config context -\/-\/import himrep caffeCoder\_caffenet.ini}
+\DoxyCodeLine{\$ yarp-\/config context -\/-\/import himrep caffeCoder\_resnet.ini}
+
+\end{DoxyCode}
+
+
+For each of them we must set the following variables to the correct paths\+: {\ttfamily caffemodel\+\_\+file} and {\ttfamily prototxt\+\_\+file}.
+
+For {\ttfamily Caffe\+Net} do\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$ cd \string~/.local/share/yarp/contexts/himrep}
+\DoxyCodeLine{\$ gedit caffeCoder\_caffenet.ini}
+
+\end{DoxyCode}
+
+
+And then set\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{caffemodel\_file \$Caffe\_ROOT/models/bvlc\_reference\_caffenet/bvlc\_reference\_caffenet.caffemodel}
+\DoxyCodeLine{prototxt\_file \string~/.local/share/yarp/contexts/himrep/bvlc\_reference\_caffenet\_val.prototxt}
+
+\end{DoxyCode}
+
+
+replacing the {\ttfamily \$\+Caffe\+\_\+\+ROOT} env variable and {\ttfamily $\sim$/} with their full values.
+
+For {\ttfamily Res\+Net-\/50} do\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{gedit caffeCoder\_resnet.ini}
+
+\end{DoxyCode}
+
+
+And then set\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{caffemodel\_file \$Caffe\_ROOT/models/ResNet50/ResNet-\/50-\/model.caffemodel}
+\DoxyCodeLine{prototxt\_file \string~/.local/share/yarp/contexts/himrep/resnet\_val.prototxt}
+
+\end{DoxyCode}
+
+
+replacing the {\ttfamily \$\+Caffe\+\_\+\+ROOT} env variable and {\ttfamily $\sim$/} with their full values.
+
+For other parameters and input and output ports we refer to the module documentation \href{http://robotology.github.io/himrep/doxygen/doc/html/group__caffeCoder.html}{\texttt{ here}}.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md9}{}\doxysection{Detailed explanation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md9}
+In Caffe, the weights of network models are stored in a {\ttfamily .caffemodel} file, whose absolute path must be provided to the {\ttfamily caffe\+Coder} in the {\ttfamily caffemodel\+\_\+file} parameter. The network definition file to be used in inference mode instead is usually called {\ttfamily deploy.\+prototxt} and must be provided to the {\ttfamily caffe\+Coder} in the {\ttfamily prototxt\+\_\+file} parameter.
+
+In Caffe\textquotesingle{}s \href{http://caffe.berkeleyvision.org/model_zoo.html}{\texttt{ Model Zoo}} there are many models available with related descriptions and usage instructions. You can use them with {\ttfamily caffe\+Coder}, by copying their {\ttfamily deploy.\+prototxt} and replacing their input layer with a corresponding {\ttfamily Memory\+Data} layer.
+
+In order to correctly use a network in inference mode, the mean image (or pixel) of the training set that has been used to learn the model parameters must be subtracted from any image that is fed to the model. The mean image is usully stored in Caffe with a {\ttfamily .binaryproto} file. You will to specify this in the {\ttfamily Memory\+Data} layer and\+:
+
+
+\begin{DoxyItemize}
+\item if the mean image is subtracted, the {\ttfamily .binaryproto} file must be downloaded and correctly pointed by the {\ttfamily .prototxt} in your system ({\ttfamily mean\+\_\+file} field of the {\ttfamily Memory\+Data} layer);
+\item if the mean pixel is subtracted, you will need to specify, in the {\ttfamily .ini} file, two additional parameters (as, e.\+g., we do in {\ttfamily caffe\+Coder\+\_\+googlenet.\+ini}) related to the width and height ({\ttfamily resize\+Width} and {\ttfamily resize\+Height}) to which the input image will be resized before being fed to the {\ttfamily Memory\+Data} layer.
+\end{DoxyItemize}
+
+Another important parameter to be set in the {\ttfamily .ini} file is the tag/name of the output of the layer we want to read. This can be specified by setting the {\ttfamily blob\+\_\+name} parameter.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md10}{}\doxysection{Additional notes on Caffe installation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md10}
+For a complete and continuously updated guide to how to install Caffe in any configuration you should go to \href{http://caffe.berkeleyvision.org/installation.html}{\texttt{ Caffe -\/ Installation}}. We do not cover here exhaustively the procedure. We just report the procedure we followed at present (07/2017) to use Caffe from this module on Ubuntu 16.\+04 LTS.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md11}{}\doxyparagraph{CUDA installation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md11}
+Download and install CUDA drivers and toolkit by following \href{http://docs.nvidia.com/cuda/cuda-installation-guide-linux/\#axzz4BkDT7m6r}{\texttt{ CUDA Installation Guide for Linux}}.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md12}{}\doxyparagraph{cu\+DNN installation (optional but recommended)}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md12}
+Download the {\bfseries{cu\+DNN}} version you need (depending on the toolkit version) from \href{https://developer.nvidia.com/cuDNN}{\texttt{ NVIDIA cu\+DNN library}} (you have to sign up as CUDA Registered Developer, it\textquotesingle{}s for free), and install it by following the instructions.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md13}{}\doxyparagraph{BLAS installation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md13}
+We chose the {\bfseries{Open\+BLAS}} implementation but also ATLAS or Intel MKL are supported by Caffe. You can either download the source code from \href{http://www.openblas.net/}{\texttt{ Open\+BLAS page}} and follow instructions to compile and install it, or install the package. In the latter case, you can just do\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo apt-\/get install libopenblas-\/dev}
+
+\end{DoxyCode}
+
+
+In case you compile the source code, we recommend to install in a separate and specified location of your choice instead of the default {\ttfamily /usr/local} by doing\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{tar -\/xzvf <downloaded-\/openblas-\/archive-\/name>.tar.gz}
+\DoxyCodeLine{cd <downloaded-\/openblas-\/archive-\/name>}
+\DoxyCodeLine{make PREFIX=/path/to/install/dir install}
+
+\end{DoxyCode}
+ and setting the {\ttfamily Open\+BLAS\+\_\+\+HOME} environment variable to the installation path to allow Caffe finding it.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md14}{}\doxyparagraph{BOOST installation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md14}
+As for BLAS, you can either download the source code from \href{http://www.boost.org/}{\texttt{ Boost C++ Libraries}} and follow instructions to compile and install it, or install the package. In any case, check the supported versions on Caffe website. For convenience, again we report the followed instructions (that can be found on Boost page) to compile from source\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{tar -\/-\/bzip2 -\/xf <downloaded-\/boost-\/archive>.tar.bz2}
+\DoxyCodeLine{cd <downloaded-\/boost-\/archive>}
+\DoxyCodeLine{./bootstrap.sh -\/-\/prefix=path/to/install/dir}
+\DoxyCodeLine{./b2 install}
+
+\end{DoxyCode}
+ and set the {\ttfamily Boost\+\_\+\+DIR} environment variable to the installation path to allow Caffe finding it, or to download the package\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo apt-\/get install libboost-\/all-\/dev}
+
+\end{DoxyCode}
+\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md15}{}\doxyparagraph{Open\+CV installation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md15}
+Open\+CV comes with the {\ttfamily icub-\/common} package. In case you need to compile it from source, you can download the source code from \href{http://opencv.org/downloads.html}{\texttt{ Open\+CV -\/ Downloads}} and compile it through the usual\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{unzip <downloaded-\/opencv-\/archive-\/name>.zip}
+\DoxyCodeLine{cd <downloaded-\/opencv-\/archive-\/name>}
+\DoxyCodeLine{mkdir build \&\& cd build}
+\DoxyCodeLine{ccmake ../}
+\DoxyCodeLine{make}
+\DoxyCodeLine{make install}
+
+\end{DoxyCode}
+
+
+Where in the CMake configuration you should have set the installation path ({\ttfamily CMAKE\textbackslash{}\+\_\+\+INSTALL\textbackslash{}\+\_\+\+PREFIX}) to one of your choice. In this case, set the {\ttfamily Open\+CV\+\_\+\+DIR} environment variable to the installation path to allow Caffe finding it.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md16}{}\doxyparagraph{Other packages}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md16}
+Refer to \href{http://caffe.berkeleyvision.org/install_apt.html}{\texttt{ Caffe -\/ Ubuntu Installation}} for updated instructions or manual installation. On Ubunutu 16.\+04 LTS at the time being we have done\+:
+
+Google Protobuf Buffers C++\+:~\newline
+ {\ttfamily sudo apt-\/get install libprotobuf-\/dev protobuf-\/compiler}
+
+Google Logging\+:~\newline
+ {\ttfamily sudo apt-\/get install libgoogle-\/glog-\/dev}
+
+Google Flags\+:~\newline
+ {\ttfamily sudo apt-\/get install libgflags-\/dev}
+
+Level\+DB\+:~\newline
+ {\ttfamily sudo apt-\/get install libleveldb-\/dev}
+
+HDF5\+:~\newline
+ {\ttfamily sudo apt-\/get install libhdf5-\/serial-\/dev}
+
+LMDB\+:~\newline
+ {\ttfamily sudo apt-\/get install liblmdb-\/dev}
+
+snappy\+:~\newline
+ {\ttfamily sudo apt-\/get install libsnappy-\/dev}\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md17}{}\doxyparagraph{Caffe compilation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md17}
+Since Caffe is under active development, we try to be compatible with the changes progressively introduced in the framework and periodically check the compatibility of {\ttfamily caffe\+Coder} against its {\ttfamily master} branch. Therefore you can refer to it and clone it\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git clone https://www.github.com/BVLC/caffe.git}
+
+\end{DoxyCode}
+
+
+Note that at present \href{https://github.com/BVLC/caffe/releases}{\texttt{ Caffe RC3}} is not compatible anymore with {\ttfamily caffe\+Coder}.
+
+In order to be able to link Caffe from an external project via CMake (as this application does) you should compile Caffe via CMake and not manually editing the Makefile.\+config.
+
+Related instructions can be found at \href{http://caffe.berkeleyvision.org/installation.html}{\texttt{ Caffe -\/ Installation}} or \href{https://github.com/BVLC/caffe/pull/1667}{\texttt{ here}}. Generally you can do\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cd caffe}
+\DoxyCodeLine{mkdir build}
+\DoxyCodeLine{cd build}
+\DoxyCodeLine{ccmake ../ (NOTE *)}
+\DoxyCodeLine{make all}
+\DoxyCodeLine{make runtest}
+\DoxyCodeLine{make install}
+
+\end{DoxyCode}
+
+
+{\bfseries{NOTE}} In the configuration step\+:
+
+
+\begin{DoxyItemize}
+\item you should be able to link to all installed dependencies, if you have set correctly the environment variables
+\item set BLAS to {\ttfamily open} or {\ttfamily Open} if you installed Open\+BLAS as we did\+: if you still see that the Atlas implementation is not found, this might be an issue with Caffe\+: in any case, if you check by toggling the advanced mode, you should see that Open\+BLAS has been found in your installation directory
+\item there is no need to build the Matlab wrapper for Caffe
+\item use the cu\+DNN library if possible (set USE\+\_\+\+CUDNN to ON)
+\item {\bfseries{important if you are on Ubuntu 16.\+04 and use GCC 5.\+3 with CUDA 7.\+5}}\+: as noted \href{https://github.com/BVLC/caffe/issues/4046}{\texttt{ here}}, in this case you need to modify the {\ttfamily CMAKE\+\_\+\+CXX\+\_\+\+FLAGS} CMake variable by appending to it the {\ttfamily -\/D\+\_\+\+FORCE\+\_\+\+INLINES} flag. You can do it during the interactive configuration step with {\ttfamily ccmake} or by modifying the following line in the {\ttfamily CMake\+Lists.\+txt}\+:
+
+\`{}\`{}\`{} set(CMAKE\+\_\+\+CXX\+\_\+\+FLAGS \char`\"{}\$\{\+CMAKE\+\_\+\+CXX\+\_\+\+FLAGS\} -\/f\+PIC -\/\+D\+\_\+\+FORCE\+\_\+\+INLINES -\/\+Wall\char`\"{}) \`{}\`{}\`{}
+\end{DoxyItemize}
+
+Finally, set the {\ttfamily Caffe\+\_\+\+DIR} environment variable to the installation path to allow finding Caffe via {\ttfamily find\+\_\+package}.\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md18}{}\doxysection{Citation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md18}
+This module has been presented and benchmarked in the i\+Cub scenario in the following paper\+:
+
+\href{http://jmlr.csail.mit.edu/proceedings/papers/v43/pasquale15.pdf}{\texttt{ Teaching i\+Cub to recognize objects using deep Convolutional Neural Networks}} {\itshape Giulia Pasquale, Carlo Ciliberto, Francesca Odone, Lorenzo Rosasco and Lorenzo Natale}, Proceedings of The 4th Workshop on Machine Learning for Interactive Systems, pp. 21–25, 2015 \begin{DoxyVerb}@inproceedings{pasquale15,
+author  = {Giulia Pasquale and Carlo Ciliberto and Francesca Odone and Lorenzo Rosasco and Lorenzo Natale},
+title   = {Teaching iCub to recognize objects using deep Convolutional Neural Networks},
+journal = {Proceedings of the 4th Workshop on Machine Learning for Interactive Systems, 32nd International Conference on Machine Learning},
+year    = {2015},
+volume  = {43},
+pages   = {21--25},
+url     = {http://www.jmlr.org/proceedings/papers/v43/pasquale15}
+}
+\end{DoxyVerb}
+ \hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md19}{}\doxysection{License}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_caffeCoder_README_autotoc_md19}
+Material included here is Copyright of {\itshape i\+Cub Facility -\/ Istituto Italiano di Tecnologia} and is released under the terms of the GPL v2.\+0 or later. See the file LICENSE for details. 

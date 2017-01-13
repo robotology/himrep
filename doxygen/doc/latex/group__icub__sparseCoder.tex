@@ -1,0 +1,67 @@
+\doxysection{sparse\+Coder}
+\label{group__icub__sparseCoder}\index{sparseCoder@{sparseCoder}}
+
+
+The module performs a sequence of coding and pooling operator and retrieves a hierarchical image representation.  
+
+
+The module performs a sequence of coding and pooling operator and retrieves a hierarchical image representation. 
+
+\hypertarget{group__GIECoder_intro_sec}{}\doxysubsection{Description}\label{group__GIECoder_intro_sec}
+This module is responsible for coding images into feature vectors. To this end, we extract local appearance descriptors (sparse or dense). These descriptors are coded using a learned dictionary and the pooled together via a spatial pyramid representation.
+
+The commands sent as bottles to the module port /sparse\+Coder/rpc are the following\+:
+
+(notation\+: \mbox{[}.\mbox{]} identifies a vocab, $<$.$>$ specifies a double, \char`\"{}.\char`\"{} specifies a string)
+
+{\bfseries{HELP}} format\+: \mbox{[}help\mbox{]} action\+: it prints the available commands.
+
+{\bfseries{DUMP\+\_\+\+SIFT}} format\+: \mbox{[}dump\mbox{]} \char`\"{}a\char`\"{} action\+: starts to dump local descriptors that can be used for dictionary learning. \char`\"{}a\char`\"{} is an optional parameters that stands for \char`\"{}append\char`\"{} in case you want to keep old descriptors previously dumped.
+
+{\bfseries{DICTIONARY\+\_\+\+LEARNING}} format\+: \mbox{[}learn\mbox{]} $<$dictionary\+Size$>$ \char`\"{}use\+PCA\char`\"{} $<$dim\+PCA$>$ action\+: starts to learn a dictionary from previously dumped local descriptors. $<$dictionary\+Size$>$ is the number of atoms of the dictionary, \char`\"{}use\+PCA\char`\"{} performs standard PCA analysis on low-\/level descriptors before the encoding and $<$dim\+PCA$>$ indicates the number of relevant eigenvectors that you want use for the projection.\hypertarget{group__icub__sparseCoder_lib_sec}{}\doxysubsection{Libraries}\label{group__icub__sparseCoder_lib_sec}
+
+\begin{DoxyItemize}
+\item YARP libraries.
+\item Open\+CV 2.\+2 libraries.
+\end{DoxyItemize}\hypertarget{group__icub__sparseCoder_portsc_sec}{}\doxysubsection{Ports Created}\label{group__icub__sparseCoder_portsc_sec}
+
+\begin{DoxyItemize}
+\item {\itshape /sparse\+Coder/img}\+:i receives the image acquired from the camera.
+\item {\itshape /sparse\+Coder/img}\+:o streams out the image containing the extracted local descriptors.
+\item {\itshape /sparse\+Coder/code}\+:o streams out the vector containing the hierarchical image representation.
+\item {\itshape /sparse\+Coder/rpc} receives requests for SIFT dump or dictionary learning.
+\end{DoxyItemize}\hypertarget{group__GIECoder_parameters_sec}{}\doxysubsection{Parameters}\label{group__GIECoder_parameters_sec}
+--dictionary\+\_\+file {\itshape file} 
+\begin{DoxyItemize}
+\item specify the dictionary file.\+ini where atoms are stored.
+\end{DoxyItemize}
+
+--coding\+\_\+mode {\itshape coding} 
+\begin{DoxyItemize}
+\item specify the coding method used. Possible values are \char`\"{}\+BOW\char`\"{} for Bag of Words, \char`\"{}\+SC\char`\"{} for Sparse Coding, \char`\"{}\+BCE\char`\"{} for Best Codes Entries.
+\end{DoxyItemize}
+
+--nearest\+\_\+neighbor {\itshape knn} 
+\begin{DoxyItemize}
+\item specify the number of nearest neighbors used for the encoding with BCE.
+\end{DoxyItemize}
+
+--dense\+\_\+descriptors {\itshape }\mbox{[}1$\vert$0\mbox{]}
+\begin{DoxyItemize}
+\item specify is a regular grid of dense descriptors must be used (1) or sparse keypoints must be detected (0).
+\end{DoxyItemize}
+
+--grid\+\_\+scale {\itshape scale} 
+\begin{DoxyItemize}
+\item specify the scale of local descriptors extracted from a dense grid.
+\end{DoxyItemize}
+
+--grid\+\_\+step {\itshape step} 
+\begin{DoxyItemize}
+\item specify the sampling step among descriptors in a dense grid.
+\end{DoxyItemize}\hypertarget{group__icub__sparseCoder_tested_os_sec}{}\doxysubsection{Tested OS}\label{group__icub__sparseCoder_tested_os_sec}
+Linux
+
+\begin{DoxyAuthor}{Author}
+Sean Ryan Fanello, Carlo Ciliberto 
+\end{DoxyAuthor}

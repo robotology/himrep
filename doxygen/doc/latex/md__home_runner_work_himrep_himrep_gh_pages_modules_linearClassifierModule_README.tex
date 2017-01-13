@@ -1,0 +1,12 @@
+\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_linearClassifierModule_README_autotoc_md30}{}\doxysubsection{Dependencies}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_linearClassifierModule_README_autotoc_md30}
+This module needs \href{https://www.csie.ntu.edu.tw/~cjlin/liblinear/}{\texttt{ LIBLINEAR}}. We have included a version (source code) of the library here, in the {\ttfamily liblinear-\/1.\+91} folder.
+
+In order to build it, you have to\+:
+
+
+\begin{DoxyItemize}
+\item compile from within the directory where the corresponding {\ttfamily cmakefile} is located
+\item place the resulting static library in the same directory of the {\ttfamily liblinear} package
+\item finally, set the environment variable {\ttfamily LIBSVMLIN\+\_\+\+DIR} to point at the same location
+\end{DoxyItemize}\hypertarget{md__home_runner_work_himrep_himrep_gh_pages_modules_linearClassifierModule_README_autotoc_md31}{}\doxysubsection{Compilation}\label{md__home_runner_work_himrep_himrep_gh_pages_modules_linearClassifierModule_README_autotoc_md31}
+Once the library has been built as explained above, you can compile this module just by setting the {\ttfamily BUILD\+\_\+linear\+Classifier\+Module} flag to {\ttfamily ON} as explained \href{https://www.github.com/robotology/himrep/\#compilation}{\texttt{ here}}. 
