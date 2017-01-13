@@ -17,7 +17,6 @@
 #include "boost/make_shared.hpp"
 
 // Caffe
-
 #include "caffe-version.h"
 
 #if (CAFFE_MAJOR >= 1)
@@ -186,7 +185,6 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
 
     #ifdef HAS_CUDA
         cudaEvent_t start, stop;
-    #endif
     
     if (timing)
     {
@@ -194,6 +192,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
         cudaEventCreate(&stop);
         cudaEventRecord(start, NULL);
     }
+    #endif
 
     // Initialize labels to zero
     vector<int> labels(images.size(), 0);
@@ -289,6 +288,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stop, NULL);
 
@@ -301,6 +301,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
         float msecPerImage = msecTotal/(float)images.size();
 
         return msecPerImage;
+        #endif
     }
     else
     {
@@ -325,14 +326,14 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
 
     #ifdef HAS_CUDA
         cudaEvent_t start, stop;
-    #endif
-
+    
     if (timing)
     {
         cudaEventCreate(&start);
         cudaEventCreate(&stop);
         cudaEventRecord(start, NULL);
     }
+    #endif
 
     // Initialize the labels to zero
     vector<int> labels(images.size(), 0);
@@ -430,6 +431,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stop, NULL);
 
@@ -442,6 +444,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
         float msecPerImage = msecTotal/(float)images.size();
 
         return msecPerImage;
+        #endif
     }
     else
     {
@@ -466,7 +469,6 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
 
     #ifdef HAS_CUDA
         cudaEvent_t start, stop;
-    #endif
 
     if (timing)
     {
@@ -474,6 +476,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
         cudaEventCreate(&stop);
         cudaEventRecord(start, NULL);
     }
+    #endif
 
     // Initialize the labels to zero
     int label = 0;
@@ -540,6 +543,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stop, NULL);
 
@@ -551,6 +555,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
         cudaEventElapsedTime(&msecTotal, start, stop);
 
         return msecTotal;
+        #endif
     }
     else
     {
@@ -576,7 +581,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
 
     #ifdef HAS_CUDA
         cudaEvent_t start, stop;
-    #endif
+   
 
     if (timing)
     {
@@ -584,6 +589,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
         cudaEventCreate(&stop);
         cudaEventRecord(start, NULL);
     }
+    #endif
 
     // Initialize label to zero
     int label = 0;
@@ -656,6 +662,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stop, NULL);
 
@@ -666,6 +673,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
         cudaEventElapsedTime(&msecTotal, start, stop);
 
         return msecTotal;
+        #endif
     }
     else
     {
@@ -690,7 +698,6 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
 
     #ifdef HAS_CUDA
         cudaEvent_t start, stop;
-    #endif
 
     if (timing)
     {
@@ -698,6 +705,8 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
         cudaEventCreate(&stop);
         cudaEventRecord(start, NULL);
     }
+
+    #endif
 
     // Initialize the labels to zero
     vector<int> labels(images.size(), 0);
@@ -800,6 +809,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stop, NULL);
 
@@ -812,6 +822,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
         float msecPerImage = msecTotal/(float)images.size();
 
         return msecPerImage;
+        #endif
     }
     else
     {
@@ -836,7 +847,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
 
     #ifdef HAS_CUDA
         cudaEvent_t start, stop;
-    #endif
+    
 
     if (timing)
     {
@@ -844,6 +855,8 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
         cudaEventCreate(&stop);
         cudaEventRecord(start, NULL);
     }
+
+    #endif
 
     // Initialize labels to zero
     vector<int> labels(images.size(), 0);
@@ -944,6 +957,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stop, NULL);
 
@@ -956,6 +970,7 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
         float msecPerImage = msecTotal/(float)images.size();
 
         return msecPerImage;
+        #endif
     }
     else
     {
@@ -980,7 +995,6 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
 
     #ifdef HAS_CUDA
         cudaEvent_t start, stop;
-    #endif
 
     if (timing)
     {
@@ -988,6 +1002,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
         cudaEventCreate(&stop);
         cudaEventRecord(start, NULL);
     }
+    #endif
 
     // Initialize labels to zero
     int label = 0;
@@ -1053,6 +1068,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stop, NULL);
 
@@ -1063,6 +1079,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
         cudaEventElapsedTime(&msecTotal, start, stop);
 
         return msecTotal;
+        #endif
     }
     else
     {
@@ -1088,7 +1105,6 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
 
     #ifdef HAS_CUDA
         cudaEvent_t start, stop;
-    #endif
 
     if (timing)
     {
@@ -1096,6 +1112,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
         cudaEventCreate(&stop);
         cudaEventRecord(start, NULL);
     }
+    #endif
 
     // Initialize labels to zero
     int label = 0;
@@ -1162,6 +1179,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stop, NULL);
 
@@ -1172,6 +1190,7 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dt
         cudaEventElapsedTime(&msecTotal, start, stop);
 
         return msecTotal;
+        #endif
     }
     else
     {
