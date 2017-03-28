@@ -104,7 +104,6 @@ private:
 
             std::vector<float> codingVecFloat;
             float times[2];
-            caffe_extractor->extract_singleFeat_1D(matImg, codingVecFloat, times);
             if (!caffe_extractor->extract_singleFeat_1D(matImg, codingVecFloat, times))
             {
                 std::cout << "CaffeFeatExtractor::extract_singleFeat_1D(): failed..." << std::endl;
