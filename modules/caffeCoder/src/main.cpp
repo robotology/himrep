@@ -165,9 +165,6 @@ public:
         string blob_name = rf.check("blob_name", Value("pool5/7x7_s1")).asString().c_str();
         cout << "Setting blob_names to " << blob_name << endl;
 
-        // Boolean flag for timing or not the feature extraction
-        bool timing = rf.check("timing",Value(false)).asBool();
-
         // Compute mode and eventually GPU ID to be used
         int device_id;
         bool timing;
@@ -182,6 +179,9 @@ public:
             device_id = -1;
             timing = false;
         #endif
+
+        int resizeWidth = rf.check("resizeWidth", Value(256)).asDouble();
+        int resizeHeight = rf.check("resizeHeight", Value(256)).asDouble();
 
         caffe_extractor = NULL;
         caffe_extractor = new CaffeFeatExtractor<float>(caffemodel_file,
