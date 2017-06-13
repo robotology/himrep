@@ -1,4 +1,4 @@
-name: "CaffeNet"
+name: "CaffeNet_iCW"
 layer {
   name: "data"
   type: "MemoryData"
@@ -7,7 +7,7 @@ layer {
   transform_param {
     mirror: false
     crop_size: 227
-    mean_file: "imagenet_mean.binaryproto"
+    mean_file: "/absolute/path/to/iCW50_mean.binaryproto"
   }
   memory_data_param {
     batch_size: 1
