@@ -104,7 +104,6 @@ private:
 
             std::vector<float> codingVecFloat;
             float times[2];
-            caffe_extractor->extract_singleFeat_1D(matImg, codingVecFloat, times);
             if (!caffe_extractor->extract_singleFeat_1D(matImg, codingVecFloat, times))
             {
                 std::cout << "CaffeFeatExtractor::extract_singleFeat_1D(): failed..." << std::endl;
@@ -166,12 +165,20 @@ public:
         string blob_name = rf.check("blob_name", Value("pool5/7x7_s1")).asString().c_str();
         cout << "Setting blob_names to " << blob_name << endl;
 
-        // Boolean flag for timing or not the feature extraction
-        bool timing = rf.check("timing",Value(false)).asBool();
-
         // Compute mode and eventually GPU ID to be used
-        string compute_mode = rf.check("compute_mode", Value("GPU")).asString();
-        int device_id = rf.check("device_id", Value(0)).asInt();
+        int device_id;
+        bool timing;
+        string compute_mode;
+
+        #ifdef HAS_CUDA
+            compute_mode = rf.check("compute_mode", Value("GPU")).asString();
+            device_id = rf.check("device_id", Value(0)).asInt();
+            timing = rf.check("timing",Value(false)).asBool(); // flag for timing feature extraction
+        #else
+            compute_mode = "CPU";
+            device_id = -1;
+            timing = false;
+        #endif
 
         int resizeWidth = rf.check("resizeWidth", Value(256)).asDouble();
         int resizeHeight = rf.check("resizeHeight", Value(256)).asDouble();
@@ -415,4 +422,3 @@ int main(int argc, char *argv[])
 
     return mod.runModule(rf);
 }
-

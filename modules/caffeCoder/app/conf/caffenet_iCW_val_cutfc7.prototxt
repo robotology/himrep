@@ -1,4 +1,4 @@
-name: "CaffeNet"
+name: "CaffeNet_iCW"
 layer {
   name: "data"
   type: "MemoryData"
@@ -7,7 +7,7 @@ layer {
   transform_param {
     mirror: false
     crop_size: 227
-    mean_file: "/absolute/path/to/imagenet_mean.binaryproto"
+    mean_file: "/absolute/path/to/iCW50_mean.binaryproto"
   }
   memory_data_param {
     batch_size: 1
@@ -206,33 +206,4 @@ layer {
   dropout_param {
     dropout_ratio: 0.5
   }
-}
-layer {
-  name: "fc8"
-  type: "InnerProduct"
-  bottom: "fc7"
-  top: "fc8"
-  inner_product_param {
-    num_output: 1000
-  }
-}
-layer {
-  name: "prob"
-  type: "Softmax"
-  bottom: "fc8"
-  top: "prob"
-}
-layer {
-  name: "accuracy"
-  type: "Accuracy"
-  bottom: "prob"
-  bottom: "label"
-  top: "accuracy"
-}
-layer {
-  name: "loss"
-  type: "SoftmaxWithLoss"
-  bottom: "fc8"
-  bottom: "label"
-  top: "loss"
 }

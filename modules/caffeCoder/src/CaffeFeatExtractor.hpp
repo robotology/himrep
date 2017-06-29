@@ -7,15 +7,16 @@
 #include <opencv2/opencv.hpp>
 
 // CUDA-C includes
-#include <cuda.h>
-#include <cuda_runtime.h>
+#ifdef HAS_CUDA
+    #include <cuda.h>
+    #include <cuda_runtime.h>
+#endif
 
 // Boost
 #include "boost/algorithm/string.hpp"
 #include "boost/make_shared.hpp"
 
 // Caffe
-
 #include "caffe-version.h"
 
 #if (CAFFE_MAJOR >= 1)
@@ -63,19 +64,19 @@ public:
             int _device_id,
             bool _timing_extraction);
 
-    float extractBatch_multipleFeat(vector<cv::Mat> &images, int new_batch_size, vector< Blob<Dtype>* > &features);
+    bool extractBatch_multipleFeat(vector<cv::Mat> &images, int new_batch_size, vector< Blob<Dtype>* > &features, float (&times)[2]);
 
-    float extractBatch_singleFeat(vector<cv::Mat> &images, int new_batch_size, vector< Blob<Dtype>* > &features);
+    bool extractBatch_singleFeat(vector<cv::Mat> &images, int new_batch_size, vector< Blob<Dtype>* > &features, float (&times)[2]);
 
-    float extractBatch_multipleFeat_1D(vector<cv::Mat> &images, int new_batch_size, vector< vector<Dtype> > &features);
+    bool extractBatch_multipleFeat_1D(vector<cv::Mat> &images, int new_batch_size, vector< vector<Dtype> > &features, float (&times)[2]);
 
-    float extractBatch_singleFeat_1D(vector<cv::Mat> &images, int new_batch_size, vector< vector<Dtype> > &features);
+    bool extractBatch_singleFeat_1D(vector<cv::Mat> &images, int new_batch_size, vector< vector<Dtype> > &features, float (&times)[2]);
 
-    float extract_multipleFeat(cv::Mat &image, vector< Blob<Dtype>* > &features);
+    bool extract_multipleFeat(cv::Mat &image, vector< Blob<Dtype>* > &features, float (&times)[2]);
 
-    float extract_singleFeat(cv::Mat &image, Blob<Dtype> *features);
+    bool extract_singleFeat(cv::Mat &image, Blob<Dtype> *feature, float (&times)[2]);
 
-    float extract_multipleFeat_1D(cv::Mat &image, vector< vector<Dtype> > &features);
+    bool extract_multipleFeat_1D(cv::Mat &image, vector< vector<Dtype> > &features, float (&times)[2]);
 
     bool extract_singleFeat_1D(cv::Mat &image, vector<Dtype> &features, float (&times)[2]);
 };
@@ -186,7 +187,34 @@ CaffeFeatExtractor<Dtype>::CaffeFeatExtractor(string _caffemodel_file,
 
 
 template<class Dtype>
-float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &images, int new_batch_size, vector< Blob<Dtype>* > &features) {
+bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &images, int new_batch_size, vector< Blob<Dtype>* > &features, float (&times)[2]) {
+
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
+    if (images.empty())
+    {
+        std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty images!" << std::endl;
+        return false;
+    }
+
+    #ifdef HAS_CUDA
+    // Start timing
+    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        cudaEventCreate(&startPrep);
+        cudaEventCreate(&stopPrep);
+        cudaEventRecord(startPrep, NULL);
+
+        cudaEventCreate(&startNet);
+        cudaEventCreate(&stopNet);
+        cudaEventRecord(startNet, NULL);
+    }
+    #endif
+
+    // Prepare Caffe
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
@@ -199,14 +227,6 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
         Caffe::set_mode(Caffe::CPU);
     }
 
-    cudaEvent_t start, stop;
-
-    if (timing)
-    {
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, NULL);
-    }
 
     // Initialize labels to zero
     vector<int> labels(images.size(), 0);
@@ -258,6 +278,13 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
 
     for (int i=0; i<images.size(); i++)
     {
+
+        if (images[i].empty())
+        {
+            std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty image!" << std::endl;
+            return false;
+        }
+
         if (images[i].rows != mean_height || images[i].cols != mean_height)
         {
             if (images[i].rows > mean_height || images[i].cols > mean_height)
@@ -274,6 +301,21 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
     memory_data_layer->AddMatVector(images,labels);
 
     size_t num_features = blob_names.size();
+
+    if (timing)
+    {
+        #ifdef HAS_CUDA
+        // Record the stop event
+        cudaEventRecord(stopPrep, NULL);
+
+        // Wait for the stop event to complete
+        cudaEventSynchronize(stopPrep);
+
+        cudaEventElapsedTime(times, startPrep, stopPrep);
+        times[0] = times[0]/images.size();
+
+        #endif
+    }
 
     // Run network and retrieve features!
 
@@ -302,28 +344,50 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &imag
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
-        cudaEventRecord(stop, NULL);
+        cudaEventRecord(stopNet, NULL);
 
         // Wait for the stop event to complete
-        cudaEventSynchronize(stop);
+        cudaEventSynchronize(stopNet);
 
-        float msecTotal = 0.0f;
-        cudaEventElapsedTime(&msecTotal, start, stop);
+        cudaEventElapsedTime(times+1, startNet, stopNet);
+        times[1] = times[1]/images.size();
 
-        float msecPerImage = msecTotal/(float)images.size();
-
-        return msecPerImage;
+        #endif
     }
-    else
-    {
-        return 0;
-    }
+
+    return true;
 
 }
 
 template<class Dtype>
-float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images, int new_batch_size, vector< Blob<Dtype>* > &features) {
+bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images, int new_batch_size, vector< Blob<Dtype>* > &features, float (&times)[2]) {
+
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
+    if (images.empty())
+    {
+        std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty images!" << std::endl;
+        return false;
+    }
+
+    #ifdef HAS_CUDA
+    // Start timing
+    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        cudaEventCreate(&startPrep);
+        cudaEventCreate(&stopPrep);
+        cudaEventRecord(startPrep, NULL);
+
+        cudaEventCreate(&startNet);
+        cudaEventCreate(&stopNet);
+        cudaEventRecord(startNet, NULL);
+    }
+    #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
@@ -334,15 +398,6 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
     else
     {
         Caffe::set_mode(Caffe::CPU);
-    }
-
-    cudaEvent_t start, stop;
-
-    if (timing)
-    {
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, NULL);
     }
 
     // Initialize the labels to zero
@@ -397,6 +452,13 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
     {
         if (images[i].rows != mean_height || images[i].cols != mean_height)
         {
+
+            if (images[i].empty())
+            {
+                std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty image!" << std::endl;
+                return false;
+            }
+
             if (images[i].rows > mean_height || images[i].cols > mean_height)
             {
                 cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
@@ -414,7 +476,22 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
     if (num_features!=1)
     {
         cout<< "Error! The list of features to be extracted has not size one!" << endl;
-        return -1;
+        return false;
+    }
+
+    if (timing)
+    {
+        #ifdef HAS_CUDA
+        // Record the stop event
+        cudaEventRecord(stopPrep, NULL);
+
+        // Wait for the stop event to complete
+        cudaEventSynchronize(stopPrep);
+
+        cudaEventElapsedTime(times, startPrep, stopPrep);
+        times[0] = times[0]/images.size();
+
+        #endif
     }
 
     // Run network and retrieve features!
@@ -441,28 +518,50 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
-        cudaEventRecord(stop, NULL);
+        cudaEventRecord(stopNet, NULL);
 
         // Wait for the stop event to complete
-        cudaEventSynchronize(stop);
+        cudaEventSynchronize(stopNet);
 
-        float msecTotal = 0.0f;
-        cudaEventElapsedTime(&msecTotal, start, stop);
+        cudaEventElapsedTime(times+1, startNet, stopNet);
+        times[1] = times[1]/images.size();
 
-        float msecPerImage = msecTotal/(float)images.size();
-
-        return msecPerImage;
+        #endif
     }
-    else
-    {
-        return 0;
-    }
+
+    return true;
 }
 
 template<class Dtype>
-float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Blob<Dtype>* > &features)
-{
+bool CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Blob<Dtype>* > &features, float (&times)[2]) {
+
+
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
+    if (image.empty())
+    {
+        std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty image!" << std::endl;
+        return false;
+    }
+
+    #ifdef HAS_CUDA
+    // Start timing
+    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        cudaEventCreate(&startPrep);
+        cudaEventCreate(&stopPrep);
+        cudaEventRecord(startPrep, NULL);
+
+        cudaEventCreate(&startNet);
+        cudaEventCreate(&stopNet);
+        cudaEventRecord(startNet, NULL);
+    }
+    #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
@@ -473,15 +572,6 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
     else
     {
         Caffe::set_mode(Caffe::CPU);
-    }
-
-    cudaEvent_t start, stop;
-
-    if (timing)
-    {
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, NULL);
     }
 
     // Initialize the labels to zero
@@ -521,6 +611,20 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
 
     size_t num_features = blob_names.size();
 
+    if (timing)
+    {
+        #ifdef HAS_CUDA
+        // Record the stop event
+        cudaEventRecord(stopPrep, NULL);
+
+        // Wait for the stop event to complete
+        cudaEventSynchronize(stopPrep);
+
+        cudaEventElapsedTime(times, startPrep, stopPrep);
+
+        #endif
+    }
+
     // Run network and retrieve features!
 
     // depending on your net's architecture, the blobs will hold accuracy and/or labels, etc
@@ -534,7 +638,7 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
         if (batch_size!=1)
         {
             cout << "Error! Retrieved more than one feature, exiting..." << endl;
-            return -1;
+            return false;
         }
 
         int channels = feature_blob->channels();
@@ -549,28 +653,49 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Bl
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
-        cudaEventRecord(stop, NULL);
+        cudaEventRecord(stopNet, NULL);
 
         // Wait for the stop event to complete
-        cudaEventSynchronize(stop);
+        cudaEventSynchronize(stopNet);
 
-        float msecTotal = 0.0f;
+        cudaEventElapsedTime(times+1, startNet, stopNet);
 
-        cudaEventElapsedTime(&msecTotal, start, stop);
-
-        return msecTotal;
+        #endif
     }
-    else
-    {
-        return 0;
-    }
+
+    return true;
 
 }
 
 template<class Dtype>
-float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *features)
-{
+bool CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *features, float (&times)[2]) {
+
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
+    if (image.empty())
+    {
+        std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty image!" << std::endl;
+        return false;
+    }
+
+    #ifdef HAS_CUDA
+    // Start timing
+    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        cudaEventCreate(&startPrep);
+        cudaEventCreate(&stopPrep);
+        cudaEventRecord(startPrep, NULL);
+
+        cudaEventCreate(&startNet);
+        cudaEventCreate(&stopNet);
+        cudaEventRecord(startNet, NULL);
+    }
+    #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
@@ -581,15 +706,6 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
     else
     {
         Caffe::set_mode(Caffe::CPU);
-    }
-
-    cudaEvent_t start, stop;
-
-    if (timing)
-    {
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, NULL);
     }
 
     // Initialize label to zero
@@ -630,7 +746,21 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
     if(num_features!=1)
     {
         cout<< "Error! The list of features to be extracted has not size one!" << endl;
-        return -1;
+        return false;
+    }
+
+    if (timing)
+    {
+        #ifdef HAS_CUDA
+        // Record the stop event
+        cudaEventRecord(stopPrep, NULL);
+
+        // Wait for the stop event to complete
+        cudaEventSynchronize(stopPrep);
+
+        cudaEventElapsedTime(times, startPrep, stopPrep);
+
+        #endif
     }
 
     // Run network and retrieve features!
@@ -661,28 +791,51 @@ float CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> 
 
     features->CopyFrom(*feature_blob);
 
+
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
-        cudaEventRecord(stop, NULL);
+        cudaEventRecord(stopNet, NULL);
 
         // Wait for the stop event to complete
-        cudaEventSynchronize(stop);
+        cudaEventSynchronize(stopNet);
 
-        float msecTotal = 0.0f;
-        cudaEventElapsedTime(&msecTotal, start, stop);
+        cudaEventElapsedTime(times+1, startNet, stopNet);
 
-        return msecTotal;
+        #endif
     }
-    else
-    {
-        return 0;
-    }
+
+    return true;
 }
 
 template<class Dtype>
-float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &images, int new_batch_size, vector< vector<Dtype> > &features)
-{
+bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &images, int new_batch_size, vector< vector<Dtype> > &features, float (&times)[2]) {
+
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
+    if (images.empty())
+    {
+        std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty images!" << std::endl;
+        return false;
+    }
+
+    #ifdef HAS_CUDA
+    // Start timing
+    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        cudaEventCreate(&startPrep);
+        cudaEventCreate(&stopPrep);
+        cudaEventRecord(startPrep, NULL);
+
+        cudaEventCreate(&startNet);
+        cudaEventCreate(&stopNet);
+        cudaEventRecord(startNet, NULL);
+    }
+    #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
@@ -693,15 +846,6 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
     else
     {
         Caffe::set_mode(Caffe::CPU);
-    }
-
-    cudaEvent_t start, stop;
-
-    if (timing)
-    {
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, NULL);
     }
 
     // Initialize the labels to zero
@@ -757,6 +901,12 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
     {
         if (images[i].rows != mean_height || images[i].cols != mean_height)
         {
+            if (images[i].empty())
+            {
+                std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty image!" << std::endl;
+                return false;
+            }
+
             if (images[i].rows > mean_height || images[i].cols > mean_height)
             {
                 cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
@@ -771,6 +921,21 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
     memory_data_layer->AddMatVector(images,labels);
 
     size_t num_features = blob_names.size();
+
+    if (timing)
+    {
+        #ifdef HAS_CUDA
+        // Record the stop event
+        cudaEventRecord(stopPrep, NULL);
+
+        // Wait for the stop event to complete
+        cudaEventSynchronize(stopPrep);
+
+        cudaEventElapsedTime(times, startPrep, stopPrep);
+        times[0] = times[0]/images.size();
+
+        #endif
+    }
 
     // Run network and retrieve features!
 
@@ -805,28 +970,49 @@ float CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &i
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
-        cudaEventRecord(stop, NULL);
+        cudaEventRecord(stopNet, NULL);
 
         // Wait for the stop event to complete
-        cudaEventSynchronize(stop);
+        cudaEventSynchronize(stopNet);
 
-        float msecTotal = 0.0f;
-        cudaEventElapsedTime(&msecTotal, start, stop);
+        cudaEventElapsedTime(times+1, startNet, stopNet);
+        times[1] = times[1]/images.size();
 
-        float msecPerImage = msecTotal/(float)images.size();
-
-        return msecPerImage;
+        #endif
     }
-    else
-    {
-        return 0;
-    }
+
+    return true;
 }
 
 template<class Dtype>
-float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &images, int new_batch_size, vector< vector<Dtype> > &features)
-{
+bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &images, int new_batch_size, vector< vector<Dtype> > &features, float (&times)[2]) {
+
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
+    if (images.empty())
+    {
+        std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty images!" << std::endl;
+        return false;
+    }
+
+    #ifdef HAS_CUDA
+    // Start timing
+    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        cudaEventCreate(&startPrep);
+        cudaEventCreate(&stopPrep);
+        cudaEventRecord(startPrep, NULL);
+
+        cudaEventCreate(&startNet);
+        cudaEventCreate(&stopNet);
+        cudaEventRecord(startNet, NULL);
+    }
+    #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
@@ -837,15 +1023,6 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
     else
     {
         Caffe::set_mode(Caffe::CPU);
-    }
-
-    cudaEvent_t start, stop;
-
-    if (timing)
-    {
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, NULL);
     }
 
     // Initialize labels to zero
@@ -900,6 +1077,12 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
     {
         if (images[i].rows != mean_height || images[i].cols != mean_height)
         {
+            if (images[i].empty())
+            {
+                std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty image!" << std::endl;
+                return false;
+            }
+
             if (images[i].rows > mean_height || images[i].cols > mean_height)
             {
                 cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
@@ -917,7 +1100,22 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
     if (num_features!=1)
     {
         cout<< "Error! The list of features to be extracted has not size one!" << endl;
-        return -1;
+        return false;
+    }
+
+    if (timing)
+    {
+        #ifdef HAS_CUDA
+        // Record the stop event
+        cudaEventRecord(stopPrep, NULL);
+
+        // Wait for the stop event to complete
+        cudaEventSynchronize(stopPrep);
+
+        cudaEventElapsedTime(times, startPrep, stopPrep);
+        times[0] = times[0]/images.size();
+
+        #endif
     }
 
     // Run network and retrieve features!
@@ -947,28 +1145,50 @@ float CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &ima
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
-        cudaEventRecord(stop, NULL);
+        cudaEventRecord(stopNet, NULL);
 
         // Wait for the stop event to complete
-        cudaEventSynchronize(stop);
+        cudaEventSynchronize(stopNet);
 
-        float msecTotal = 0.0f;
-        cudaEventElapsedTime(&msecTotal, start, stop);
+        cudaEventElapsedTime(times+1, startNet, stopNet);
+        times[1] = times[1]/images.size();
 
-        float msecPerImage = msecTotal/(float)images.size();
-
-        return msecPerImage;
+        #endif
     }
-    else
-    {
-        return 0;
-    }
+
+    return true;
+
 }
 
 template<class Dtype>
-float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< vector<Dtype> > &features)
-{
+bool CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< vector<Dtype> > &features, float (&times)[2]) {
+
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
+    if (image.empty())
+    {
+        std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty images!" << std::endl;
+        return false;
+    }
+
+    #ifdef HAS_CUDA
+    // Start timing
+    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        cudaEventCreate(&startPrep);
+        cudaEventCreate(&stopPrep);
+        cudaEventRecord(startPrep, NULL);
+
+        cudaEventCreate(&startNet);
+        cudaEventCreate(&stopNet);
+        cudaEventRecord(startNet, NULL);
+    }
+    #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
@@ -979,15 +1199,6 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
     else
     {
         Caffe::set_mode(Caffe::CPU);
-    }
-
-    cudaEvent_t start, stop;
-
-    if (timing)
-    {
-        cudaEventCreate(&start);
-        cudaEventCreate(&stop);
-        cudaEventRecord(start, NULL);
     }
 
     // Initialize labels to zero
@@ -1026,6 +1237,20 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
 
     size_t num_features = blob_names.size();
 
+    if (timing)
+    {
+        #ifdef HAS_CUDA
+        // Record the stop event
+        cudaEventRecord(stopPrep, NULL);
+
+        // Wait for the stop event to complete
+        cudaEventSynchronize(stopPrep);
+
+        cudaEventElapsedTime(times, startPrep, stopPrep);
+
+        #endif
+    }
+
     // Run network and retrieve features!
 
     // depending on your net's architecture, the blobs will hold accuracy and/or labels, etc
@@ -1054,27 +1279,51 @@ float CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector<
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
-        cudaEventRecord(stop, NULL);
+        cudaEventRecord(stopNet, NULL);
 
         // Wait for the stop event to complete
-        cudaEventSynchronize(stop);
+        cudaEventSynchronize(stopNet);
 
-        float msecTotal = 0.0f;
-        cudaEventElapsedTime(&msecTotal, start, stop);
+        cudaEventElapsedTime(times+1, startNet, stopNet);
 
-        return msecTotal;
+        #endif
     }
-    else
-    {
-        return 0;
-    }
+
+    return true;
 
 }
 
 template<class Dtype>
-bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dtype> &features, float (&times)[2])
-{
+bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dtype> &features, float (&times)[2]) {
+
+    times[0] = 0.0f;
+    times[1] = 0.0f;
+
+    if (image.empty())
+    {
+        std::cout << "CaffeFeatExtractor::extractBatch_multipleFeat(): empty images!" << std::endl;
+        return false;
+    }
+
+    #ifdef HAS_CUDA
+    // Start timing
+    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        cudaEventCreate(&startPrep);
+        cudaEventCreate(&stopPrep);
+        cudaEventRecord(startPrep, NULL);
+
+        cudaEventCreate(&startNet);
+        cudaEventCreate(&stopNet);
+        cudaEventRecord(startNet, NULL);
+    }
+    #endif
+
+    // Prepare Caffe
 
     times[0] = 0.0f;
     times[1] = 0.0f;
@@ -1151,6 +1400,7 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stopPrep, NULL);
 
@@ -1158,6 +1408,8 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
         cudaEventSynchronize(stopPrep);
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
+
+        #endif
     }
 
 
@@ -1172,7 +1424,7 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
     if (batch_size!=1)
     {
         std::cout << "CaffeFeatExtractor::extract_singleFeat_1D(): Error! Retrieved more than one feature, exiting..." << std::endl;
-        return -1;
+        return false;
     }
 
     int feat_dim = feature_blob->count(); // should be equal to: count/num=channels*width*height
@@ -1185,6 +1437,7 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
 
     if (timing)
     {
+        #ifdef HAS_CUDA
         // Record the stop event
         cudaEventRecord(stopNet, NULL);
 
@@ -1193,9 +1446,12 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
 
+        #endif
     }
 
     return true;
+
+
 
 }
 

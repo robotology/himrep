@@ -10,23 +10,15 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(OpenCV REQUIRED)
 
-# CUDA packagee
-find_package(CUDA REQUIRED)
-# CUDA compilation flags
-list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_20,code=sm_20)
-list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30)
-list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_35,code=sm_35)
-list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_50,code=sm_50)
-
 include_directories(${YARP_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${Caffe_INCLUDE_DIRS})
 
 include_directories(${PROJECT_SOURCE_DIR})
 
-# no need to use the following instruction because this is automatically done by CUDA_ADD_EXECUTABLE
-#if(NOT CPU_ONLY)
-#  include_directories(${CUDA_INCLUDE_DIRS})
+#if(NOT Caffe_CPU_ONLY)
+  #no need to use the following instruction because this is automatically done by CUDA_ADD_EXECUTABLE
+  #include_directories(${CUDA_INCLUDE_DIRS})
 #endif()
 
 get_target_property(CAFFE_SONAME caffe IMPORTED_SONAME_RELEASE)
@@ -62,10 +54,32 @@ set(folder_header CaffeFeatExtractor.hpp)
 source_group("Source Files" FILES ${folder_source})
 source_group("Header Files" FILES ${folder_header})
 
-cuda_add_executable(${PROJECTNAME} ${folder_source} ${folder_header})
+if (NOT Caffe_CPU_ONLY)
+
+    add_definitions(-DHAS_CUDA)
+    
+    find_package(CUDA REQUIRED)
+    
+    list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_20,code=sm_20)
+    list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30)
+    list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_35,code=sm_35)
+    list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_50,code=sm_50)
+    
+endif()
+
+if(NOT Caffe_CPU_ONLY)
+    cuda_add_executable(${PROJECTNAME} ${folder_source} ${folder_header})
+else()
+    add_executable(${PROJECTNAME} ${folder_source} ${folder_header})
+endif()
 
 target_link_libraries(${PROJECTNAME} ${YARP_LIBRARIES} ${OpenCV_LIBRARIES} ${Caffe_LIBRARIES})
-target_link_libraries(${PROJECTNAME} ${CUDA_LIBRARIES})
+
+if(NOT Caffe_CPU_ONLY)
+    target_link_libraries(${PROJECTNAME} ${CUDA_LIBRARIES})
+endif()
 
 install(TARGETS ${PROJECTNAME} DESTINATION bin)
+
 yarp_install(FILES ../${PROJECTNAME}.xml DESTINATION ${ICUBCONTRIB_MODULES_INSTALL_DIR})
+

@@ -25,7 +25,7 @@ Indeed CUDA events are used in the module to measure the feature extraction time
 ## Caffe Installation
 
 For a complete and continuously updated guide to how to install Caffe in any configuration you should go to [Caffe - Installation](http://caffe.berkeleyvision.org/installation.html).
-We do not cover here exhaustively the procedure because it is changing quite rapidly (as Caffe is under active developement) and detailed instructions are provided by the developers. We just report the procedure we followed at present (06/16/16) to use Caffe library in YARP and iCub's modules on Ubuntu 14.04 and 16.04 LTS.
+We do not cover here exhaustively the procedure because it is changing quite rapidly (as Caffe is under active developement) and detailed instructions are provided by the developers. We just report the procedure we followed at present (06/16/16) to use Caffe library in YARP and iCub's modules on Ubuntu 16.04 LTS.
 
 ##### CUDA installation
 
@@ -45,21 +45,19 @@ However, in order to compile Caffe with this CUDA version on Ubuntu 16.04 and GC
 
 ##### cuDNN installation (optional but recommended)
 
-Download the **cuDNN** version you need (depending on the toolkit version) from [NVIDIA cuDNN library](https://developer.nvidia.com/cuDNN) (you have to sign up as CUDA Registered Developer, it's for free), and install by following the instructions. For convenience, we report what we did on Ubuntu 16.04/14.04:
-
-```
-export CUDA_DIR=/path/to/cuda/installation/directory
-tar -xzvf <downladed-cudnn-archive-name>.tgz
-cd <downladed-cudnn-archive-name>
-sudo cp lib* $CUDA_DIR/lib64/
-sudo cp cudnn.h $CUDA_DIR/include/
-```
+Download the **cuDNN** version you need (depending on the toolkit version) from [NVIDIA cuDNN library](https://developer.nvidia.com/cuDNN) (you have to sign up as CUDA Registered Developer, it's for free), and install it by following the instructions.
 
 ##### BLAS installation
 
 We chose the **OpenBLAS** implementation but also ATLAS or Intel MKL are supported by Caffe.
 You can either download the source code from [OpenBLAS page](http://www.openblas.net/) and follow instructions to compile and install it, or install the package.
-In the first case, we recommend to install in a separate and specified location of your choice instead of the default `/usr/local` by doing:
+In the latter case, you can just do:
+
+```
+sudo apt-get install libopenblas-dev
+```
+
+In case you compile the source code, we recommend to install in a separate and specified location of your choice instead of the default `/usr/local` by doing:
 
 ```
 tar -xzvf <downloaded-openblas-archive-name>.tar.gz
@@ -67,11 +65,6 @@ cd <downloaded-openblas-archive-name>
 make PREFIX=/path/to/install/dir install
 ```
 and setting the `OpenBLAS_HOME` environment variable to the installation path to allow Caffe finding it.
-In the second case, you can do:
-
-```
-sudo apt-get install libopenblas-dev
-```
 
 ##### BOOST installation
 
@@ -87,7 +80,7 @@ cd <downloaded-boost-archive>
 and set the `Boost_DIR` environment variable to the installation path to allow Caffe finding it, or to download the package:
 
 ```
-sudo apt-get install --no-install-recommends libboost-all-dev
+sudo apt-get install libboost-all-dev
 ```
 
 ##### OpenCV installation
@@ -103,11 +96,11 @@ make
 make install
 ```
 
-Where in the CMake configuration you should have set the installation path (CMAKE_INSTALL_PREFIX) to one of your choice. In this case, set the `OpenCV_DIR` environment variable to the installation path to allow Caffe finding it.
+Where in the CMake configuration you should have set the installation path (`CMAKE\_INSTALL\_PREFIX`) to one of your choice. In this case, set the `OpenCV_DIR` environment variable to the installation path to allow Caffe finding it.
 
 ##### Other packages
 
-Refer to [Caffe - Ubuntu Installation](http://caffe.berkeleyvision.org/install_apt.html) for updated instructions or manual installation. On Ubunutu 14.04 and 16.06 LTS at the time being we have done:
+Refer to [Caffe - Ubuntu Installation](http://caffe.berkeleyvision.org/install_apt.html) for updated instructions or manual installation. On Ubunutu 16.04 LTS at the time being we have done:
 
 Google Protobuf Buffers C++:<br>
 `sudo apt-get install libprotobuf-dev protobuf-compiler`
@@ -132,7 +125,15 @@ snappy:<br>
 
 ##### Caffe compilation
 
-At present we support the first and only [Caffe release candidate 3](https://github.com/BVLC/caffe/releases) that is version 1.0.0.rc3. You can download it from the linked page.
+Since Caffe is under active development, and we try to be compatible with the changes progressively introduced in the framework, we periodically check the compatibility of `himrep` modules against Caffe's `master` branch. At present the latest commit that we verified to work with `CaffeCoder` is `b2982c7eef65a1b94db6f22fb8bb7caa986e6f29`, hence you should clone Caffe's `master` branch and checkout to this commit:
+
+```
+git clone https://www.github.com/BVLC/caffe.git
+cd caffe
+git checkout b2982c7eef65a1b94db6f22fb8bb7caa986e6f29
+```
+But of course you can try building `CaffeCoder` with latest Caffe's `master` commit.
+Note that at present [Caffe RC3](https://github.com/BVLC/caffe/releases) is not compatible anymore with `CaffeCoder`.
 
 In order to be able to link Caffe from an external project via CMake (as this application does) you should compile Caffe via CMake and not manually editing the Makefile.config.
 

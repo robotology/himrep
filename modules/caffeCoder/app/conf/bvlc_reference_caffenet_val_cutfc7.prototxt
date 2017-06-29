@@ -7,7 +7,7 @@ layer {
   transform_param {
     mirror: false
     crop_size: 227
-    mean_file: "imagenet_mean.binaryproto"
+    mean_file: "/absolute/path/to/imagenet_mean.binaryproto"
   }
   memory_data_param {
     batch_size: 1
