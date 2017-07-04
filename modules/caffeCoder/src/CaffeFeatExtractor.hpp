@@ -1325,30 +1325,6 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
 
     // Prepare Caffe
 
-    times[0] = 0.0f;
-    times[1] = 0.0f;
-
-    // Check input image
-    if (image.empty())
-    {
-        std::cout << "CaffeFeatExtractor::extract_singleFeat_1D(): empty imMat!" << std::endl;
-        return false;
-    }
-
-    // Start timing
-    cudaEvent_t startPrep, stopPrep, startNet, stopNet;
-    if (timing)
-    {
-        cudaEventCreate(&startPrep);
-        cudaEventCreate(&startNet);
-        cudaEventCreate(&stopPrep);
-        cudaEventCreate(&stopNet);
-        cudaEventRecord(startPrep, NULL);
-        cudaEventRecord(startNet, NULL);
-    }
-
-    // Prepare Caffe
-
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
     {
@@ -1411,7 +1387,6 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
 
         #endif
     }
-
 
     // Run network and retrieve features!
 
