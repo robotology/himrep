@@ -154,7 +154,7 @@ public:
         // Data initialization (specific for Caffe method)
 
         // Binary file (.caffemodel) containing the network's weights
-        string caffemodel_file = rf.check("caffemodel_file", Value("/usr/local/src/robot/caffe/models/bvlc_googlenet/bvlc_googlenet.caffemodel")).asString().c_str();
+        string caffemodel_file = rf.check("caffemodel_file", Value("bvlc_googlenet.caffemodel")).asString().c_str();
         cout << "Setting .caffemodel file to " << caffemodel_file << endl;
 
         // Text file (.prototxt) defining the network structure

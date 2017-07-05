@@ -46,10 +46,10 @@ are needed by all modules, the following dependencies are required only if you p
 
 Instructions on how to install and setup the dependencies for each module can be found in specific README files:
 
-- `caffeCoder`: link to [README](https://www.github.com/robotology/himrep/modules/caffeCoder/README)
-- `GIECoder`: link to [README](https://www.github.com/robotology/himrep/modules/GIECoder/README)
-- `sparseCoder`: link to [README](https://www.github.com/robotology/himrep/modules/sparseCoder/README)
-- `linearClassifierModule`: link to [README](https://www.github.com/robotology/himrep/modules/linearClassifierModule/README)
+- `caffeCoder`: link to [README](https://github.com/GiuliaP/himrep/tree/master/modules/caffeCoder)
+- `GIECoder`: link to [README](https://github.com/GiuliaP/himrep/tree/master/modules/GIECoder)
+- `sparseCoder`: link to [README](https://github.com/GiuliaP/himrep/tree/master/modules/sparseCoder)
+- `linearClassifierModule`: link to [README](https://github.com/GiuliaP/himrep/tree/master/modules/linearClassifierModule)
 
 ### Compilation
  

@@ -5,8 +5,12 @@ Table of Contents
     * [Dependencies](#dependencies)
     * [Compilation](#compilation)
   * [Setup](#setup)
+    * [Download binary Caffe models (.caffemodel)](#caffemodel)
+    * [Configure .prototxt and .ini with absolute paths](#config)
+  * [Detailed explanation](#details)
   * [Additional notes on Caffe installation](#notes)
-  * [Contributing](#contributing)
+  * [Citation](#contributing)
+  * [License](#license)
 
 ## Description
 
@@ -157,7 +161,7 @@ In Caffe's [Model Zoo](http://caffe.berkeleyvision.org/model_zoo.html) there are
 In order to correctly use a network in inference mode, the mean image (or pixel) of the training set that has been used to learn the model parameters must be subtracted from any image that is fed to the model. The mean image is usully stored in Caffe with a `.binaryproto` file. You will to specify this in the `MemoryData` layer and:
 
 - if the mean image is subtracted, the `.binaryproto` file must be downloaded and correctly pointed by the `.prototxt` in your system (`mean_file` field of the `MemoryData` layer);
-- if the mean pixel is subtracted, you will need to specify, in the `.ini` file, two additional parameters (as, e.g., we do in `caffeCoder_googlenet.ini`) related to the width and height to which the input image will be resized before being fed to the `MemoryData` layer.
+- if the mean pixel is subtracted, you will need to specify, in the `.ini` file, two additional parameters (as, e.g., we do in `caffeCoder_googlenet.ini`) related to the width and height (`resizeWidth` and `resizeHeight`) to which the input image will be resized before being fed to the `MemoryData` layer.
 
 Another important parameter to be set in the `.ini` file is the tag/name of the output of the layer we want to read. This can be specified by setting the `blob_name` parameter.
 
