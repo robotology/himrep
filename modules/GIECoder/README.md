@@ -5,8 +5,6 @@ Table of Contents
     * [Dependencies](#dependencies)
     * [Compilation](#compilation)
   * [Setup](#setup)
-    * [Download binary Caffe models (.caffemodel)](#caffemodel)
-    * [Configure .prototxt and .ini with absolute paths](#config)
   * [Detailed explanation](#details)
   * [License](#license)
 
