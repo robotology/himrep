@@ -5,11 +5,11 @@ Table of Contents
     * [Dependencies](#dependencies)
     * [Compilation](#compilation)
   * [Setup](#setup)
-    * [Download binary Caffe models (.caffemodel)](#caffemodel)
-    * [Configure .prototxt and .ini with absolute paths](#config)
-  * [Detailed explanation](#details)
-  * [Additional notes on Caffe installation](#notes)
-  * [Citation](#contributing)
+    * [Download binary Caffe models (.caffemodel)](#download)
+    * [Configure .prototxt and .ini with absolute paths](#configure)
+  * [Detailed explanation](#detailed)
+  * [Additional notes on Caffe installation](#additional)
+  * [Citation](#citation)
   * [License](#license)
 
 ## Description
@@ -31,7 +31,7 @@ this is an optional dependency of Caffe and also of this module. However, we str
 
 ### Compilation
 
-Provided that the dependencies are satified, you can compile this module just by setting the `BUILD_caffeCoder` flag to `ON` as explained [here](https://www.github.com/robotology/himrep/README/#compilation).
+Provided that the dependencies are satified, you can compile this module just by setting the `BUILD_caffeCoder` flag to `ON` as explained [here](https://www.github.com/robotology/himrep#compilation).
 
 When you run the `ccmake` command, ensure also that:
 
@@ -284,12 +284,11 @@ make install
 - set BLAS to `open` or `Open` if you installed OpenBLAS as we did: if you still see that the Atlas implementation is not found, this might be an issue with Caffe: in any case, if you check by toggling the advanced mode, you should see that OpenBLAS has been found in your installation directory
 - there is no need to build the Matlab wrapper for Caffe
 - use the cuDNN library if possible (set USE_CUDNN to ON)
-- **important if you are on Ubuntu 16.04 and use GCC 5.3 with CUDA 7.5**: as noted [here](https://github.com/BVLC/caffe/issues/4046), in this case you need to modify the `CMAKE_CXX_FLAGS` CMake variable by appending to it the `-D_FORCE_INLINES` flag. You can do it in the `CMakeLists.txt` by modifying the following line:
+- **important if you are on Ubuntu 16.04 and use GCC 5.3 with CUDA 7.5**: as noted [here](https://github.com/BVLC/caffe/issues/4046), in this case you need to modify the `CMAKE_CXX_FLAGS` CMake variable by appending to it the `-D_FORCE_INLINES` flag. You can do it during the interactive configuration step with `ccmake` or by modifying the following line in the `CMakeLists.txt`:
 
 	```
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -D_FORCE_INLINES -Wall")
 	```
-or during the interactive configuration step with `ccmake`. Alternatively, you can use CUDA 8 as suggested above.
 
 Finally, set the `Caffe_DIR` environment variable to the installation path to allow finding Caffe via `find_package`.
 
