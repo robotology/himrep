@@ -23,21 +23,28 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 get_target_property(CAFFE_SONAME caffe IMPORTED_SONAME_RELEASE)
 
-if("${CAFFE_SONAME}" MATCHES "libcaffe.so.([0-9]+).([0-9]+).([0-9]+)(-(.+))?")
+MESSAGE( STATUS "CAFFE_SONAME:         " ${CAFFE_SONAME} )
+
+if("${CAFFE_SONAME}" MATCHES "([0-9]+).([0-9]+).([0-9]+)")
+
     set(CAFFE_MAJOR "${CMAKE_MATCH_1}")
     set(CAFFE_MINOR "${CMAKE_MATCH_2}")
     set(CAFFE_PATCH "${CMAKE_MATCH_3}")
-    set(CAFFE_PATCH2 "${CMAKE_MATCH_5}")
+
+    MESSAGE( STATUS "CAFFE_MAJOR:         " ${CMAKE_MATCH_1} )
+    MESSAGE( STATUS "CAFFE_MINOR:         " ${CMAKE_MATCH_2} )
+    MESSAGE( STATUS "CAFFE_PATCH:         " ${CMAKE_MATCH_3} )
+
     set(CAFFE_VERSION_STRING "${CAFFE_MAJOR}.${CAFFE_MINOR}.${CAFFE_PATCH}")
-    if(NOT "${CAFFE_PATCH2}" STREQUAL "")
-        set(CAFFE_VERSION_STRING "${CAFFE_VERSION_STRING}-${CAFFE_PATCH2}")
-    endif()
+
 else()
+
     set(CAFFE_MAJOR 0)
     set(CAFFE_MINOR 0)
     set(CAFFE_PATCH 0)
-    set(CAFFE_PATCH2 0)
+
     set(CAFFE_VERSION_STRING unknown)
+
 endif()
 
 math(EXPR CAFFE_VERSION "${CAFFE_MAJOR}*10000 + ${CAFFE_MINOR}*100 + ${CAFFE_PATCH}")
@@ -57,14 +64,14 @@ source_group("Header Files" FILES ${folder_header})
 if (NOT Caffe_CPU_ONLY)
 
     add_definitions(-DHAS_CUDA)
-    
+
     find_package(CUDA REQUIRED)
-    
+
     list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_20,code=sm_20)
     list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30)
     list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_35,code=sm_35)
     list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_50,code=sm_50)
-    
+
 endif()
 
 if(NOT Caffe_CPU_ONLY)
@@ -82,4 +89,3 @@ endif()
 install(TARGETS ${PROJECTNAME} DESTINATION bin)
 
 yarp_install(FILES ../${PROJECTNAME}.xml DESTINATION ${ICUBCONTRIB_MODULES_INSTALL_DIR})
-

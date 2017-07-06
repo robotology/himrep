@@ -1,8 +1,6 @@
-# Copyright: 2014 iCub Facility
+# Copyright: 2017 iCub Facility
 # Author: Sean Ryan Fanello, Carlo Ciliberto, Giulia Pasquale
 # CopyPolicy: Released under the terms of the GNU GPL v2.0.
-
-add_subdirectory(linearClassifierModule)
 
 option(BUILD_sparseCoder "Build sparseCoder" OFF)
 option(BUILD_GIECoder "Build GIECoder" OFF)
