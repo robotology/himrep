@@ -5,7 +5,9 @@ Table of Contents
     * [Dependencies](#dependencies)
     * [Compilation](#compilation)
   * [Setup](#setup)
-  * [Detailed explanation](#details)
+    * [Download binary Caffe models (.caffemodel)](#download-binary-caffe-models-caffemodel)
+    * [Configure .ini](#configure-ini)
+  * [Detailed explanation](#detailed-explanation)
   * [License](#license)
 
 ## Description
