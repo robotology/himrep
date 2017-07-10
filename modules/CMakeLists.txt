@@ -1,14 +1,13 @@
-# Copyright: 2014 iCub Facility
+# Copyright: 2017 iCub Facility
 # Author: Sean Ryan Fanello, Carlo Ciliberto, Giulia Pasquale
 # CopyPolicy: Released under the terms of the GNU GPL v2.0.
 
-add_subdirectory(linearClassifierModule)
-
 option(BUILD_sparseCoder "Build sparseCoder" OFF)
-option(BUILD_GIE "Build GIE" OFF)
-option(BUILD_caffe "Build caffe" ON)
+option(BUILD_GIECoder "Build GIECoder" OFF)
+option(BUILD_caffeCoder "Build caffeCoder" ON)
+option(BUILD_linearClassifierModule "Build linearClassifierModule" ON)
 
-if (BUILD_GIE)
+if (BUILD_GIECoder)
 	add_subdirectory(GIECoder)
 endif()
 
@@ -16,7 +15,7 @@ if (BUILD_sparseCoder)
 	add_subdirectory(sparseCoder)
 endif()
 
-if (BUILD_caffe)
+if (BUILD_caffeCoder)
 	find_package(Caffe)
 	if (Caffe_FOUND)
     		message(STATUS "Caffe is found => caffeCoder will be compiled")
@@ -24,4 +23,8 @@ if (BUILD_caffe)
 	else()
     		message(STATUS "Caffe not found => skip compiling caffeCoder")
 	endif()
+endif()
+
+if (BUILD_linearClassifierModule)
+	add_subdirectory(linearClassifierModule)
 endif()

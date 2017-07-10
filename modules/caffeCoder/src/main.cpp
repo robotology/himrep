@@ -154,7 +154,7 @@ public:
         // Data initialization (specific for Caffe method)
 
         // Binary file (.caffemodel) containing the network's weights
-        string caffemodel_file = rf.check("caffemodel_file", Value("/usr/local/src/robot/caffe/models/bvlc_googlenet/bvlc_googlenet.caffemodel")).asString().c_str();
+        string caffemodel_file = rf.check("caffemodel_file", Value("bvlc_googlenet.caffemodel")).asString().c_str();
         cout << "Setting .caffemodel file to " << caffemodel_file << endl;
 
         // Text file (.prototxt) defining the network structure
@@ -169,7 +169,7 @@ public:
         int device_id;
         bool timing;
         string compute_mode;
-        
+
         #ifdef HAS_CUDA
             compute_mode = rf.check("compute_mode", Value("GPU")).asString();
             device_id = rf.check("device_id", Value(0)).asInt();
@@ -422,4 +422,3 @@ int main(int argc, char *argv[])
 
     return mod.runModule(rf);
 }
-

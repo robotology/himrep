@@ -153,11 +153,11 @@ public:
         // Data initialization (specific for Caffe method)
 
         // Binary file (.caffemodel) containing the network's weights
-        string caffemodel_file = rf.check("caffemodel_file", Value("/usr/local/src/robot/GIE/models/bvlc_googlenet/bvlc_googlenet.caffemodel")).asString().c_str();
+        string caffemodel_file = rf.check("caffemodel_file", Value("bvlc_googlenet.caffemodel")).asString().c_str();
         cout << "Setting .caffemodel file to " << caffemodel_file << endl;
-           
+
         // Text file (.prototxt) defining the network structure
-        string prototxt_file = rf.check("prototxt_file", Value("/usr/local/src/robot/GIE/models/bvlc_googlenet/deploy.prototxt")).asString().c_str();
+        string prototxt_file = rf.check("prototxt_file", Value("deploy.prototxt")).asString().c_str();
         cout << "Setting .prototxt file to " << prototxt_file << endl;
 
         // Name of blobs to be extracted
@@ -165,7 +165,7 @@ public:
 
         // Boolean flag for timing or not the feature extraction
         bool timing = rf.check("timing",Value(false)).asBool();
-    
+
         string  binaryproto_meanfile = "";
         float meanR = -1, meanG = -1, meanB = -1;
         int resizeWidth = -1, resizeHeight = -1;
@@ -182,11 +182,11 @@ public:
             resizeHeight = rf.check("resizeHeight", Value(256)).asDouble();
             std::cout << "Setting mean to " << " R: " << meanR << " G: " << meanG << " B: " << meanB << std::endl;
             std::cout << "Resizing anysotropically to " << " W: " << resizeWidth << " H: " << resizeHeight << std::endl;
-            
-        } 
+
+        }
         else if (rf.find("meanR").isNull())
         {
-            binaryproto_meanfile = rf.check("binaryproto_meanfile", Value("/usr/local/src/robot/GIE/data/ilsvrc12/imagenet_mean.binaryproto")).asString().c_str();
+            binaryproto_meanfile = rf.check("binaryproto_meanfile", Value("imagenet_mean.binaryproto")).asString().c_str();
             cout << "Setting .binaryproto file to " << binaryproto_meanfile << endl;
         }
         else
@@ -436,4 +436,3 @@ int main(int argc, char *argv[])
 
     return mod.runModule(rf);
 }
-
