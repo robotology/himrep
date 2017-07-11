@@ -199,6 +199,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &image
     }
 
     #ifdef HAS_CUDA
+
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
 
@@ -206,15 +207,23 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &image
     {
         cudaEventCreate(&startPrep);
         cudaEventCreate(&stopPrep);
-        cudaEventRecord(startPrep, NULL);
-
         cudaEventCreate(&startNet);
         cudaEventCreate(&stopNet);
-        cudaEventRecord(startNet, NULL);
-    }
-    #endif
 
-    // Prepare Caffe
+        cudaEventRecord(startPrep, NULL);
+    }
+
+    #else
+
+    // Start timing
+    double startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        startPrep = yarp::os::Time::now();
+    }
+
+    #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
@@ -226,7 +235,6 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &image
     {
         Caffe::set_mode(Caffe::CPU);
     }
-
 
     // Initialize labels to zero
     vector<int> labels(images.size(), 0);
@@ -305,6 +313,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &image
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopPrep, NULL);
 
@@ -313,6 +322,18 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &image
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
         times[0] = times[0]/images.size();
+
+        // Start the network timer
+        cudaEventRecord(startNet, NULL);
+
+        #else
+
+        // Record the stop event
+        stopPrep = yarp::os::Time::now();
+        times[0] = ( stopPrep - startPrep ) / images.size() * 1000;
+
+        // Start the network timer
+        startNet = yarp::os::Time::now();
 
         #endif
     }
@@ -345,6 +366,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &image
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopNet, NULL);
 
@@ -353,6 +375,11 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &image
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
         times[1] = times[1]/images.size();
+
+        #else
+
+        stopNet = yarp::os::Time::now();
+        times[1] = ( stopNet - startNet ) / images.size() * 1000;
 
         #endif
     }
@@ -374,6 +401,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images,
     }
 
     #ifdef HAS_CUDA
+
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
 
@@ -381,12 +409,22 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images,
     {
         cudaEventCreate(&startPrep);
         cudaEventCreate(&stopPrep);
-        cudaEventRecord(startPrep, NULL);
-
         cudaEventCreate(&startNet);
         cudaEventCreate(&stopNet);
-        cudaEventRecord(startNet, NULL);
+
+        cudaEventRecord(startPrep, NULL);
     }
+
+    #else
+
+    // Start timing
+    double startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        startPrep = yarp::os::Time::now();
+    }
+
     #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
@@ -482,6 +520,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images,
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopPrep, NULL);
 
@@ -490,6 +529,18 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images,
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
         times[0] = times[0]/images.size();
+
+        // Start the network timer
+        cudaEventRecord(startNet, NULL);
+
+        #else
+
+        // Record the stop event
+        stopPrep = yarp::os::Time::now();
+        times[0] = ( stopPrep - startPrep ) / images.size() * 1000;
+
+        // Start the network timer
+        startNet = yarp::os::Time::now();
 
         #endif
     }
@@ -519,6 +570,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images,
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopNet, NULL);
 
@@ -527,6 +579,11 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images,
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
         times[1] = times[1]/images.size();
+
+        #else
+
+        stopNet = yarp::os::Time::now();
+        times[1] = ( stopNet - startNet ) / images.size() * 1000;
 
         #endif
     }
@@ -548,6 +605,7 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Blo
     }
 
     #ifdef HAS_CUDA
+
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
 
@@ -555,12 +613,22 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Blo
     {
         cudaEventCreate(&startPrep);
         cudaEventCreate(&stopPrep);
-        cudaEventRecord(startPrep, NULL);
-
         cudaEventCreate(&startNet);
         cudaEventCreate(&stopNet);
-        cudaEventRecord(startNet, NULL);
+
+        cudaEventRecord(startPrep, NULL);
     }
+
+    #else
+
+    // Start timing
+    double startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        startPrep = yarp::os::Time::now();
+    }
+
     #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
@@ -614,6 +682,7 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Blo
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopPrep, NULL);
 
@@ -621,6 +690,18 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Blo
         cudaEventSynchronize(stopPrep);
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
+
+        // Start the network timer
+        cudaEventRecord(startNet, NULL);
+
+        #else
+
+        // Record the stop event
+        stopPrep = yarp::os::Time::now();
+        times[0] = (stopPrep - startPrep) * 1000;
+
+        // Start the network timer
+        startNet = yarp::os::Time::now();
 
         #endif
     }
@@ -654,6 +735,7 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Blo
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopNet, NULL);
 
@@ -661,6 +743,11 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Blo
         cudaEventSynchronize(stopNet);
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
+
+        #else
+
+        stopNet = yarp::os::Time::now();
+        times[1] = (stopNet - startNet) * 1000;
 
         #endif
     }
@@ -682,6 +769,7 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *
     }
 
     #ifdef HAS_CUDA
+
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
 
@@ -689,12 +777,22 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *
     {
         cudaEventCreate(&startPrep);
         cudaEventCreate(&stopPrep);
-        cudaEventRecord(startPrep, NULL);
-
         cudaEventCreate(&startNet);
         cudaEventCreate(&stopNet);
-        cudaEventRecord(startNet, NULL);
+
+        cudaEventRecord(startPrep, NULL);
     }
+
+    #else
+
+    // Start timing
+    double startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        startPrep = yarp::os::Time::now();
+    }
+
     #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
@@ -752,6 +850,7 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopPrep, NULL);
 
@@ -759,6 +858,18 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *
         cudaEventSynchronize(stopPrep);
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
+
+        // Start the network timer
+        cudaEventRecord(startNet, NULL);
+
+        #else
+
+        // Record the stop event
+        stopPrep = yarp::os::Time::now();
+        times[0] = (stopPrep - startPrep) * 1000;
+
+        // Start the network timer
+        startNet = yarp::os::Time::now();
 
         #endif
     }
@@ -791,10 +902,10 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *
 
     features->CopyFrom(*feature_blob);
 
-
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopNet, NULL);
 
@@ -802,6 +913,11 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *
         cudaEventSynchronize(stopNet);
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
+
+        #else
+
+        stopNet = yarp::os::Time::now();
+        times[1] = (stopNet - startNet) * 1000;
 
         #endif
     }
@@ -822,6 +938,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &im
     }
 
     #ifdef HAS_CUDA
+
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
 
@@ -829,12 +946,22 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &im
     {
         cudaEventCreate(&startPrep);
         cudaEventCreate(&stopPrep);
-        cudaEventRecord(startPrep, NULL);
-
         cudaEventCreate(&startNet);
         cudaEventCreate(&stopNet);
-        cudaEventRecord(startNet, NULL);
+
+        cudaEventRecord(startPrep, NULL);
     }
+
+    #else
+
+    // Start timing
+    double startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        startPrep = yarp::os::Time::now();
+    }
+
     #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
@@ -925,6 +1052,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &im
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopPrep, NULL);
 
@@ -933,6 +1061,18 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &im
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
         times[0] = times[0]/images.size();
+
+        // Start the network timer
+        cudaEventRecord(startNet, NULL);
+
+        #else
+
+        // Record the stop event
+        stopPrep = yarp::os::Time::now();
+        times[0] = ( stopPrep - startPrep ) / images.size() * 1000;
+
+        // Start the network timer
+        startNet = yarp::os::Time::now();
 
         #endif
     }
@@ -971,6 +1111,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &im
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopNet, NULL);
 
@@ -979,6 +1120,11 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &im
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
         times[1] = times[1]/images.size();
+
+        #else
+
+        stopNet = yarp::os::Time::now();
+        times[1] = ( stopNet - startNet ) / images.size() * 1000;
 
         #endif
     }
@@ -999,6 +1145,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &imag
     }
 
     #ifdef HAS_CUDA
+
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
 
@@ -1006,12 +1153,22 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &imag
     {
         cudaEventCreate(&startPrep);
         cudaEventCreate(&stopPrep);
-        cudaEventRecord(startPrep, NULL);
-
         cudaEventCreate(&startNet);
         cudaEventCreate(&stopNet);
-        cudaEventRecord(startNet, NULL);
+
+        cudaEventRecord(startPrep, NULL);
     }
+
+    #else
+
+    // Start timing
+    double startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        startPrep = yarp::os::Time::now();
+    }
+
     #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
@@ -1106,6 +1263,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &imag
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopPrep, NULL);
 
@@ -1114,6 +1272,18 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &imag
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
         times[0] = times[0]/images.size();
+
+        // Start the network timer
+        cudaEventRecord(startNet, NULL);
+
+        #else
+
+        // Record the stop event
+        stopPrep = yarp::os::Time::now();
+        times[0] = ( stopPrep - startPrep ) / images.size() * 1000;
+
+        // Start the network timer
+        startNet = yarp::os::Time::now();
 
         #endif
     }
@@ -1146,6 +1316,7 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &imag
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopNet, NULL);
 
@@ -1154,6 +1325,11 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &imag
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
         times[1] = times[1]/images.size();
+
+        #else
+
+        stopNet = yarp::os::Time::now();
+        times[1] = ( stopNet - startNet ) / images.size() * 1000;
 
         #endif
     }
@@ -1175,6 +1351,7 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< 
     }
 
     #ifdef HAS_CUDA
+
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
 
@@ -1182,12 +1359,22 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< 
     {
         cudaEventCreate(&startPrep);
         cudaEventCreate(&stopPrep);
-        cudaEventRecord(startPrep, NULL);
-
         cudaEventCreate(&startNet);
         cudaEventCreate(&stopNet);
-        cudaEventRecord(startNet, NULL);
+
+        cudaEventRecord(startPrep, NULL);
     }
+
+    #else
+
+    // Start timing
+    double startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        startPrep = yarp::os::Time::now();
+    }
+
     #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
@@ -1240,6 +1427,7 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< 
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopPrep, NULL);
 
@@ -1247,6 +1435,18 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< 
         cudaEventSynchronize(stopPrep);
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
+
+        // Start the network timer
+        cudaEventRecord(startNet, NULL);
+
+        #else
+
+        // Record the stop event
+        stopPrep = yarp::os::Time::now();
+        times[0] = (stopPrep - startPrep) * 1000;
+
+        // Start the network timer
+        startNet = yarp::os::Time::now();
 
         #endif
     }
@@ -1280,6 +1480,7 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< 
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopNet, NULL);
 
@@ -1287,6 +1488,11 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< 
         cudaEventSynchronize(stopNet);
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
+
+        #else
+
+        stopNet = yarp::os::Time::now();
+        times[1] = (stopNet - startNet) * 1000;
 
         #endif
     }
@@ -1308,6 +1514,7 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
     }
 
     #ifdef HAS_CUDA
+
     // Start timing
     cudaEvent_t startPrep, stopPrep, startNet, stopNet;
 
@@ -1315,15 +1522,23 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
     {
         cudaEventCreate(&startPrep);
         cudaEventCreate(&stopPrep);
-        cudaEventRecord(startPrep, NULL);
-
         cudaEventCreate(&startNet);
         cudaEventCreate(&stopNet);
-        cudaEventRecord(startNet, NULL);
-    }
-    #endif
 
-    // Prepare Caffe
+        cudaEventRecord(startPrep, NULL);
+    }
+
+    #else
+
+    // Start timing
+    double startPrep, stopPrep, startNet, stopNet;
+
+    if (timing)
+    {
+        startPrep = yarp::os::Time::now();
+    }
+
+    #endif
 
     // Set the GPU/CPU mode for Caffe (here in order to be thread-safe)
     if (gpu_mode)
@@ -1377,6 +1592,7 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopPrep, NULL);
 
@@ -1384,6 +1600,18 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
         cudaEventSynchronize(stopPrep);
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
+
+        // Start the network timer
+        cudaEventRecord(startNet, NULL);
+
+        #else
+
+        // Record the stop event
+        stopPrep = yarp::os::Time::now();
+        times[0] = (stopPrep - startPrep) * 1000;
+
+        // Start the network timer
+        startNet = yarp::os::Time::now();
 
         #endif
     }
@@ -1413,6 +1641,7 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
     if (timing)
     {
         #ifdef HAS_CUDA
+
         // Record the stop event
         cudaEventRecord(stopNet, NULL);
 
@@ -1421,12 +1650,15 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
 
+        #else
+
+        stopNet = yarp::os::Time::now();
+        times[1] = (stopNet - startNet) * 1000;
+
         #endif
     }
 
     return true;
-
-
 
 }
 

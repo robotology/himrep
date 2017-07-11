@@ -23,6 +23,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <numeric>
+
 // OpenCV
 #include <opencv2/opencv.hpp>
 
@@ -78,6 +80,10 @@ private:
 
     Semaphore                     mutex;
 
+    list<double>                time_measurements_prep;
+    list<double>                time_measurements_net;
+    int                           time_avg_window;
+
     // Data (specific for each method - instantiate only those are needed)
 
     CaffeFeatExtractor<float>    *caffe_extractor;
@@ -113,7 +119,28 @@ private:
 
             if (caffe_extractor->timing)
             {
-                std::cout << times[0] << ": PREP " << times[1] << ": NET" << std::endl;
+                time_measurements_prep.push_back(times[0]);
+                time_measurements_net.push_back(times[1]);
+
+                while (time_measurements_prep.size()>time_avg_window)
+                {
+                    time_measurements_prep.pop_front();
+                    time_measurements_net.pop_front();
+                }
+
+                double prep_sum = std::accumulate(time_measurements_prep.begin(), time_measurements_prep.end(), 0.0);
+                double prep_mean = prep_sum / time_measurements_prep.size();
+                double prep_sq_sum = std::inner_product(time_measurements_prep.begin(), time_measurements_prep.end(), time_measurements_prep.begin(), 0.0);
+                double prep_stdev = std::sqrt(prep_sq_sum / time_measurements_prep.size() - prep_mean * prep_mean);
+
+                double net_sum = std::accumulate(time_measurements_net.begin(), time_measurements_net.end(), 0.0);
+                double net_mean = net_sum / time_measurements_net.size();
+                double net_sq_sum = std::inner_product(time_measurements_net.begin(), time_measurements_net.end(), time_measurements_net.begin(), 0.0);
+                double net_stdev = std::sqrt(net_sq_sum / time_measurements_net.size() - net_mean * net_mean);
+
+                std::cout << "PREP: " << prep_mean << " - " << prep_stdev << endl;
+                std::cout << "NET: " << net_mean << " - " << net_stdev << endl;
+
             }
 
             // Dump if required
@@ -165,19 +192,19 @@ public:
         string blob_name = rf.check("blob_name", Value("pool5/7x7_s1")).asString().c_str();
         cout << "Setting blob_names to " << blob_name << endl;
 
+        bool timing = rf.check("timing",Value(false)).asBool(); // flag for timing feature extraction
+        time_avg_window = 1000;
+
         // Compute mode and eventually GPU ID to be used
         int device_id;
-        bool timing;
         string compute_mode;
 
         #ifdef HAS_CUDA
             compute_mode = rf.check("compute_mode", Value("GPU")).asString();
             device_id = rf.check("device_id", Value(0)).asInt();
-            timing = rf.check("timing",Value(false)).asBool(); // flag for timing feature extraction
         #else
             compute_mode = "CPU";
             device_id = -1;
-            timing = false;
         #endif
 
         int resizeWidth = rf.check("resizeWidth", Value(256)).asDouble();
