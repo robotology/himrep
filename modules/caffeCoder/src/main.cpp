@@ -141,6 +141,8 @@ private:
                 std::cout << "PREP: " << prep_mean << " - " << prep_stdev << endl;
                 std::cout << "NET: " << net_mean << " - " << net_stdev << endl;
 
+                std::cout << time_measurements_prep.size() << " - " << time_measurements_net.size() << endl;
+
             }
 
             // Dump if required
