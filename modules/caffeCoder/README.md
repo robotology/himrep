@@ -5,7 +5,7 @@ Table of Contents
     * [Dependencies](#dependencies)
     * [Compilation](#compilation)
   * [Setup](#setup)
-    * [Download binary Caffe models (.caffemodel)](#download-binary-caffe-models-caffemodel) 
+    * [Download binary Caffe models (.caffemodel)](#download-binary-caffe-models-caffemodel)
     * [Configure .prototxt and .ini with absolute paths](#configure-prototxt-and-ini-with-absolute-paths)
   * [Detailed explanation](#detailed-explanation)
   * [Additional notes on Caffe installation](#additional-notes-on-caffe-installation)
@@ -22,11 +22,11 @@ This module is a basic YARP wrapper for [Caffe](http://caffe.berkeleyvision.org/
 
 The libraries that are needed to compile this module are:
 
-- [YARP](https://github.com/robotology/yarp) 
-- [iCub](https://github.com/robotology/icub-main) 
-- [OpenCV](http://opencv.org/releases.html) 
+- [YARP](https://github.com/robotology/yarp)
+- [iCub](https://github.com/robotology/icub-main)
+- [OpenCV](http://opencv.org/releases.html)
 - [Caffe](https://www.github.com/BVLC/caffe.git)
-- [CUDA](https://developer.nvidia.com/cuda-zone): 
+- [CUDA](https://developer.nvidia.com/cuda-zone):
 this is an optional dependency of Caffe and also of this module. However, we strongly recommend to rely on a powerful enough NVIDIA CUDA-enabled GPU (with Compute Capability >= 3.0) in order to achieve a good frame rate.
 
 ### Compilation
@@ -46,14 +46,14 @@ The setup procedure basically follows the [Extracting Features](http://caffe.ber
 
 ### Download binary Caffe models (.caffemodel)
 
-If you don't have setted it already, for convenience, set the `Caffe_ROOT` env variable pointing to your `caffe` source code directory. 
- 
+If you don't have setted it already, for convenience, set the `Caffe_ROOT` env variable pointing to your `caffe` source code directory.
+
 For `CaffeNet` we can follow the instructions on [caffe](http://caffe.berkeleyvision.org/model_zoo.html) website:
 
 ~~~
 $ cd $Caffe_ROOT
 $ scripts/download_model_binary.py models/bvlc_reference_caffenet
-# for this model we need also to get the mean image of the training set of ILSVRC 
+# for this model we need also to get the mean image of the training set of ILSVRC
 $ ./data/ilsvrc12/get_ilsvrc_aux.sh
 ~~~
 
@@ -144,7 +144,7 @@ gedit caffeCoder_resnet.ini
 And then set:
 
 ~~~
-caffemodel_file $Caffe_ROOT/models/ResNet-50/ResNet-50-model.caffemodel
+caffemodel_file $Caffe_ROOT/models/ResNet50/ResNet-50-model.caffemodel
 prototxt_file ~/.local/share/yarp/contexts/himrep/resnet_val.prototxt
 ~~~
 
@@ -172,7 +172,7 @@ We do not cover here exhaustively the procedure. We just report the procedure we
 
 ##### CUDA installation
 
-Download and install CUDA drivers and toolkit by following [CUDA Installation Guide for Linux](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/#axzz4BkDT7m6r). 
+Download and install CUDA drivers and toolkit by following [CUDA Installation Guide for Linux](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/#axzz4BkDT7m6r).
 
 ##### cuDNN installation (optional but recommended)
 
@@ -296,7 +296,7 @@ Finally, set the `Caffe_DIR` environment variable to the installation path to al
 
 This module has been presented and benchmarked in the iCub scenario in the following paper:
 
-[Teaching iCub to recognize objects using deep Convolutional Neural Networks](http://jmlr.csail.mit.edu/proceedings/papers/v43/pasquale15.pdf) *Giulia Pasquale, Carlo Ciliberto, Francesca Odone, Lorenzo Rosasco and Lorenzo Natale*, 
+[Teaching iCub to recognize objects using deep Convolutional Neural Networks](http://jmlr.csail.mit.edu/proceedings/papers/v43/pasquale15.pdf) *Giulia Pasquale, Carlo Ciliberto, Francesca Odone, Lorenzo Rosasco and Lorenzo Natale*,
 Proceedings of The 4th Workshop on Machine Learning for Interactive Systems, pp. 21–25, 2015
 
     @inproceedings{pasquale15,
@@ -308,7 +308,7 @@ Proceedings of The 4th Workshop on Machine Learning for Interactive Systems, pp.
   	pages   = {21--25},
   	url     = {http://www.jmlr.org/proceedings/papers/v43/pasquale15}
 	}
-      
+
 ## License
 
 Material included here is Copyright of _iCub Facility - Istituto Italiano di Tecnologia_ and is released under the terms of the GPL v2.0 or later. See the file LICENSE for details.

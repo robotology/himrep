@@ -10,7 +10,7 @@ Table of Contents
     * [Compilation](#compilation)
   * [Documentation](#documentation)
   * [Contributing](#license)
-  
+
 ## Repository Structure
 
 This repository contains a collection of modules to extract features from images or to perform classification tasks on feature vectors. These modules are meant to be used by other demos to build object recognition pipelines.
@@ -29,7 +29,7 @@ The `linearClassifierModule` instead implements a linear classifier which can be
 
 ### Dependencies
 
-While 
+While
 
 - [YARP](https://github.com/robotology/yarp)
 - [iCub](https://github.com/robotology/icub-main)
@@ -52,7 +52,7 @@ Instructions on how to setup the dependencies for each module can be found in sp
 - `linearClassifierModule`: link to [README](https://github.com/GiuliaP/himrep/tree/master/modules/linearClassifierModule)
 
 ### Compilation
- 
+
 Get the code:
 
 ~~~
@@ -73,6 +73,12 @@ Where you will configure the project by setting to `ON` the modules you want to 
 
 - the `CMAKE_INSTALL_PREFIX` points to the `icub-contrib-common` installation directory
 - the `YARP_DIR`, `ICUB_DIR`, `OpenCV_DIR` are correctly pointing to valid installation paths
+
+After that, you can compile and install as usual:
+~~~
+$ make
+$ make install
+~~~
 
 ## Documentation
 

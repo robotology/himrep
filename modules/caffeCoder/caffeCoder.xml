@@ -28,7 +28,7 @@
     <param default="pool5/7x7_s1" desc="Tag (defined in the .prototxt) of the layer at which we want to extract the features."> blob_name </param>
     <param default="GPU" desc="[GPU|gpu|CPU|cpu] passed to Caffe initialization."> compute_mode </param>
     <param default="0" desc="GPU device chosen by Caffe to run the computations (used if compute_mode is set to GPU|gpu)."> device_id </param>
-    <param default="false" desc="[true|false] depending on whether you desire to read in the stdout the time to extract the features."> timing </param>
+    <param default="1000" desc="Pass this parameter if you want to measure the time for feature extraction. This is an integer specifying the number of iterations of the moving window to average the time measurements."> timing </param>
     <param default="256" desc="Integer specifying the width to which resize (anysotropically) the image before feeding it to the network. This is used if the mean pixel is subtracted from the input image and must be coupled with `resizeHeight`."> resizeWidth </param>
     <param default="256" desc="Integer specifying the height to which resize (anysotropically) the image before feeding it to the network. This is used if the mean pixel is subtracted from the input image and must be coupled with `resizeWidth`."> resizeHeight </param>
     <param default="codes.bin" desc="Path where to save the features extracted from each image in a binary format."> dump_code </param>

@@ -80,8 +80,8 @@ private:
 
     Semaphore                     mutex;
 
-    list<double>                time_measurements_prep;
-    list<double>                time_measurements_net;
+    list<double>                  time_measurements_prep;
+    list<double>                  time_measurements_net;
     int                           time_avg_window;
 
     // Data (specific for each method - instantiate only those are needed)
@@ -141,8 +141,6 @@ private:
                 std::cout << "PREP: " << prep_mean << " - " << prep_stdev << endl;
                 std::cout << "NET: " << net_mean << " - " << net_stdev << endl;
 
-                std::cout << time_measurements_prep.size() << " - " << time_measurements_net.size() << endl;
-
             }
 
             // Dump if required
@@ -192,10 +190,17 @@ public:
 
         // Name of blobs to be extracted
         string blob_name = rf.check("blob_name", Value("pool5/7x7_s1")).asString().c_str();
-        cout << "Setting blob_names to " << blob_name << endl;
+        cout << "Setting blob_name to " << blob_name << endl;
 
-        bool timing = rf.check("timing",Value(false)).asBool(); // flag for timing feature extraction
-        time_avg_window = 1000;
+        bool timing = rf.check("timing");
+        if (timing)
+        {
+            time_avg_window = rf.check("timing",Value("1000")).asInt();
+        }
+        else
+        {
+            time_avg_window = -1;
+        }
 
         // Compute mode and eventually GPU ID to be used
         int device_id;

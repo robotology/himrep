@@ -885,7 +885,7 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *
     if (batch_size!=1)
     {
         cout << "Error! Retrieved more than one feature, exiting..." << endl;
-        return -1;
+        return false;
     }
 
     int channels = feature_blob->channels();
@@ -1464,7 +1464,7 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< 
         if (batch_size!=1)
         {
             cout << "Error! Retrieved more than one feature, exiting..." << endl;
-            return -1;
+            return false;
         }
 
         int feat_dim = feature_blob->count(); // should be equal to: count/batch_size=channels*width*height
