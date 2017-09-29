@@ -41,7 +41,7 @@ are needed by all modules, the following dependencies are required only if you p
 - [LIBLINEAR](http://www.csie.ntu.edu.tw/~cjlin/liblinear/): needed by `linearClassifierModule`
 - [SiftGPU](https://github.com/pitzer/SiftGPU): needed by `sparseCoder`
 - [Caffe](http://caffe.berkeleyvision.org/): needed by `caffeCoder`
-- [TensorRT](): needed by `GIECoder`
+- [TensorRT](https://developer.nvidia.com/tensorrt): needed by `GIECoder`
 - [CUDA](https://developer.nvidia.com/cuda-zone) and [cuDNN](https://developer.nvidia.com/cudnn): optional for `caffeCoder` but mandatory for `GIECoder`
 
 Instructions on how to setup the dependencies for each module can be found in specific README files:
