@@ -378,10 +378,7 @@ public:
 
     bool configure(ResourceFinder &rf)
     {
-
         string name = rf.find("name").asString().c_str();
-
-        Time::turboBoost();
 
         caffePort = new CaffeCoderPort(rf);
 

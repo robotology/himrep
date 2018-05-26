@@ -356,10 +356,7 @@ public:
 
     bool configure(ResourceFinder &rf)
     {
-
         string name = rf.find("name").asString().c_str();
-
-        Time::turboBoost();
 
         GIEPort = new GIECoderPort(rf);
 

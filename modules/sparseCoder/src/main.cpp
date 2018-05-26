@@ -475,8 +475,6 @@ public:
     {
         string name=rf.find("name").asString().c_str();
 
-        Time::turboBoost();
-
         scPort=new SparseCoderPort(rf);
         scPort->open(("/"+name+"/img:i").c_str());
         rpcPort.open(("/"+name+"/rpc").c_str());
