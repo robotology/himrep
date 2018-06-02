@@ -7,7 +7,6 @@ project(${projectname})
 include(FindLibSVMLin.cmake)
 include(FindLibSVM.cmake)
 
-include_directories(${YARP_INCLUDE_DIRS})
 include_directories(${ICUB_INCLUDE_DIRS})
 
 IF(LIBSVM_FOUND)
