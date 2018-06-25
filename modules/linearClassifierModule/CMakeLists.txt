@@ -1,13 +1,11 @@
 # Copyright: 2010 RobotCub Consortium
 # Author: Sean Ryan Fanello, Carlo Ciliberto
 # CopyPolicy: Released under the terms of the GNU GPL v2.0.
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.5)
 set(projectname linearClassifierModule)
 project(${projectname})
 include(FindLibSVMLin.cmake)
 include(FindLibSVM.cmake)
-
-include_directories(${ICUB_INCLUDE_DIRS})
 
 IF(LIBSVM_FOUND)
    include_directories(${LIBSVM_INCLUDE_DIR})
