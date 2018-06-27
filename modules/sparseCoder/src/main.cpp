@@ -122,10 +122,10 @@ using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::math;
 
-#define CMD_HELP                    VOCAB4('h','e','l','p')
-#define DUMP_SIFT                   VOCAB4('d','u','m','p')
-#define DUMP_STOP                   VOCAB4('s','t','o','p')
-#define LEARN_DICT                  VOCAB4('l','e','a','r')
+#define CMD_HELP                    yarp::os::createVocab('h','e','l','p')
+#define DUMP_SIFT                   yarp::os::createVocab('d','u','m','p')
+#define DUMP_STOP                   yarp::os::createVocab('s','t','o','p')
+#define LEARN_DICT                  yarp::os::createVocab('l','e','a','r')
 
 #define CODE_MODE_SC                0
 #define CODE_MODE_BOW               1
