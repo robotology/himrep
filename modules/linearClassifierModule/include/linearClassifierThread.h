@@ -5,8 +5,6 @@
 #include <yarp/sig/all.h>
 #include <yarp/math/Math.h>
 
-#include <iCub/ctrl/math.h>
-
 #include "SVMLinear.h"
 
 #ifdef _WIN32
