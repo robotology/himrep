@@ -10,7 +10,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(OpenCV REQUIRED)
 
-include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${Caffe_INCLUDE_DIRS})
 
 include_directories(${PROJECT_SOURCE_DIR})

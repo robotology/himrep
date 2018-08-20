@@ -13,8 +13,6 @@ if(SIFTGPU_FOUND)
    if(OpenCV_VERSION_MAJOR GREATER 2)
       message(STATUS "detected Version(OpenCV) > 2.x.y => ${PROJECTNAME} will not be built")
    else()
-      include_directories(${OpenCV_INCLUDE_DIRS})
-      
       set(folder_source main.cpp SiftGPU_Extractor.cpp DictionaryLearning.cpp)
       set(folder_header SiftGPU_Extractor.h DictionaryLearning.h)
       source_group("Source Files" FILES ${folder_source})

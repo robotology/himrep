@@ -25,8 +25,6 @@ set(
        -O3 -gencode arch=compute_53,code=sm_53
 )
 
-include_directories(${OpenCV_INCLUDE_DIRS})
-
 #include_directories(${GIE_PATH}/include)
 #link_directories(${GIE_PATH}/lib)
 
