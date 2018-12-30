@@ -101,7 +101,7 @@ private:
 
             // Convert the image and check that it is continuous
 
-            cv::Mat tmp_mat = toCvMat(std::move(img));
+            cv::Mat tmp_mat = toCvMat(img);
             cv::cvtColor(tmp_mat, matImg, CV_RGB2BGR);
 
             // Extract the feature vector
