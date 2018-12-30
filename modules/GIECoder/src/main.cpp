@@ -22,6 +22,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <utility>
 
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -38,6 +39,8 @@
 #include <yarp/sig/Vector.h>
 #include <yarp/sig/Image.h>
 
+#include <yarp/cv/Cv.h>
+
 #include <yarp/math/Math.h>
 
 #include "GIEFeatExtractor.h"
@@ -46,6 +49,7 @@ using namespace std;
 using namespace yarp;
 using namespace yarp::os;
 using namespace yarp::sig;
+using namespace yarp::cv;
 using namespace yarp::math;
 
 #define CMD_HELP                    yarp::os::createVocab('h','e','l','p')
@@ -85,7 +89,7 @@ private:
     void onRead(Image &img)
     {
 
-    	// Read at specified rate
+        // Read at specified rate
         if (Time::now() - last_read < rate)
             return;
 
@@ -97,7 +101,7 @@ private:
 
             // Convert the image and check that it is continuous
 
-            cv::Mat tmp_mat = cv::cvarrToMat((IplImage*)img.getIplImage());
+            cv::Mat tmp_mat = toCvMat(std::move(img));
             cv::cvtColor(tmp_mat, matImg, CV_RGB2BGR);
 
             // Extract the feature vector
@@ -198,10 +202,10 @@ public:
                 prototxt_file, resizeWidth, resizeHeight,
                 blob_name,
                 timing);
-	    if( !gie_extractor )
-	    {
-		    cout << "Failed to initialize GIEFeatExtractor" << endl;
-	    }
+        if( !gie_extractor )
+        {
+            cout << "Failed to initialize GIEFeatExtractor" << endl;
+        }
 
         // Data (common to all methods)
 

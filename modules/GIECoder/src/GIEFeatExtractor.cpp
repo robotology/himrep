@@ -6,20 +6,20 @@
 // Allocate ZeroCopy mapped memory, shared between CUDA and CPU.
 bool GIEFeatExtractor::cudaAllocMapped( void** cpuPtr, void** gpuPtr, size_t size )
 {
-	if( !cpuPtr || !gpuPtr || size == 0 )
-		return false;
+    if( !cpuPtr || !gpuPtr || size == 0 )
+        return false;
 
-	//CUDA(cudaSetDeviceFlags(cudaDeviceMapHost));
+    //CUDA(cudaSetDeviceFlags(cudaDeviceMapHost));
 
-	if( CUDA_FAILED(cudaHostAlloc(cpuPtr, size, cudaHostAllocMapped)) )
-		return false;
+    if( CUDA_FAILED(cudaHostAlloc(cpuPtr, size, cudaHostAllocMapped)) )
+        return false;
 
-	if( CUDA_FAILED(cudaHostGetDevicePointer(gpuPtr, *cpuPtr, 0)) )
-		return false;
+    if( CUDA_FAILED(cudaHostGetDevicePointer(gpuPtr, *cpuPtr, 0)) )
+        return false;
 
-	memset(*cpuPtr, 0, size);
-	std::cout << "cudaAllocMapped : " << size << " bytes" << std::endl;
-	return true;
+    memset(*cpuPtr, 0, size);
+    std::cout << "cudaAllocMapped : " << size << " bytes" << std::endl;
+    return true;
 }
 
 bool GIEFeatExtractor::cudaFreeMapped(void *cpuPtr)
@@ -29,12 +29,12 @@ bool GIEFeatExtractor::cudaFreeMapped(void *cpuPtr)
     std::cout << "cudaFreeMapped: OK" << std::endl;
 }
 
-bool GIEFeatExtractor::caffeToGIEModel( const std::string& deployFile,			// name for .prototxt
-					const std::string& modelFile,	                // name for .caffemodel
+bool GIEFeatExtractor::caffeToGIEModel( const std::string& deployFile,          // name for .prototxt
+                    const std::string& modelFile,                   // name for .caffemodel
                     const std::string& binaryprotoFile,             // name for .binaryproto
-					const std::vector<std::string>& outputs,        // network outputs
-					unsigned int maxBatchSize,			// batch size - NB must be at least as large as the batch we want to run with)
-					std::ostream& gieModelStream)		        // output stream for the GIE model
+                    const std::vector<std::string>& outputs,        // network outputs
+                    unsigned int maxBatchSize,          // batch size - NB must be at least as large as the batch we want to run with)
+                    std::ostream& gieModelStream)               // output stream for the GIE model
 {
     // create API root class - must span the lifetime of the engine usage
     nvinfer1::IBuilder* builder = createInferBuilder(gLogger);
@@ -49,7 +49,7 @@ bool GIEFeatExtractor::caffeToGIEModel( const std::string& deployFile,			// name
     const bool useFp16 = builder->platformHasFastFp16(); //getHalf2Mode();
     std::cout << "Platform FP16 support: " << useFp16 << std::endl;
     std::cout << "Loading: " << deployFile << ", " << modelFile << std::endl;
-	
+    
     nvinfer1::DataType modelDataType = useFp16 ? nvinfer1::DataType::kHALF : nvinfer1::DataType::kFLOAT; // create a 16-bit model if it's natively supported
     const nvcaffeparser1::IBlobNameToTensor *blobNameToTensor = parser->parse(deployFile.c_str(), // caffe deploy file
                                                                 modelFile.c_str(), // caffe model file
@@ -58,8 +58,8 @@ bool GIEFeatExtractor::caffeToGIEModel( const std::string& deployFile,			// name
 
     if( !blobNameToTensor )
     {
-	std::cout << "Failed to parse caffe network." << std::endl;
-	return false;
+    std::cout << "Failed to parse caffe network." << std::endl;
+    return false;
     }
 
     if (binaryprotoFile!="")
@@ -88,27 +88,27 @@ bool GIEFeatExtractor::caffeToGIEModel( const std::string& deployFile,			// name
 
     // the caffe file has no notion of outputs, so we need to manually say which tensors the engine should generate
     const size_t num_outputs = outputs.size();
-	
+    
     for( size_t n=0; n < num_outputs; n++ )
-	network->markOutput(*blobNameToTensor->find(outputs[n].c_str()));
+    network->markOutput(*blobNameToTensor->find(outputs[n].c_str()));
 
     // Build the engine
     std::cout << "Configuring CUDA engine..." << std::endl;
-		
+        
     builder->setMaxBatchSize(maxBatchSize);
     builder->setMaxWorkspaceSize(16 << 20);
 
     // set up the network for paired-fp16 format, only on DriveCX
     if (useFp16)
-	builder->setHalf2Mode(true);
+    builder->setHalf2Mode(true);
 
     std::cout << "Building CUDA engine..." << std::endl;
     nvinfer1::ICudaEngine* engine = builder->buildCudaEngine(*network);
-	
+    
     if( !engine )
     {
         std::cout << "Failed to build CUDA engine." << std::endl;
-	return false;
+    return false;
     }
 
     network->destroy();
@@ -210,7 +210,7 @@ bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfil
 
     if( !caffeToGIEModel( prototxt_file, caffemodel_file, binaryproto_meanfile, std::vector< std::string > {  blob_name }, 1, gieModelStream) )
     {
-	std::cout << "Failed to load: " << caffemodel_file << std::endl;
+    std::cout << "Failed to load: " << caffemodel_file << std::endl;
     }
 
     std::cout << caffemodel_file << ": loaded." << std::endl;
@@ -221,21 +221,21 @@ bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfil
     {
         std::cout << "Failed to create InferRuntime." << std::endl;
     }
-	
+    
     nvinfer1::ICudaEngine* engine = infer->deserializeCudaEngine(gieModelStream);
     if( !engine )
     {
-	std::cout << "Failed to create CUDA engine." << std::endl;
+    std::cout << "Failed to create CUDA engine." << std::endl;
     }
-	
+    
     nvinfer1::IExecutionContext* context = engine->createExecutionContext();
     if( !context )
     {
-	std::cout << "failed to create execution context." << std::endl;
+    std::cout << "failed to create execution context." << std::endl;
     }
 
     std::cout << "CUDA engine context initialized with " << engine->getNbBindings() << " bindings." << std::endl;
-	
+    
     mInfer   = infer;
     mEngine  = engine;
     mContext = context;
@@ -246,26 +246,26 @@ bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfil
 
     std::cout << caffemodel_file << " input  binding index: " << inputIndex << std::endl;
     std::cout << caffemodel_file << " output binding index: " << outputIndex << std::endl;
-	
+    
     nvinfer1::Dims3 inputDims  = engine->getBindingDimensions(inputIndex);
     nvinfer1::Dims3 outputDims = engine->getBindingDimensions(outputIndex);
-	
+    
     size_t inputSize  = inputDims.c * inputDims.h * inputDims.w * sizeof(float);
     size_t outputSize = outputDims.c * outputDims.h * outputDims.w * sizeof(float);
-	
+    
     std::cout << caffemodel_file << "input  dims (c=" << inputDims.c << " h=" << inputDims.h << " w=" << inputDims.w << ") size=" << inputSize << std::endl;
     std::cout << caffemodel_file << "output dims (c=" << outputDims.c << " h=" << outputDims.h << " w=" << outputDims.w << ") size=" << outputSize << std::endl;
-	
+    
     // Allocate memory to hold the input image
     if ( !cudaAllocMapped((void**)&mInputCPU, (void**)&mInputCUDA, inputSize) )
     {
-	std::cout << "Failed to alloc CUDA mapped memory for input, " << inputSize << " bytes" << std::endl;
+    std::cout << "Failed to alloc CUDA mapped memory for input, " << inputSize << " bytes" << std::endl;
     }
 
     mInputSize   = inputSize;
     mWidth       = inputDims.w;
     mHeight      = inputDims.h;
-	
+    
     // Allocate output memory to hold the result
     if( !cudaAllocMapped((void**)&mOutputCPU, (void**)&mOutputCUDA, outputSize) )
     {
@@ -275,7 +275,7 @@ bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfil
 
     mOutputSize    = outputSize;
     mOutputDims    = outputDims.c;
-	
+    
     std::cout << caffemodel_file << ": initialized." << std::endl;
 
     if (binaryproto_meanfile=="")
@@ -297,7 +297,7 @@ GIEFeatExtractor::~GIEFeatExtractor()
         mEngine->destroy();
         mEngine = NULL;
     }
-		
+        
     if( mInfer != NULL )
     {
         mInfer->destroy();

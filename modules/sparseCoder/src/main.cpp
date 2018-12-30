@@ -99,6 +99,8 @@ Linux
 #include <yarp/sig/Vector.h>
 #include <yarp/sig/Image.h>
 
+#include <yarp/cv/Cv.h>
+
 #include <yarp/math/Math.h>
 #include <yarp/math/Rand.h>
 
@@ -112,6 +114,7 @@ Linux
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <utility>
 
 #include "SiftGPU_Extractor.h"
 #include "DictionaryLearning.h"
@@ -120,6 +123,7 @@ using namespace std;
 using namespace yarp;
 using namespace yarp::os;
 using namespace yarp::sig;
+using namespace yarp::cv;
 using namespace yarp::math;
 
 #define CMD_HELP                    yarp::os::createVocab('h','e','l','p')
@@ -187,7 +191,7 @@ private:
             siftGPU_extractor.setDenseGrid(ipl,grid_step,grid_scale);
         }
 
-        cvCvtColor((IplImage*)img.getIplImage(),ipl,CV_RGB2GRAY);
+        cv::cvtColor(toCvMat(std::move(img)),cv::cvarrToMat(ipl),CV_RGB2GRAY);
         
         //cvSmooth(ipl,ipl);  
         if(dense)
@@ -246,7 +250,7 @@ private:
                 {   
                     int x = cvRound(keypoints[i].x);
                     int y = cvRound(keypoints[i].y);
-                    cvCircle(img.getIplImage(),cvPoint(x,y),3,cvScalar(0,0,255),-1);
+                    cv::circle(toCvMat(std::move(img)),cvPoint(x,y),3,cvScalar(0,0,255),-1);
                 }
                 port_out_img.write(img);
 

@@ -22,8 +22,8 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-
 #include <numeric>
+#include <utility>
 
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -40,6 +40,8 @@
 #include <yarp/sig/Vector.h>
 #include <yarp/sig/Image.h>
 
+#include <yarp/cv/Cv.h>
+
 #include <yarp/math/Math.h>
 
 #include "CaffeFeatExtractor.hpp"
@@ -48,6 +50,7 @@ using namespace std;
 using namespace yarp;
 using namespace yarp::os;
 using namespace yarp::sig;
+using namespace yarp::cv;
 using namespace yarp::math;
 
 #define CMD_HELP                    yarp::os::createVocab('h','e','l','p')
@@ -103,7 +106,7 @@ private:
 
             // Convert the image
 
-            cv::Mat tmp_mat=cv::cvarrToMat((IplImage*)img.getIplImage());
+            cv::Mat tmp_mat=toCvMat(std::move(img));
             cv::cvtColor(tmp_mat, matImg, CV_RGB2BGR);
 
             // Extract the feature vector
