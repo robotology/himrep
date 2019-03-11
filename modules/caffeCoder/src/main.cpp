@@ -74,7 +74,7 @@ private:
 
     // Data (common to all methods)
 
-    cv::Mat                       matImg;
+    ::cv::Mat                       matImg;
 
     Port                          port_out_img;
     Port                          port_out_code;
@@ -91,7 +91,7 @@ private:
 
     CaffeFeatExtractor<float>    *caffe_extractor;
 
-    void onRead(Image &img)
+    void onRead(ImageOf<PixelRgb> &img)
     {
 
     	// Read at specified rate
@@ -106,8 +106,8 @@ private:
 
             // Convert the image
 
-            cv::Mat tmp_mat=toCvMat(img);
-            cv::cvtColor(tmp_mat, matImg, CV_RGB2BGR);
+            ::cv::Mat tmp_mat=toCvMat(img);
+            ::cv::cvtColor(tmp_mat, matImg, CV_RGB2BGR);
 
             // Extract the feature vector
 
