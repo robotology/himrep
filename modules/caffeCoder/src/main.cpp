@@ -91,7 +91,7 @@ private:
 
     CaffeFeatExtractor<float>    *caffe_extractor;
 
-    void onRead(ImageOf<PixelRgb> &img)
+    void onRead(Image &img)
     {
 
     	// Read at specified rate
@@ -105,9 +105,9 @@ private:
         {
 
             // Convert the image
-
-            ::cv::Mat tmp_mat=toCvMat(img);
-            ::cv::cvtColor(tmp_mat, matImg, CV_RGB2BGR);
+            ImageOf<PixelRgb> tmp_img;
+            tmp_img.copy(img);
+            matImg = toCvMat(tmp_img);
 
             // Extract the feature vector
 
