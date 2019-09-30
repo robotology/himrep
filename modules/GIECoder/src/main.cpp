@@ -23,6 +23,7 @@
 #include <iostream>
 #include <fstream>
 #include <utility>
+#include <mutex>
 
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -31,7 +32,6 @@
 #include <yarp/os/RFModule.h>
 #include <yarp/os/Time.h>
 #include <yarp/os/BufferedPort.h>
-#include <yarp/os/Semaphore.h>
 #include <yarp/os/RpcClient.h>
 #include <yarp/os/PortReport.h>
 #include <yarp/os/Stamp.h>
@@ -80,7 +80,7 @@ private:
 
     FILE                          *fout_code;
 
-    Semaphore                     mutex;
+    mutex                         mtx;
 
     // Data (specific for each method - instantiate only those are needed)
 
@@ -93,7 +93,7 @@ private:
         if (Time::now() - last_read < rate)
             return;
 
-        mutex.wait();
+        lock_guard<mutex> lg(mtx);
 
         // If something arrived...
         if (img.width()>0 && img.height()>0)
@@ -140,9 +140,6 @@ private:
                 port_out_img.write(img);
             }
         }
-
-        mutex.post();
-
     }
 
 public:
@@ -233,31 +230,27 @@ public:
 
     void interrupt()
     {
-        mutex.wait();
+        lock_guard<mutex> lg(mtx);
 
         port_out_code.interrupt();
         port_out_img.interrupt();
 
         BufferedPort<Image>::interrupt();
-
-        mutex.post();
     }
 
     void resume()
     {
-        mutex.wait();
+        lock_guard<mutex> lg(mtx);
 
         port_out_code.resume();
         port_out_img.resume();
 
         BufferedPort<Image>::resume();
-
-        mutex.post();
     }
 
     void close()
     {
-        mutex.wait();
+        lock_guard<mutex> lg(mtx);
 
         if (dump_code)
         {
@@ -270,8 +263,6 @@ public:
         delete gie_extractor;
 
         BufferedPort<Image>::close();
-
-        mutex.post();
     }
 
     bool execReq(const Bottle &command, Bottle &reply)
@@ -289,7 +280,7 @@ public:
 
         case(DUMP_CODE):
             {
-            mutex.wait();
+            lock_guard<mutex> lg(mtx);
 
             dump_code = true;
             string code_path;
@@ -320,19 +311,16 @@ public:
             fout_code = fopen(code_path.c_str(),code_write_mode.c_str());
             reply.addString("Start dumping codes...");
 
-            mutex.post();
             return true;
             }
 
         case(DUMP_STOP):
             {
-            mutex.wait();
+            lock_guard<mutex> lg(mtx);
 
             dump_code = false;
             fclose(fout_code);
             reply.addString("Stopped code dump.");
-
-            mutex.post();
 
             return true;
             }

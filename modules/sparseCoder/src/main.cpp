@@ -92,7 +92,6 @@ Linux
 #include <yarp/os/RFModule.h>
 #include <yarp/os/Time.h>
 #include <yarp/os/BufferedPort.h>
-#include <yarp/os/Semaphore.h>
 #include <yarp/os/RpcClient.h>
 #include <yarp/os/PortReport.h>
 
@@ -115,6 +114,7 @@ Linux
 #include <fstream>
 #include <algorithm>
 #include <utility>
+#include <mutex>
 
 #include "SiftGPU_Extractor.h"
 #include "DictionaryLearning.h"
@@ -158,7 +158,7 @@ private:
     DictionaryLearning                  *sparse_coder;
     IplImage                            *ipl;
 
-    Semaphore                           mutex;
+    mutex                               mtx;
     
     bool                                no_code;
     int                                 dense;
@@ -180,7 +180,7 @@ private:
         if(Time::now()-last_read<rate)
             return;
 
-        mutex.wait();
+        lock_guard<mutex> lg(mtx);
         if(ipl==NULL || ipl->width!=img.width() || ipl->height!=img.height())
         {
             if(ipl!=NULL)
@@ -256,8 +256,6 @@ private:
                 port_out_img.write(img);
             }
         }
-
-        mutex.post();
     }
 
 
@@ -333,29 +331,23 @@ public:
 
    virtual void interrupt()
    {
-        mutex.wait();
-        //some closure :P
-
+        lock_guard<mutex> lg(mtx);
         port_out_code.interrupt();
         port_out_img.interrupt();
         BufferedPort<Image>::interrupt();
-        mutex.post();
    }
 
    virtual void resume()
    {
-        mutex.wait();
-        //some closure :P
-
+        lock_guard<mutex> lg(mtx);
         port_out_code.resume();
         port_out_img.resume();
         BufferedPort<Image>::resume();
-        mutex.post();
    }
 
    virtual void close()
    {
-        mutex.wait();
+        lock_guard<mutex> lg(mtx);
         if(ipl!=NULL)
             cvReleaseImage(&ipl);
 
@@ -369,7 +361,6 @@ public:
         port_out_code.close();
         port_out_img.close();
         BufferedPort<Image>::close();
-        mutex.post();
    }
 
 
@@ -397,7 +388,7 @@ public:
            }
            case(DUMP_SIFT):
            {
-                mutex.wait();
+                lock_guard<mutex> lg(mtx);
                 dump_sift=true; 
                 string sift_path="sift.txt";
                 sift_path=contextPath+"/"+sift_path;
@@ -410,22 +401,20 @@ public:
 
                 fout_sift=fopen(sift_path.c_str(),sift_write_mode.c_str());
                 reply.addString("Starting to dump SIFTs...");
-                mutex.post();
                 return true;
 
            }
            case(DUMP_STOP):
            {
-                mutex.wait();
+                lock_guard<mutex> lg(mtx);
                 dump_sift=false;                
                 fclose(fout_sift);
                 reply.addString("Stopped SIFT Dump.");
-                mutex.post();
                 return true;
            }
            case(LEARN_DICT):
            {
-                mutex.wait();
+                lock_guard<mutex> lg(mtx);
                 //string sift_path="sift.txt";
                 //sift_path=contextPath+"/"+sift_path;
                 string sift_path=rf.findFile("sift.txt").c_str();
@@ -451,7 +440,6 @@ public:
                 }
                 sparse_coder->learnDictionary(sift_path, dictSize,usePCA,dimPCA);
                 sparse_coder->saveDictionary(dictionary_path);
-                mutex.post();
                 return true;
            }
            default:

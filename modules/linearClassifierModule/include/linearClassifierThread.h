@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <mutex>
 
 #include <yarp/os/all.h>
 #include <yarp/sig/all.h>
@@ -36,7 +37,7 @@ private:
     BufferedPort<Bottle> featuresPort;
     BufferedPort<Bottle> outputPort;
     Port scorePort;
-    Mutex mutex;
+    mutex mtx;
     fstream objFeatures;
 
     vector<pair<string,vector<string> > > knownObjects;

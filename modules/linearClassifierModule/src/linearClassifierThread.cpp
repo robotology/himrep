@@ -35,7 +35,7 @@ linearClassifierThread::linearClassifierThread(yarp::os::ResourceFinder &rf, Por
 
 bool linearClassifierThread::getClassList(Bottle &b)
 {
-    LockGuard lg(mutex);
+    lock_guard<mutex> lg(mtx);
     for(int i=0; i<knownObjects.size(); i++)
         b.addString(knownObjects[i].first.c_str());
     return true;
@@ -43,7 +43,7 @@ bool linearClassifierThread::getClassList(Bottle &b)
 
 bool linearClassifierThread::changeName(const string &old_name, const string &new_name)
 {
-    LockGuard lg(mutex);
+    lock_guard<mutex> lg(mtx);
 
     int j=-1; int k=-1;    
     for (size_t i=0; i<knownObjects.size(); i++)
@@ -143,7 +143,7 @@ void linearClassifierThread::run()
             continue;
         }
 
-        LockGuard lg(mutex);
+        lock_guard<mutex> lg(mtx);
 
         vector<double> feature;
         feature.resize(p->size());
@@ -273,7 +273,7 @@ void linearClassifierThread::onStop()
 
 void linearClassifierThread::prepareObjPath(const string &objName)
 {    
-    LockGuard lg(mutex);
+    lock_guard<mutex> lg(mtx);
     stopAllHelper();
 
     pathObj=currPath+"/"+objName;
@@ -325,7 +325,7 @@ void linearClassifierThread::stopAllHelper()
 
 void linearClassifierThread::stopAll()
 {
-    LockGuard lg(mutex);
+    lock_guard<mutex> lg(mtx);
     stopAllHelper();
 }
 
@@ -450,13 +450,13 @@ bool linearClassifierThread::trainClassifiersHelper()
 
 bool linearClassifierThread::trainClassifiers()
 {
-    LockGuard lg(mutex);
+    lock_guard<mutex> lg(mtx);
     return trainClassifiersHelper();
 }
 
 bool linearClassifierThread::startRecognition()
 {
-    LockGuard lg(mutex);
+    lock_guard<mutex> lg(mtx);
     stopAllHelper();
 
     if(this->linearClassifiers.size()==0)
@@ -502,13 +502,13 @@ bool linearClassifierThread::forgetClassHelper(const string &className, const bo
 
 bool linearClassifierThread::forgetClass(const string &className, const bool retrain)
 {
-    LockGuard lg(mutex);
+    lock_guard<mutex> lg(mtx);
     return forgetClassHelper(className,retrain);
 }
 
 bool linearClassifierThread::forgetAll()
 {
-    LockGuard lg(mutex);
+    lock_guard<mutex> lg(mtx);
     checkKnownObjects();
 
     for (int i=0; i<knownObjects.size(); i++)
