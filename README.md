@@ -3,6 +3,8 @@ Hierarchical IMage REPresentation
 
 [![ZenHub](https://img.shields.io/badge/Shipping_faster_with-ZenHub-435198.svg)](https://zenhub.com)
 
+![gh-pages](https://github.com/robotology/himrep/workflows/GitHub%20Pages/badge.svg)
+
 Table of Contents
 =================
 
