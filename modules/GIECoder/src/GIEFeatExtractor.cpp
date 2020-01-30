@@ -1,4 +1,6 @@
 
+#include <opencv2/imgproc/types_c.h>
+#include <opencv2/imgproc.hpp>
 #include "GIEFeatExtractor.h"
 
 #include <sstream>
@@ -108,7 +110,7 @@ bool GIEFeatExtractor::caffeToGIEModel( const std::string& deployFile,          
     if( !engine )
     {
         std::cout << "Failed to build CUDA engine." << std::endl;
-    return false;
+        return false;
     }
 
     network->destroy();
@@ -270,7 +272,6 @@ bool GIEFeatExtractor::init(string _caffemodel_file, string _binaryproto_meanfil
     if( !cudaAllocMapped((void**)&mOutputCPU, (void**)&mOutputCUDA, outputSize) )
     {
         std::cout << "Failed to alloc CUDA mapped memory for output, " << outputSize << " bytes" << std::endl;
-
     }
 
     mOutputSize    = outputSize;
@@ -313,7 +314,6 @@ GIEFeatExtractor::~GIEFeatExtractor()
 
 bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &features, float (&times)[2])
 {
-
     times[0] = 0.0f;
     times[1] = 0.0f;
 
@@ -343,11 +343,11 @@ bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &feat
     {
        if (imMat.rows > resizeDims.h || imMat.cols > resizeDims.w)
        {
-           cv::resize(imMat, imMat, cv::Size(resizeDims.h, resizeDims.w), 0, 0, CV_INTER_LANCZOS4);
+           cv::resize(imMat, imMat, cv::Size(resizeDims.h, resizeDims.w), 0, 0, cv::INTER_LANCZOS4);
        }
        else
        {
-           cv::resize(imMat, imMat, cv::Size(resizeDims.h, resizeDims.w), 0, 0, CV_INTER_LINEAR);
+           cv::resize(imMat, imMat, cv::Size(resizeDims.h, resizeDims.w), 0, 0, cv::INTER_LINEAR);
        }
     }
 
@@ -411,7 +411,7 @@ bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &feat
     } 
         else
     {
-        cv::resize(imMat, imMat, cv::Size(mHeight, mWidth), 0, 0, CV_INTER_LINEAR);
+        cv::resize(imMat, imMat, cv::Size(mHeight, mWidth), 0, 0, cv::INTER_LINEAR);
     }
 
     // convert to float (with range 0-255)
@@ -435,11 +435,10 @@ bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &feat
         cudaEventSynchronize(stopPrep);
 
         cudaEventElapsedTime(times, startPrep, stopPrep);
-
     }
 
      mContext->execute(1, inferenceBuffers);
-     //CUDA(cudaDeviceSynchronize());\
+     //CUDA(cudaDeviceSynchronize());
 
     features.insert(features.end(), &mOutputCPU[0], &mOutputCPU[mOutputDims]);
 
@@ -452,10 +451,8 @@ bool GIEFeatExtractor::extract_singleFeat_1D(cv::Mat &imMat, vector<float> &feat
         cudaEventSynchronize(stopNet);
 
         cudaEventElapsedTime(times+1, startNet, stopNet);
-
     }
 
     return true;
-
 }
 

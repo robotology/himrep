@@ -5,6 +5,7 @@
 
 // OpenCV
 #include <opencv2/opencv.hpp>
+#include <opencv2/imgproc.hpp>
 
 // CUDA-C includes
 #ifdef HAS_CUDA
@@ -297,11 +298,11 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat(vector<cv::Mat> &image
         {
             if (images[i].rows > mean_height || images[i].cols > mean_height)
             {
-                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
+                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LANCZOS4);
             }
             else
             {
-                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LINEAR);
+                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LINEAR);
             }
         }
     }
@@ -499,11 +500,11 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat(vector<cv::Mat> &images,
 
             if (images[i].rows > mean_height || images[i].cols > mean_height)
             {
-                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
+                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LANCZOS4);
             }
             else
             {
-                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LINEAR);
+                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LINEAR);
             }
         }
     }
@@ -667,11 +668,11 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat(cv::Mat &image, vector< Blo
     {
         if (image.rows > mean_height || image.cols > mean_height)
         {
-            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
+            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LANCZOS4);
         }
         else
         {
-            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LINEAR);
+            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LINEAR);
         }
     }
 
@@ -830,11 +831,11 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat(cv::Mat &image, Blob<Dtype> *
     {
         if (image.rows > mean_height || image.cols > mean_height)
         {
-            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
+            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LANCZOS4);
         }
         else
         {
-            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LINEAR);
+            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LINEAR);
         }
     }
 
@@ -1036,11 +1037,11 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_multipleFeat_1D(vector<cv::Mat> &im
 
             if (images[i].rows > mean_height || images[i].cols > mean_height)
             {
-                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
+                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LANCZOS4);
             }
             else
             {
-                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LINEAR);
+                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LINEAR);
             }
         }
     }
@@ -1242,11 +1243,11 @@ bool CaffeFeatExtractor<Dtype>::extractBatch_singleFeat_1D(vector<cv::Mat> &imag
 
             if (images[i].rows > mean_height || images[i].cols > mean_height)
             {
-                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
+                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LANCZOS4);
             }
             else
             {
-                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LINEAR);
+                cv::resize(images[i], images[i], cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LINEAR);
             }
         }
     }
@@ -1412,11 +1413,11 @@ bool CaffeFeatExtractor<Dtype>::extract_multipleFeat_1D(cv::Mat &image, vector< 
     {
         if (image.rows > mean_height || image.cols > mean_height)
         {
-            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
+            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LANCZOS4);
         }
         else
         {
-            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LINEAR);
+            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LINEAR);
         }
     }
 
@@ -1572,11 +1573,11 @@ bool CaffeFeatExtractor<Dtype>::extract_singleFeat_1D(cv::Mat &image, vector<Dty
     {
         if (image.rows > mean_height || image.cols > mean_height)
         {
-            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LANCZOS4);
+            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LANCZOS4);
         }
         else
         {
-            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, CV_INTER_LINEAR);
+            cv::resize(image, image, cv::Size(mean_height, mean_width), 0, 0, cv::INTER_LINEAR);
         }
     }
 

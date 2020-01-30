@@ -27,6 +27,7 @@
 
 // OpenCV
 #include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/types_c.h>
 
 #include <yarp/os/Network.h>
 #include <yarp/os/RFModule.h>
@@ -88,7 +89,6 @@ private:
 
     void onRead(Image &img)
     {
-
         // Read at specified rate
         if (Time::now() - last_read < rate)
             return;
@@ -98,7 +98,6 @@ private:
         // If something arrived...
         if (img.width()>0 && img.height()>0)
         {
-
             // Convert the image and check that it is continuous
 
             cv::Mat tmp_mat = toCvMat(img);
@@ -146,9 +145,7 @@ public:
 
     GIECoderPort(ResourceFinder &_rf) :BufferedPort<Image>(),rf(_rf)
     {
-
         // Resource Finder and module options
-
         contextPath = rf.getHomeContextPath().c_str();
 
         // Data initialization (specific for Caffe method)
@@ -225,7 +222,6 @@ public:
 
             fout_code = fopen(code_path.c_str(),code_write_mode.c_str());
         }
-
     }
 
     void interrupt()
@@ -329,7 +325,6 @@ public:
             return false;
         }
     }
-
 };
 
 
@@ -396,32 +391,23 @@ public:
     bool updateModule()
     {
         //GIEPort->update();
-
         return true;
     }
-
 };
-
 
 int main(int argc, char *argv[])
 {
     Network yarp;
-
     if (!yarp.checkNetwork())
         return 1;
 
     ResourceFinder rf;
-
     rf.setVerbose(true);
-
     rf.setDefaultContext("himrep");
     rf.setDefaultConfigFile("GIECoder_googlenet.ini");
-
     rf.configure(argc,argv);
-
     rf.setDefault("name","GIECoder");
 
     GIECoderModule mod;
-
     return mod.runModule(rf);
 }

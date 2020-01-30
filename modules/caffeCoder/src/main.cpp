@@ -26,9 +26,6 @@
 #include <utility>
 #include <mutex>
 
-// OpenCV
-#include <opencv2/opencv.hpp>
-
 #include <yarp/os/Network.h>
 #include <yarp/os/RFModule.h>
 #include <yarp/os/Time.h>
@@ -74,7 +71,7 @@ private:
 
     // Data (common to all methods)
 
-    ::cv::Mat                       matImg;
+    ::cv::Mat                     matImg;
 
     Port                          port_out_img;
     Port                          port_out_code;
@@ -93,7 +90,6 @@ private:
 
     void onRead(Image &img)
     {
-
     	// Read at specified rate
         if (Time::now() - last_read < rate)
             return;
@@ -103,7 +99,6 @@ private:
         // If something arrived...
         if (img.width()>0 && img.height()>0)
         {
-
             // Convert the image
             ImageOf<PixelRgb> tmp_img;
             tmp_img.copy(img);
@@ -145,7 +140,6 @@ private:
                 std::cout << "NET: " << net_mean << " - " << net_stdev << endl;
 
                 std::cout << "time_avg_window = " << time_measurements_prep.size() << endl;
-
             }
 
             // Dump if required
@@ -175,9 +169,7 @@ public:
 
     CaffeCoderPort(ResourceFinder &_rf) :BufferedPort<Image>(),rf(_rf)
     {
-
         // Resource Finder and module options
-
         contextPath = rf.getHomeContextPath().c_str();
 
         // Data initialization (specific for Caffe method)
@@ -228,7 +220,6 @@ public:
                 timing);
 
         // Data (common to all methods)
-
         string name = rf.find("name").asString().c_str();
 
         port_out_img.open(("/"+name+"/img:o").c_str());
@@ -248,7 +239,6 @@ public:
 
             fout_code = fopen(code_path.c_str(),code_write_mode.c_str());
         }
-
     }
 
     void interrupt()
@@ -350,7 +340,6 @@ public:
             return false;
         }
     }
-
 };
 
 
@@ -363,9 +352,9 @@ protected:
 public:
 
     CaffeCoderModule()
-{
+    {
         caffePort=NULL;
-}
+    }
 
     bool configure(ResourceFinder &rf)
     {
@@ -420,29 +409,22 @@ public:
 
         return true;
     }
-
 };
 
 
 int main(int argc, char *argv[])
 {
     Network yarp;
-
     if (!yarp.checkNetwork())
         return 1;
 
     ResourceFinder rf;
-
     rf.setVerbose(true);
-
     rf.setDefaultContext("himrep");
     rf.setDefaultConfigFile("caffeCoder.ini");
-
     rf.configure(argc,argv);
-
     rf.setDefault("name","caffeCoder");
 
     CaffeCoderModule mod;
-
     return mod.runModule(rf);
 }
