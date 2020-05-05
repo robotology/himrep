@@ -86,7 +86,6 @@ int main(int argc, char * argv[])
    linearClassifierModule linearClassifierModule; 
 
    ResourceFinder rf;
-   rf.setVerbose(true);
    rf.setDefaultConfigFile("linearClassifier.ini"); 
    rf.setDefaultContext("himrep");
    rf.configure(argc, argv);

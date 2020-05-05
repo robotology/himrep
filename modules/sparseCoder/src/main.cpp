@@ -519,7 +519,6 @@ int main(int argc, char *argv[])
        return 1;
 
    ResourceFinder rf;
-   rf.setVerbose(true);
    rf.setDefaultContext("himrep");
    rf.setDefaultConfigFile("sparseCoder.ini");
    rf.configure(argc,argv);

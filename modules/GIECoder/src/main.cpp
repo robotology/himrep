@@ -402,7 +402,6 @@ int main(int argc, char *argv[])
         return 1;
 
     ResourceFinder rf;
-    rf.setVerbose(true);
     rf.setDefaultContext("himrep");
     rf.setDefaultConfigFile("GIECoder_googlenet.ini");
     rf.configure(argc,argv);
