@@ -126,10 +126,10 @@ using namespace yarp::sig;
 using namespace yarp::cv;
 using namespace yarp::math;
 
-#define CMD_HELP                    yarp::os::createVocab('h','e','l','p')
-#define DUMP_SIFT                   yarp::os::createVocab('d','u','m','p')
-#define DUMP_STOP                   yarp::os::createVocab('s','t','o','p')
-#define LEARN_DICT                  yarp::os::createVocab('l','e','a','r')
+#define CMD_HELP                    yarp::os::createVocab32('h','e','l','p')
+#define DUMP_SIFT                   yarp::os::createVocab32('d','u','m','p')
+#define DUMP_STOP                   yarp::os::createVocab32('s','t','o','p')
+#define LEARN_DICT                  yarp::os::createVocab32('l','e','a','r')
 
 #define CODE_MODE_SC                0
 #define CODE_MODE_BOW               1
@@ -267,8 +267,8 @@ public:
         help=false;
         verbose=rf.check("verbose");
 
-        grid_step=rf.check("grid_step",Value(8)).asInt();
-        grid_scale=rf.check("grid_scale",Value(1)).asInt();
+        grid_step=rf.check("grid_step",Value(8)).asInt32();
+        grid_scale=rf.check("grid_scale",Value(1)).asInt32();
 
         contextPath=rf.getHomeContextPath().c_str();
         string dictionary_name=rf.check("dictionary_file",Value("dictionary_bow.ini")).asString().c_str();
@@ -290,12 +290,12 @@ public:
             fout_sift=fopen(sift_path.c_str(),sift_write_mode.c_str());
         }
 
-        rate=rf.check("rate",Value(0.0)).asDouble();
-        dense=rf.check("useDense",Value(1)).asInt();
-        int knn=rf.check("KNN",Value(5)).asInt();
+        rate=rf.check("rate",Value(0.0)).asFloat64();
+        dense=rf.check("useDense",Value(1)).asInt32();
+        int knn=rf.check("KNN",Value(5)).asInt32();
         last_read=0.0;
 
-        pyramidLevels=rf.check("PyramidLevels",Value(3)).asInt();
+        pyramidLevels=rf.check("PyramidLevels",Value(3)).asInt32();
 
             if(dense)
                   fprintf(stdout,"Step: %d Scale: %d Pyramid: %d Using Dense SIFT Grid\n",grid_step, grid_scale, pyramidLevels);
@@ -366,7 +366,7 @@ public:
 
    bool execReq(const Bottle &command, Bottle &reply)
    {
-       switch(command.get(0).asVocab())
+       switch(command.get(0).asVocab32())
        {
            case(CMD_HELP):
            {
@@ -377,7 +377,7 @@ public:
                     help=true;
                 } else
                 {
-                    reply.add(Value::makeVocab("many"));
+                    reply.add(Value::makeVocab32("many"));
                     reply.addString("Ok joking.. here the help!");                    
                     reply.addString("[dump] [a] for starting the SIFT dumping in the context directory.. use 'a' for appending");
                     reply.addString("[stop] for stopping the SIFT dumping in the context directory.. ");
@@ -425,14 +425,14 @@ public:
                 if(command.size()==1)
                    dictSize=512;
                 else
-                   dictSize=command.get(1).asInt();
+                   dictSize=command.get(1).asInt32();
 
                 bool usePCA=command.size()>2;
 
                 int dimPCA;
                 if(command.size()>3)
                 {
-                    dimPCA=command.get(3).asInt();
+                    dimPCA=command.get(3).asInt32();
                 }else
                 {
                     if(usePCA)

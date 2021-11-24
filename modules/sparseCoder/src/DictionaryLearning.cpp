@@ -38,20 +38,20 @@ bool DictionaryLearning::read()
 {
     Property config; config.fromConfigFile(dictionariesFilePath.c_str());
     Bottle& bgeneral=config.findGroup("GENERAL");
-    lambda=bgeneral.find("lambda").asDouble();
-    usePCA=bgeneral.check("usePCA",Value(0)).asInt();
-    dimPCA=bgeneral.check("dimPCA",Value(80)).asInt();
+    lambda=bgeneral.find("lambda").asFloat64();
+    usePCA=bgeneral.check("usePCA",Value(0)).asInt32();
+    dimPCA=bgeneral.check("dimPCA",Value(80)).asInt32();
 
-    powerNormalization=bgeneral.check("powerNormalization",Value(0)).asInt();
-    alpha=bgeneral.check("alpha",Value(3)).asInt(); // alpha-root
+    powerNormalization=bgeneral.check("powerNormalization",Value(0)).asInt32();
+    alpha=bgeneral.check("alpha",Value(3)).asInt32(); // alpha-root
     alpha=1./alpha;
 
 
     mappingType=bgeneral.check("mappingType",Value("linear")).asString().c_str(); 
 
-    dictionarySize=bgeneral.find("dictionarySize").asInt();
+    dictionarySize=bgeneral.find("dictionarySize").asInt32();
     Bottle& dictionaryGroup=config.findGroup(group.c_str());
-    featuresize=dictionaryGroup.find("featureSize").asInt();
+    featuresize=dictionaryGroup.find("featureSize").asInt32();
     if(!usePCA)
         dictionary.resize(featuresize,dictionarySize);
     else
@@ -68,7 +68,7 @@ bool DictionaryLearning::read()
         Bottle* line=dictionaryGroup.find(num.c_str()).asList();
         
         for (int j=0; j<dictionarySize; j++)
-            dictionary(i,j)=line->get(j).asDouble();
+            dictionary(i,j)=line->get(j).asFloat64();
     }
 
     double beta=1e-4;
@@ -91,7 +91,7 @@ bool DictionaryLearning::read()
             Bottle* line=eigengroup.find(num.c_str()).asList();
             
             for (int j=0; j<featuresize; j++)
-                eig(i,j)=line->get(j).asDouble();
+                eig(i,j)=line->get(j).asFloat64();
         }
 
         cv::Mat eigens;
@@ -107,7 +107,7 @@ bool DictionaryLearning::read()
             string num = "line"+oss.str();
             Bottle* line=eigengroup.find(num.c_str()).asList();
             
-            eigv(i,0)=line->get(0).asDouble();
+            eigv(i,0)=line->get(0).asFloat64();
         }
 
         cv::Mat eigenvs;
@@ -120,7 +120,7 @@ bool DictionaryLearning::read()
         Bottle* line=eigengroup.find(num.c_str()).asList();
     
         for (int j=0; j<featuresize; j++)
-            mean(0,j)=line->get(j).asDouble();
+            mean(0,j)=line->get(j).asFloat64();
         
 
         cv::Mat m;

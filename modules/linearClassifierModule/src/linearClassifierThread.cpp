@@ -22,9 +22,9 @@ linearClassifierThread::linearClassifierThread(yarp::os::ResourceFinder &rf, Por
     this->outputScorePortName += moduleName;
     this->outputScorePortName += rf.check("OutputPortScores",Value("/scores:o"),"Input image port (string)").asString().c_str();
 
-    this->bufferSize = rf.check("BufferSize",Value(15),"Buffer Size").asInt();
-    this->CSVM = rf.check("CSVM",Value(1.0),"CSVM").asDouble();
-    this->useWeightedSVM= rf.check("WeightedSVM",Value(0),"WeightedSVM").asInt();
+    this->bufferSize = rf.check("BufferSize",Value(15),"Buffer Size").asInt32();
+    this->CSVM = rf.check("CSVM",Value(1.0),"CSVM").asFloat64();
+    this->useWeightedSVM= rf.check("WeightedSVM",Value(0),"WeightedSVM").asInt32();
 
     printf("WeightedSVM: %d \n",useWeightedSVM);
 
@@ -149,7 +149,7 @@ void linearClassifierThread::run()
         feature.resize(p->size());
 
         for (int i=0; i<p->size(); i++)
-            feature[i]=p->get(i).asDouble();
+            feature[i]=p->get(i).asFloat64();
     
         if(currentState==STATE_DONOTHING)
             continue;
@@ -240,7 +240,7 @@ void linearClassifierThread::run()
                 {
                     Bottle &b=allScores.addList();
                     b.addString(knownObjects[i].first.c_str());
-                    b.addDouble(bufferScores[current%bufferSize][i]);
+                    b.addFloat64(bufferScores[current%bufferSize][i]);
                     
                 }
                 scorePort.write(allScores);

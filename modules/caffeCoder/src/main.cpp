@@ -50,9 +50,9 @@ using namespace yarp::sig;
 using namespace yarp::cv;
 using namespace yarp::math;
 
-#define CMD_HELP                    yarp::os::createVocab('h','e','l','p')
-#define DUMP_CODE                   yarp::os::createVocab('d','u','m','p')
-#define DUMP_STOP                   yarp::os::createVocab('s','t','o','p')
+#define CMD_HELP                    yarp::os::createVocab32('h','e','l','p')
+#define DUMP_CODE                   yarp::os::createVocab32('d','u','m','p')
+#define DUMP_STOP                   yarp::os::createVocab32('s','t','o','p')
 
 class CaffeCoderPort: public BufferedPort<Image>
 {
@@ -189,7 +189,7 @@ public:
         bool timing = rf.check("timing");
         if (timing)
         {
-            time_avg_window = rf.check("timing",Value("1000")).asInt();
+            time_avg_window = rf.check("timing",Value("1000")).asInt32();
         }
         else
         {
@@ -202,14 +202,14 @@ public:
 
         #ifdef HAS_CUDA
             compute_mode = rf.check("compute_mode", Value("GPU")).asString();
-            device_id = rf.check("device_id", Value(0)).asInt();
+            device_id = rf.check("device_id", Value(0)).asInt32();
         #else
             compute_mode = "CPU";
             device_id = -1;
         #endif
 
-        int resizeWidth = rf.check("resizeWidth", Value(256)).asDouble();
-        int resizeHeight = rf.check("resizeHeight", Value(256)).asDouble();
+        int resizeWidth = rf.check("resizeWidth", Value(256)).asFloat64();
+        int resizeHeight = rf.check("resizeHeight", Value(256)).asFloat64();
 
         caffe_extractor = NULL;
         caffe_extractor = new CaffeFeatExtractor<float>(caffemodel_file,
@@ -227,7 +227,7 @@ public:
 
         BufferedPort<Image>::useCallback();
 
-        rate = rf.check("rate",Value(0.0)).asDouble();
+        rate = rf.check("rate",Value(0.0)).asFloat64();
         last_read = 0.0;
 
         dump_code = rf.check("dump_code");
@@ -278,12 +278,12 @@ public:
 
     bool execReq(const Bottle &command, Bottle &reply)
     {
-        switch(command.get(0).asVocab())
+        switch(command.get(0).asVocab32())
         {
         case(CMD_HELP):
             {
             reply.clear();
-            reply.add(Value::makeVocab("many"));
+            reply.add(Value::makeVocab32("many"));
             reply.addString("[dump] [path-to-file] [a] to start dumping the codes in the context directory. Use 'a' for appending.");
             reply.addString("[stop] to stop dumping.");
             return true;

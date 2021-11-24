@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.5)
 project(himrep)
 
 find_package(ICUBcontrib REQUIRED)
-find_package(YARP 3.3.0 REQUIRED COMPONENTS os sig dev math cv)
+find_package(YARP 3.5.1 REQUIRED COMPONENTS os sig dev math cv)
 find_package(ICUB REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH} ${ICUBCONTRIB_MODULE_PATH})

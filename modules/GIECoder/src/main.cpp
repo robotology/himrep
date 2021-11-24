@@ -53,9 +53,9 @@ using namespace yarp::sig;
 using namespace yarp::cv;
 using namespace yarp::math;
 
-#define CMD_HELP                    yarp::os::createVocab('h','e','l','p')
-#define DUMP_CODE                   yarp::os::createVocab('d','u','m','p')
-#define DUMP_STOP                   yarp::os::createVocab('s','t','o','p')
+#define CMD_HELP                    yarp::os::createVocab32('h','e','l','p')
+#define DUMP_CODE                   yarp::os::createVocab32('d','u','m','p')
+#define DUMP_STOP                   yarp::os::createVocab32('s','t','o','p')
 
 class GIECoderPort: public BufferedPort<Image>
 {
@@ -173,11 +173,11 @@ public:
         }
         else if (rf.find("binaryproto_meanfile").isNull())
         {
-            meanR = rf.check("meanR", Value(123)).asDouble();
-            meanG = rf.check("meanG", Value(117)).asDouble();
-            meanB = rf.check("meanB", Value(104)).asDouble();
-            resizeWidth = rf.check("resizeWidth", Value(256)).asDouble();
-            resizeHeight = rf.check("resizeHeight", Value(256)).asDouble();
+            meanR = rf.check("meanR", Value(123)).asFloat64();
+            meanG = rf.check("meanG", Value(117)).asFloat64();
+            meanB = rf.check("meanB", Value(104)).asFloat64();
+            resizeWidth = rf.check("resizeWidth", Value(256)).asFloat64();
+            resizeHeight = rf.check("resizeHeight", Value(256)).asFloat64();
             std::cout << "Setting mean to " << " R: " << meanR << " G: " << meanG << " B: " << meanB << std::endl;
             std::cout << "Resizing anysotropically to " << " W: " << resizeWidth << " H: " << resizeHeight << std::endl;
 
@@ -210,7 +210,7 @@ public:
 
         BufferedPort<Image>::useCallback();
 
-        rate = rf.check("rate",Value(0.0)).asDouble();
+        rate = rf.check("rate",Value(0.0)).asFloat64();
         last_read = 0.0;
 
         dump_code = rf.check("dump_code");
@@ -263,12 +263,12 @@ public:
 
     bool execReq(const Bottle &command, Bottle &reply)
     {
-        switch(command.get(0).asVocab())
+        switch(command.get(0).asVocab32())
         {
         case(CMD_HELP):
             {
             reply.clear();
-            reply.add(Value::makeVocab("many"));
+            reply.add(Value::makeVocab32("many"));
             reply.addString("[dump] [path-to-file] [a] to start dumping the codes in the context directory. Use 'a' for appending.");
             reply.addString("[stop] to stop dumping.");
             return true;
