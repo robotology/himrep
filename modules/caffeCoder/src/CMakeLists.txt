@@ -78,7 +78,7 @@ else()
     add_executable(${PROJECTNAME} ${folder_source} ${folder_header})
 endif()
 
-target_link_libraries(${PROJECTNAME} ${YARP_LIBRARIES} ${OpenCV_LIBRARIES} ${Caffe_LIBRARIES})
+target_link_libraries(${PROJECTNAME} ${YARP_LIBRARIES} ${OpenCV_LIBS} ${Caffe_LIBRARIES})
 
 if(NOT Caffe_CPU_ONLY)
     target_link_libraries(${PROJECTNAME} ${CUDA_LIBRARIES})
